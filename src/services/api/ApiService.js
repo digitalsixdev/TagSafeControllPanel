@@ -35,3 +35,50 @@ export const formatApiError = (error) => {
   if (error?.request) return 'Erro de conexão. Verifique sua internet.';
   return 'Erro desconhecido. Tente novamente.';
 };
+
+// controle e gestao master
+
+// cria uma empresa 
+export const createCompanie = (data) => {
+  const payload = {
+    nome: data?.nome,
+    cnpj: data?.cnpj,
+    unidade: data?.unidade,
+    modulo: data?.modulo,
+  }
+
+  return apiClient.post('/empresas', payload)  
+}
+
+// trazer todas as empresas disponiveis
+export const getCompanies = () => {
+  return apiClient.get('/empresas')
+}
+
+// trazer todos os modulos disponiveis
+export const getModules = () => {
+  return apiClient.get('/modulos')
+}
+
+// criar usuario
+export const createUser = (data) => {
+  const payload = {
+    nome: data?.nome,
+    email: data?.email,
+    senha: data?.senha,
+    roles: data?.roles,
+    unidades_id: data?.unidades_id
+  }
+
+  return apiClient.post('/auth/registrar', payload)
+}
+
+// lista todos os cargos disponiveis
+export const getRoles = () => {
+  return apiClient.get('/roles')
+}
+
+// traz quantas empresas, usuarios, unidades e modulos existem atualmente
+export const getStats = () => {
+  return apiClient.get('/admin/stats')
+}

@@ -97,7 +97,19 @@ const Login = ({ onLoginSuccess }) => {
               }}
             >
               <CardContent sx={{ p: 4 }}>
-                <Box sx={{ textAlign: 'center', mb: 4 }}>
+                  <Box sx={{ textAlign: 'center', mb: 4 }}>
+                  <Box
+                    component="img"
+                    src="/logo-digital-six.png"
+                    alt="Logo TagSafe"
+                    sx={{
+                      display: 'block',
+                      width: 'auto',
+                      height: 90,    
+                      mb: 3,
+                      mx: 'auto'   
+                    }}
+                  />
                   <Avatar
                     sx={{
                       width: 80,
@@ -182,7 +194,7 @@ const Login = ({ onLoginSuccess }) => {
 
                 <Box sx={{ textAlign: 'center', mt: 4 }}>
                   <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                    Plataforma de Gestão e Evidência Operacional
+                    Painel de Controle TagSafe
                   </Typography>
                   <Typography variant="caption" sx={{ color: 'text.secondary' }}>
                     TagSafe © 2025

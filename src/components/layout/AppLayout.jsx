@@ -66,9 +66,9 @@ function AppLayout({ children, menuItems: menuItemsProp = [] }) {
         <Box sx={{ display: 'flex', justifyContent: 'center' }}>
           <Box
             component="img"
-            src="/logo-digital-six.png"
+            src="/Principal.png"
             alt="TagSafe Admin"
-            sx={{ width: '100%', maxWidth: 180, height: 'auto', objectFit: 'contain' }}
+            sx={{ width: '100%', maxWidth: 250, height: 'auto', objectFit: 'contain' }}
           />
         </Box>
       </Box>

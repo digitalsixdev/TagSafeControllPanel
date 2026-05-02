@@ -3,13 +3,18 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import { GlobalStyles } from '@mui/material';
-import { Business } from '@mui/icons-material';
-
+import { 
+  Business, 
+  People,
+  AdminPanelSettings
+} from '@mui/icons-material';
 import { Box, Typography, Button } from '@mui/material';
 import { AuthProvider, useAuth } from '../features/auth/AuthContext';
 import AppLayout from '../components/layout/AppLayout';
 import Login from '../features/auth/Login';
 import GestaoMaster from '../features/master/GestaoMaster';
+import GestaoEmpresas from '../features/empresas/GestaoEmpresas';
+import GestaoUsuarios from '../features/usuarios/GestaoUsuarios';
 import LoadingSpinner from '../components/feedback/LoadingSpinner';
 import theme from './theme';
 
@@ -132,7 +137,9 @@ const ProtectedRoute = ({ children }) => {
 
 
 const masterMenuItems = [
-  { text: 'Painel Master', path: '/master', icon: Business },
+  { text: 'Painel Master', path: '/master', icon: AdminPanelSettings },
+  { text: 'Painel Empresas', path: '/empresas', icon: Business },
+  { text: 'Painel Usuários', path: '/usuarios', icon: People }
 ];
 
 const AuthenticatedApp = () => {
@@ -141,9 +148,21 @@ const AuthenticatedApp = () => {
   return (
     <AppLayout user={user} onLogout={logout} menuItems={masterMenuItems}>
       <Routes>
-        <Route path="/" element={<Navigate to="/master" replace />} />
-        <Route path="/master" element={<GestaoMaster />} />
-        <Route path="*" element={<Navigate to="/master" replace />} />
+        <Route 
+          path="/" 
+          element={<Navigate to="/master" replace />} />
+        <Route 
+          path="/master" 
+          element={<GestaoMaster />} 
+        />
+        <Route 
+          path="/empresas" 
+          element={<GestaoEmpresas />} 
+        />
+        <Route
+          path="/usuarios"
+          element={<GestaoUsuarios />}
+        />
       </Routes>
     </AppLayout>
   );
