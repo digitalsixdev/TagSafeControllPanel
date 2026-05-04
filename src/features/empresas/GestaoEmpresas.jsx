@@ -4,7 +4,8 @@ import {
   getModules,
   getStats,
   getCompanies,
-  formatApiError
+  formatApiError,
+  getAllUsersByIdCompany
 } from '../../services/api/ApiService';
 import { 
   Add, 
@@ -50,7 +51,27 @@ import {
 import { DataGrid } from '@mui/x-data-grid';
 import { ptBR } from '@mui/x-data-grid/locales';
 
-function StatCard({ title, value, icon: Icon, gradient, delay = 0, isLoading = false, view = false}) {
+const getModulesColor = (moduleName) => {
+  const colors = {
+    'TR': { backgroundColor: 'rgba(37, 99, 235, 0.1)', textColor: '#60a5fa', border: 'rgba(59, 130, 246, 0.5)' },
+    'GL': { backgroundColor: 'rgba(245, 158, 11, 0.1)', textColor: '#fbbf24', border: 'rgba(245, 158, 11, 0.5)' },
+    'default': { backgroundColor: 'rgba(255, 255, 255, 0.05)', textColor: '#94a3b8', border: 'rgba(255, 255, 255, 0.2)' }
+  };
+  return colors[moduleName] || colors['default'];
+};
+
+const getRolesColor = (roleName) => {
+  const colors = {
+    'instrutor': { backgroundColor: 'rgba(37, 99, 235, 0.1)', textColor: '#60a5fa', border: 'rgba(59, 130, 246, 0.5)' },
+    'user_master': { backgroundColor: 'rgba(245, 158, 11, 0.1)', textColor: '#fbbf24', border: 'rgba(245, 158, 11, 0.5)' },
+    'admin': { backgroundColor: 'rgba(139, 92, 246, 0.1)', textColor: '#a78bfa', border: 'rgba(139, 92, 246, 0.5)' },
+    'padrao': { backgroundColor: 'rgba(255, 255, 255, 0.05)', textColor: '#94a3b8', border: 'rgba(255, 255, 255, 0.2)' },
+    'default': { backgroundColor: 'rgba(255, 255, 255, 0.05)', textColor: '#94a3b8', border: 'rgba(255, 255, 255, 0.2)' }
+  };
+  return colors[roleName] || colors['default'];
+};
+
+function StatCard({ title, value, icon: Icon, gradient, delay = 0, isLoading = false }) {
   if (isLoading) {
     return (
       <Card sx={{ height: 160, borderRadius: 2 }}>
@@ -95,6 +116,9 @@ function GestaoEmpresas() {
   const [searchTerm, setSearchTerm] = useState('');
   const [anchorEl, setAnchorEl] = useState(null);
   const [selectedCompany, setSelectedCompany] = useState(null);
+  const [usersOpen, setUsersOpen] = useState(false);
+  const [companyUsers, setCompanyUsers] = useState([]);
+  const [usersLoading, setUsersLoading] = useState(false);
   const [stats, setStats] = useState({
     total_empresas: '',
     total_usuarios: '',
@@ -108,16 +132,6 @@ function GestaoEmpresas() {
     modulos: [],
   });
 
-  const getModulesColor = (moduleName) => {
-      const colors = {
-      'TR': { backgroundColor: 'rgba(37, 99, 235, 0.1)', textColor: '#60a5fa', border: 'rgba(59, 130, 246, 0.5)' },
-      'GL': { backgroundColor: 'rgba(245, 158, 11, 0.1)', textColor: '#fbbf24', border: 'rgba(245, 158, 11, 0.5)' },
-      'default': { bg: 'rgba(255, 255, 255, 0.05)', text: '#94a3b8', border: 'rgba(255, 255, 255, 0.2)' }
-    };
-
-      return colors[moduleName] || colors['default'];
-  };
-
   const columns = useMemo(() => [
     {
       field: 'nome',
@@ -129,12 +143,15 @@ function GestaoEmpresas() {
       field: 'unidade',
       headerName: 'Unidade',
       width: 300,
-      background: 'blue',
     },
     {
       field: 'cnpj',
       headerName: 'CNPJ',
       width: 250,
+      renderCell: (params) => {
+        if (!params.value) return '—';
+        return params.value.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})$/, "$1.$2.$3/$4-$5");
+      }
     },
     {
       field: 'modulos',
@@ -188,6 +205,43 @@ function GestaoEmpresas() {
           <MoreVert fontSize="small" />
         </IconButton>
       ),
+    },
+  ], []);
+
+  const usersColumns = useMemo(() => [
+    { 
+      field: 'nome', 
+      headerName: 'Nome', 
+      flex: 1
+    },
+    { 
+      field: 'email', 
+      headerName: 'E-mail', 
+      flex: 1 
+    },
+    { 
+      field: 'cargo', 
+      headerName: 'Cargo', 
+      width: 150,
+      renderCell: (params) => {
+        if (!params.value) return <Typography variant="caption" color="text.disabled">—</Typography>;
+        const style = getRolesColor(params.value);
+        const displayLabel = params.value === 'user_master' ? 'Master' : params.value.replace('_', ' ');
+        return (
+          <Chip 
+            label={displayLabel} 
+            size="small" 
+            variant="outlined"
+            sx={{
+              color: style.textColor,
+              backgroundColor: style.backgroundColor,
+              borderColor: style.border,
+              fontWeight: 600,
+              textTransform: 'capitalize'
+            }}
+          />
+        );
+      }
     },
   ], []);
 
@@ -256,10 +310,26 @@ function GestaoEmpresas() {
     setSelectedCompany(company);
   }
 
-  const handleMenuClose = () => {
-    setAnchorEl(null);
-    setSelectedCompany(null);
-  }
+  const handleMenuClose = () => setAnchorEl(null);
+
+  const handleViewUsers = async () => {
+    if (!selectedCompany) return;
+    
+    handleMenuClose();
+    setError('');
+    setCompanyUsers([]);
+    setUsersOpen(true);
+    setUsersLoading(true);
+    
+    try {
+      const response = await getAllUsersByIdCompany(selectedCompany.public_id);
+      setCompanyUsers(response.data || []);
+    } catch (err) {
+      setError(formatApiError(err));
+    } finally {
+      setUsersLoading(false);
+    }
+  };
 
   return (
     <Container maxWidth="xl">
@@ -280,12 +350,15 @@ function GestaoEmpresas() {
             </Button>
           </Box>
 
-          <Grid container spacing={3} sx={{ mb: 4, justifyContent: 'left' }}>
-            <Grid item xs={12} sm={6} md={3}>
+          <Grid container spacing={3} sx={{ mb: 4 }}>
+            <Grid item xs={12} sm={6} md={4}>
               <StatCard title="Empresas cadastradas" value={stats.total_empresas} icon={Business} gradient="linear-gradient(135deg, #2563EB 0%, #3B82F6 100%)" isLoading={statsLoading} />
             </Grid>
-            <Grid item xs={12} sm={6} md={3}>
+            <Grid item xs={12} sm={6} md={4}>
               <StatCard title="Unidades cadastradas" value={stats.total_unidades} icon={Store} gradient="linear-gradient(135deg, #5f46ff 0%, #501bff 100%)" isLoading={statsLoading} />
+            </Grid>
+            <Grid item xs={12} sm={6} md={4}>
+              <StatCard title="Módulos disponíveis" value={stats.total_modulos} icon={ViewModule} gradient="linear-gradient(135deg, #F59E0B 0%, #D97706 100%)" isLoading={statsLoading} delay={200} />
             </Grid>
           </Grid>
 
@@ -413,6 +486,11 @@ function GestaoEmpresas() {
           <Edit fontSize="small" sx={{ mr: 1.5, color: 'primary.main' }} />
           <Typography variant="body2">Editar Empresa</Typography>
         </MenuItem>
+
+        <MenuItem onClick={handleViewUsers}>
+          <Groups3 fontSize="small" sx={{ mr: 1.5, color: 'info.main' }} />
+          <Typography variant="body2">Visualizar Usuários</Typography>
+        </MenuItem> 
         
         <MenuItem onClick={() => { /* Lógica de Módulos */ handleMenuClose(); }}>
           <ViewModule fontSize="small" sx={{ mr: 1.5, color: 'secondary.main' }} />
@@ -426,6 +504,40 @@ function GestaoEmpresas() {
           <Typography variant="body2">Remover Empresa</Typography>
         </MenuItem>
       </Menu>
+
+      <Dialog open={usersOpen} onClose={() => setUsersOpen(false)} fullWidth maxWidth="md">
+        <DialogTitle variant='h4' component='span' sx={{ fontWeight: 'bold', letterSpacing: 1}}>
+          Usuários vinculados - {selectedCompany?.nome}
+        </DialogTitle>
+        <DialogContent dividers>
+          {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
+          <Box sx={{ height: 400, width: '100%' }}>
+            <DataGrid
+              rows={companyUsers}
+              columns={usersColumns}
+              loading={usersLoading}
+              getRowId={(row) => row.public_id}
+              localeText={ptBR.components.MuiDataGrid.defaultProps.localeText}
+              pageSizeOptions={[5, 10]}
+              initialState={{ pagination: { paginationModel: { pageSize: 5 } } }}
+              disableRowSelectionOnClick
+              sx={{ border: 'none' }}
+            />
+          </Box>
+        </DialogContent>
+        <DialogActions>
+          <Button 
+            onClick={() => {
+              setUsersOpen(false);
+              setSelectedCompany(null);
+              setError('');
+            }} 
+            variant="outlined"
+          >
+            Fechar
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Container>
   );
 }

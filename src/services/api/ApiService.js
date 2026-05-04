@@ -54,8 +54,8 @@ export const getCompanies = () => {
   return apiClient.get('/empresas')
 }
 
-export const deleteCompany = () => {
-  return apiClient.get('/') // necessario fazer a rota na API para deletar
+export const getAllUsersByIdCompany = (public_id) => {
+  return apiClient.get(`/empresas/users/${public_id}`)
 }
 
 // trazer todos os modulos disponiveis
