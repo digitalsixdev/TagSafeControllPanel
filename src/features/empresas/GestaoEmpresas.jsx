@@ -1,11 +1,22 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import {
   createCompanie,
   getModules,
   getStats,
+  getCompanies,
   formatApiError
 } from '../../services/api/ApiService';
-import { Add, Business, ViewModule, Groups3, Store } from '@mui/icons-material';
+import { 
+  Add, 
+  Business, 
+  ViewModule, 
+  Groups3, 
+  Store, 
+  Search,
+  MoreVert,
+  Edit,
+  Delete
+} from '@mui/icons-material';
 import {
   Alert,
   Avatar,
@@ -13,6 +24,8 @@ import {
   Button,
   Card,
   CardContent,
+  Chip,
+  Checkbox,
   Container,
   Dialog,
   DialogActions,
@@ -22,15 +35,20 @@ import {
   FormControl,
   Grid,
   Grow,
+  InputAdornment,
   InputLabel,
+  ListItemText,
   MenuItem,
   Select,
   Skeleton,
   TextField,
   Typography,
-  Checkbox,
-  ListItemText
+  IconButton,
+  Menu,
+  Divider
 } from '@mui/material';
+import { DataGrid } from '@mui/x-data-grid';
+import { ptBR } from '@mui/x-data-grid/locales';
 
 function StatCard({ title, value, icon: Icon, gradient, delay = 0, isLoading = false, view = false}) {
   if (isLoading) {
@@ -73,6 +91,10 @@ function GestaoEmpresas() {
   const [success, setSuccess] = useState(null);
   const [modules, setModules] = useState([]);
   const [statsLoading, setStatsLoading] = useState(true);
+  const [companies, setCompanies] = useState([]);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [selectedCompany, setSelectedCompany] = useState(null);
   const [stats, setStats] = useState({
     total_empresas: '',
     total_usuarios: '',
@@ -86,11 +108,97 @@ function GestaoEmpresas() {
     modulos: [],
   });
 
+  const getModulesColor = (moduleName) => {
+      const colors = {
+      'TR': { backgroundColor: 'rgba(37, 99, 235, 0.1)', textColor: '#60a5fa', border: 'rgba(59, 130, 246, 0.5)' },
+      'GL': { backgroundColor: 'rgba(245, 158, 11, 0.1)', textColor: '#fbbf24', border: 'rgba(245, 158, 11, 0.5)' },
+      'default': { bg: 'rgba(255, 255, 255, 0.05)', text: '#94a3b8', border: 'rgba(255, 255, 255, 0.2)' }
+    };
+
+      return colors[moduleName] || colors['default'];
+  };
+
+  const columns = useMemo(() => [
+    {
+      field: 'nome',
+      headerName: 'Empresa',
+      flex: 1,
+      minWidth: 200,
+    },
+    {
+      field: 'unidade',
+      headerName: 'Unidade',
+      width: 300,
+      background: 'blue',
+    },
+    {
+      field: 'cnpj',
+      headerName: 'CNPJ',
+      width: 250,
+    },
+    {
+      field: 'modulos',
+      headerName: 'Módulos',
+      flex: 1,
+      minWidth: 200,
+      sortable: false,
+      renderCell: (params) => (
+        <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap', alignItems: 'center' }}>
+          {params.value?.length
+            ? params.value.map((mod) => {
+                const style = getModulesColor(mod.abreviacao);
+                return (
+                  <Chip 
+                    key={mod.id} 
+                    label={mod.abreviacao || mod.nome} 
+                    size="small" 
+                    variant="outlined"
+                    sx={{
+                      color: style.textColor,
+                      backgroundColor: style.backgroundColor,
+                      borderColor: style.border,
+                      fontWeight: 600
+                    }}
+                  />
+              )})
+            : <Typography variant="caption" color="text.disabled">—</Typography>
+          }
+        </Box>
+      ),
+    },
+    {
+      field: 'actions',
+      headerName: 'Ações',
+      width: 80,
+      sortable: false,
+      align: 'center',
+      headerAlign: 'center',
+      renderCell: (params) => (
+        <IconButton
+          size="small"
+          onClick={(e) => {
+            e.stopPropagation();
+            handleMenuOpen(e, params.row);
+          }}
+          sx={{ 
+            color: 'text.secondary',
+            '&:hover': { color: 'primary.main', bgcolor: 'rgba(255,255,255,0.05)' }
+          }}
+        >
+          <MoreVert fontSize="small" />
+        </IconButton>
+      ),
+    },
+  ], []);
+
   useEffect(() => {
     const loadStats = async () => {
       try {
-        const response = await getStats();
-        setStats(response.data);
+        const response_stats = await getStats();
+        setStats(response_stats.data);
+
+        const response_companies = await getCompanies();
+        setCompanies(response_companies.data || []);
       } finally {
         setStatsLoading(false);
       }
@@ -101,12 +209,24 @@ function GestaoEmpresas() {
     }
   }, [open]);
 
+  const filteredCompanies = useMemo(() => {
+    console.log("Filtrando empresas...");
+    const term = searchTerm.toLowerCase();
+
+    return companies.filter((emp) => {
+      return (
+        emp.nome?.toLowerCase().includes(term) ||
+        emp.cnpj?.includes(term)
+      );
+    });
+  }, [companies, searchTerm]);
+
   const handleOpen = async () => {
     setError('');
     setSuccess('');
     const response = await getModules();
     setModules(response.data);
-    setFormData({ nome: '', cnpj: '', unidade: '', modulo: '' });
+    setFormData({ nome: '', cnpj: '', unidade: '', modulos: [] });
     setOpen(true);
   };
 
@@ -130,6 +250,16 @@ function GestaoEmpresas() {
       setLoading(false);
     }
   };
+
+  const handleMenuOpen = (event, company) => {
+    setAnchorEl(event.currentTarget);
+    setSelectedCompany(company);
+  }
+
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+    setSelectedCompany(null);
+  }
 
   return (
     <Container maxWidth="xl">
@@ -159,6 +289,55 @@ function GestaoEmpresas() {
             </Grid>
           </Grid>
 
+          <Grow in timeout={1200}>
+            <Card sx={{ 
+              borderRadius: 2, 
+              border: '1px solid rgba(255,255,255,0.08)', 
+              bgcolor: 'background.paper' 
+            }}>
+              
+              <Box sx={{ p: 1, borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
+                <Typography sx={{ p: 2, fontWeight: 'bold'}}>
+                  Encontre todas as {stats.total_empresas} empresas e suas respectivas unidades cadastradas no sistema
+                </Typography>
+                <TextField
+                  size="small"
+                  placeholder="Buscar empresa por nome ou CNPJ..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <Search fontSize="small" />
+                      </InputAdornment>
+                    ),
+                  }}
+                  sx={{ p: 1, width: { xs: '100%', sm: 700 } }}
+                />
+              </Box>
+
+              <Box sx={{ p: 1, height: 500, width: '100%' }}>
+                <DataGrid
+                  rows={filteredCompanies}
+                  columns={columns}
+                  loading={statsLoading}
+                  getRowId={(row) => row.public_id}
+                  localeText={ptBR.components.MuiDataGrid.defaultProps.localeText}
+                  initialState={{ pagination: { paginationModel: { pageSize: 10 } } }}
+                  pageSizeOptions={[5, 10, 25, 50]}
+                  rowHeight={64}
+                  disableRowSelectionOnClick
+                  sx={{
+                    border: 'none',
+                    '& .MuiDataGrid-cell': { borderColor: 'rgba(255,255,255,0.05)', display: 'flex', alignItems: 'center' },
+                    '& .MuiDataGrid-columnHeaders': { backgroundColor: 'rgba(255,255,255,0.02)', borderColor: 'rgba(255,255,255,0.05)' },
+                    '& .MuiDataGrid-row:hover': { backgroundColor: 'rgba(255,255,255,0.02)' },
+                    '& .MuiDataGrid-footerContainer': { borderColor: 'rgba(255,255,255,0.05)' },
+                  }}
+                />
+              </Box>
+            </Card>
+          </Grow>
         </Box>
       </Fade>
 
@@ -190,11 +369,10 @@ function GestaoEmpresas() {
             <Select
               labelId="select-modulos-label"
               multiple // atributo para permitir selecionar varios
-              value={formData.modulo || []}
-              onChange={(e) => setFormData({ ...formData, modulo: e.target.value })}
+              value={formData.modulos}
+              onChange={(e) => setFormData({ ...formData, modulos: e.target.value })}
               label="Módulos"
               renderValue={(selected) => {
-                // mostrar os nomes separados por virgulas
                 const selectedNames = modules
                   .filter(mod => selected.includes(mod.public_id))
                   .map(mod => mod.nome);
@@ -203,7 +381,7 @@ function GestaoEmpresas() {
             >
               {modules?.map((mod) => (
                 <MenuItem key={mod.public_id} value={mod.public_id}>
-                  <Checkbox checked={formData.modulo.indexOf(mod.public_id) > -1} />
+                  <Checkbox checked={formData.modulos.indexOf(mod.public_id) > -1} />
                   <ListItemText primary={mod.nome} />
                 </MenuItem>
               ))}
@@ -218,6 +396,36 @@ function GestaoEmpresas() {
           </Button>
         </DialogActions>
       </Dialog>
+
+      <Menu
+        anchorEl={anchorEl}
+        open={Boolean(anchorEl)}
+        onClose={handleMenuClose}
+        PaperProps={{
+          sx: { 
+            minWidth: 180, 
+            bgcolor: '#1e1e1e',
+            border: '1px solid rgba(255,255,255,0.1)' 
+          }
+        }}
+      >
+        <MenuItem onClick={() => { /* Lógica de Editar */ handleMenuClose(); }}>
+          <Edit fontSize="small" sx={{ mr: 1.5, color: 'primary.main' }} />
+          <Typography variant="body2">Editar Empresa</Typography>
+        </MenuItem>
+        
+        <MenuItem onClick={() => { /* Lógica de Módulos */ handleMenuClose(); }}>
+          <ViewModule fontSize="small" sx={{ mr: 1.5, color: 'secondary.main' }} />
+          <Typography variant="body2">Ajustar Módulos</Typography>
+        </MenuItem>
+
+        <Divider sx={{ my: 1, borderColor: 'rgba(255,255,255,0.05)' }} />
+
+        <MenuItem onClick={() => { /* Lógica de Deletar */ handleMenuClose(); }} sx={{ color: 'error.main' }}>
+          <Delete fontSize="small" sx={{ mr: 1.5 }} />
+          <Typography variant="body2">Remover Empresa</Typography>
+        </MenuItem>
+      </Menu>
     </Container>
   );
 }

@@ -38,21 +38,24 @@ export const formatApiError = (error) => {
 
 // controle e gestao master
 
-// cria uma empresa 
+// empresas
 export const createCompanie = (data) => {
   const payload = {
     nome: data?.nome,
     cnpj: data?.cnpj,
     unidade: data?.unidade,
-    modulo: data?.modulo,
+    modulos: data?.modulos,
   }
 
   return apiClient.post('/empresas', payload)  
 }
 
-// trazer todas as empresas disponiveis
 export const getCompanies = () => {
   return apiClient.get('/empresas')
+}
+
+export const deleteCompany = () => {
+  return apiClient.get('/') // necessario fazer a rota na API para deletar
 }
 
 // trazer todos os modulos disponiveis
