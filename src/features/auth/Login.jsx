@@ -100,7 +100,7 @@ const Login = ({ onLoginSuccess }) => {
                   <Box sx={{ textAlign: 'center', mb: 4 }}>
                   <Box
                     component="img"
-                    src="/logo-digital-six.png"
+                    src="/Principal.png"
                     alt="Logo TagSafe"
                     sx={{
                       display: 'block',

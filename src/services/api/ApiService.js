@@ -58,6 +58,17 @@ export const getAllUsersByIdCompany = (public_id) => {
   return apiClient.get(`/empresas/users/${public_id}`)
 }
 
+export const updateCompaniesById = (public_id, data) => {
+  const payload = {
+    nome: data?.nome,
+    cnpj: data?.cnpj,
+    unidade: data?.unidade,
+    modulos: data?.modulos
+  }
+
+  return apiClient.put(`/empresas/${public_id}`, payload)
+}
+
 // trazer todos os modulos disponiveis
 export const getModules = () => {
   return apiClient.get('/modulos')

@@ -5,7 +5,8 @@ import {
   getStats,
   getCompanies,
   formatApiError,
-  getAllUsersByIdCompany
+  getAllUsersByIdCompany,
+  updateCompaniesById
 } from '../../services/api/ApiService';
 import { 
   Add, 
@@ -111,12 +112,14 @@ function GestaoEmpresas() {
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
   const [modules, setModules] = useState([]);
+  const [isEditing, setIsEditing] = useState(false);
   const [statsLoading, setStatsLoading] = useState(true);
   const [companies, setCompanies] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [anchorEl, setAnchorEl] = useState(null);
   const [selectedCompany, setSelectedCompany] = useState(null);
   const [usersOpen, setUsersOpen] = useState(false);
+  const [editCompanieOpen, setEditCompanieOpen] = useState(false);
   const [companyUsers, setCompanyUsers] = useState([]);
   const [usersLoading, setUsersLoading] = useState(false);
   const [stats, setStats] = useState({
@@ -278,6 +281,7 @@ function GestaoEmpresas() {
   const handleOpen = async () => {
     setError('');
     setSuccess('');
+    setIsEditing(false);
     const response = await getModules();
     setModules(response.data);
     setFormData({ nome: '', cnpj: '', unidade: '', modulos: [] });
@@ -295,8 +299,14 @@ function GestaoEmpresas() {
     setError('');
     setSuccess('');
     try {
-      await createCompanie(formData);
-      setSuccess('Empresa cadastrada com sucesso!');
+      if (isEditing) {
+        await updateCompaniesById(selectedCompany.public_id, formData);
+        console.log(formData.modulos)
+        setSuccess('Empresa atualizada com sucesso!');
+      } else {
+        await createCompanie(formData);
+        setSuccess('Empresa cadastrada com sucesso!');
+      }
       setTimeout(handleClose, 3000);
     } catch (err) {
       setError(formatApiError(err));
@@ -331,6 +341,42 @@ function GestaoEmpresas() {
     }
   };
 
+  const handleEditCompanies = async () => {
+    if (!selectedCompany) return;
+
+    handleMenuClose();
+    setError('');
+    setSuccess('');
+    setIsEditing(true);
+    
+    try {
+      const response = await getModules();
+      setModules(response.data);
+
+      const existingModules = selectedCompany.modulos || [];
+      const selectedPublicIds = response.data
+        .filter(m =>
+          existingModules.some(em =>
+            (em.id && em.id === m.id) ||
+            (em.nome && em.nome === m.nome) ||
+            (em.abreviacao && em.abreviacao === m.abreviacao)
+          )
+        )
+        .map(m => m.public_id);
+
+      setFormData({
+        nome: selectedCompany.nome || '',
+        cnpj: selectedCompany.cnpj || '',
+        unidade: selectedCompany.unidade || '',
+        modulos: selectedPublicIds,
+      });
+
+      setOpen(true);
+    } catch (err) {
+      setError('Erro ao carregar dados para edição.');
+    }
+  }
+
   return (
     <Container maxWidth="xl">
       <Fade in timeout={800}>
@@ -345,9 +391,14 @@ function GestaoEmpresas() {
                 Gerencie as empresas cadastradas na plataforma.
               </Typography>
             </Box>
-            <Button variant="contained" startIcon={<Add />} onClick={handleOpen} sx={{ borderRadius: 2 }}>
-              Nova Empresa
-            </Button>
+            <Box sx={{ display: 'flex', gap: 2 }}>
+              <Button variant="outlined" startIcon={<Business />} onClick={handleClose} sx={{ borderRadius: 2 }}>
+                Nova Unidade
+              </Button>
+              <Button variant="contained" startIcon={<Store />} onClick={handleOpen} sx={{ borderRadius: 2 }}>
+                Nova Empresa
+              </Button>
+            </Box>
           </Box>
 
           <Grid container spacing={3} sx={{ mb: 4 }}>
@@ -424,7 +475,10 @@ function GestaoEmpresas() {
               }}
             >
               <Typography variant='h4' component='span' sx={{ fontWeight: 'bold', letterSpacing: 1}}>
-                Vincule uma nova empresa
+                <Box>
+                {isEditing ? <Store /> : <Store />}
+                </Box>
+                {isEditing ? 'Editar Empresa' : 'Vincule uma nova empresa'}
               </Typography>
             </Box>
           </Fade>
@@ -482,7 +536,7 @@ function GestaoEmpresas() {
           }
         }}
       >
-        <MenuItem onClick={() => { /* Lógica de Editar */ handleMenuClose(); }}>
+        <MenuItem onClick={handleEditCompanies}>
           <Edit fontSize="small" sx={{ mr: 1.5, color: 'primary.main' }} />
           <Typography variant="body2">Editar Empresa</Typography>
         </MenuItem>
@@ -491,11 +545,6 @@ function GestaoEmpresas() {
           <Groups3 fontSize="small" sx={{ mr: 1.5, color: 'info.main' }} />
           <Typography variant="body2">Visualizar Usuários</Typography>
         </MenuItem> 
-        
-        <MenuItem onClick={() => { /* Lógica de Módulos */ handleMenuClose(); }}>
-          <ViewModule fontSize="small" sx={{ mr: 1.5, color: 'secondary.main' }} />
-          <Typography variant="body2">Ajustar Módulos</Typography>
-        </MenuItem>
 
         <Divider sx={{ my: 1, borderColor: 'rgba(255,255,255,0.05)' }} />
 

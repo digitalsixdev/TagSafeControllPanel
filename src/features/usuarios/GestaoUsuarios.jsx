@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import {
   createUser,
   getRoles,
@@ -73,6 +73,7 @@ function GestaoUsuarios() {
   const [roles, setRoles] = useState([]);
   const [companies, setCompanies] = useState([]);
   const [statsLoading, setStatsLoading] = useState(true);
+  const [selectedCompanyName, setSelectedCompanyName] = useState('');
   const [stats, setStats] = useState({
     total_empresas: '',
     total_usuarios: '',
@@ -105,6 +106,7 @@ function GestaoUsuarios() {
     const [rolesRes, companiesRes] = await Promise.all([getRoles(), getCompanies()]);
     setRoles(rolesRes.data);
     setCompanies(companiesRes.data);
+    setSelectedCompanyName('');
     setFormData({ nome: '', email: '', senha: '', roles: '', unidades_id: '' });
     setOpen(true);
   };
@@ -129,6 +131,16 @@ function GestaoUsuarios() {
       setLoading(false);
     }
   };
+
+  // set para unificar as empresas sem precisar de uma nova rota
+  const uniqueCompanyNames = useMemo(() => {
+    const names = companies.map(c => c.nome).filter(Boolean);
+    return [...new Set(names)].sort();
+  }, [companies]);
+
+  const filteredUnits = useMemo(() => {
+    return companies.filter(c => c.nome === selectedCompanyName);
+  }, [companies, selectedCompanyName]);
 
   return (
     <Container maxWidth="xl">
@@ -159,10 +171,27 @@ function GestaoUsuarios() {
       </Fade>
 
       <Dialog open={open} onClose={handleClose} fullWidth maxWidth="sm">
-        <DialogTitle>Novo Usuário</DialogTitle>
+        <DialogTitle>
+          <Fade in={open} timeout={800}>
+            <Box
+              sx={{
+                pt: 2,
+                textAlign: 'center',
+              }}
+            >
+              <Typography variant='h4' component='span' sx={{ fontWeight: 'bold', letterSpacing: 1}}>
+                <Box>
+                  <People />
+                </Box>
+                {'Cadastre um novo usuário'}
+              </Typography>
+            </Box>
+          </Fade>
+        </DialogTitle>
         <DialogContent>
           {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
           {success && <Alert severity="success" sx={{ mb: 2 }}>{success}</Alert>}
+          
           <TextField label="Nome" fullWidth margin="normal" value={formData.nome} onChange={(e) => setFormData({ ...formData, nome: e.target.value })} />
           <TextField label="E-mail" fullWidth margin="normal" value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} />
           <TextField label="Senha" fullWidth margin="normal" value={formData.senha} onChange={(e) => setFormData({ ...formData, senha: e.target.value })} />
@@ -174,11 +203,34 @@ function GestaoUsuarios() {
               ))}
             </Select>
           </FormControl>
+          
           <FormControl fullWidth margin="normal">
-            <InputLabel id="select-companies-label">Empresa</InputLabel>
-            <Select labelId="select-companies-label" value={formData.unidades_id || ''} onChange={(e) => setFormData({ ...formData, unidades_id: e.target.value })} label="Empresa">
-              {companies?.map((comp) => (
-                <MenuItem key={comp.public_id} value={comp.public_id}>{comp.nome} - {comp.unidade}</MenuItem>
+            <InputLabel id="select-company-name-label">Empresa</InputLabel>
+            <Select 
+              labelId="select-company-name-label" 
+              value={selectedCompanyName} 
+              onChange={(e) => {
+                setSelectedCompanyName(e.target.value);
+                setFormData({ ...formData, unidades_id: '' });
+              }} 
+              label="Empresa"
+            >
+              {uniqueCompanyNames.map((name) => (
+                <MenuItem key={name} value={name}>{name}</MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+
+          <FormControl fullWidth margin="normal" disabled={!selectedCompanyName}>
+            <InputLabel id="select-units-label">Unidade</InputLabel>
+            <Select 
+              labelId="select-units-label" 
+              value={formData.unidades_id || ''} 
+              onChange={(e) => setFormData({ ...formData, unidades_id: e.target.value })} 
+              label="Unidade"
+            >
+              {filteredUnits.map((unit) => (
+                <MenuItem key={unit.public_id} value={unit.public_id}>{unit.unidade}</MenuItem>
               ))}
             </Select>
           </FormControl>
