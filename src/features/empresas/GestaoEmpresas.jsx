@@ -6,7 +6,9 @@ import {
   getCompanies,
   formatApiError,
   getAllUsersByIdCompany,
-  updateCompaniesById
+  updateCompaniesById,
+  addUnit,
+  getAllCompanies
 } from '../../services/api/ApiService';
 import { 
   Add, 
@@ -122,6 +124,14 @@ function GestaoEmpresas() {
   const [editCompanieOpen, setEditCompanieOpen] = useState(false);
   const [companyUsers, setCompanyUsers] = useState([]);
   const [usersLoading, setUsersLoading] = useState(false);
+  const [unitOpen, setUnitOpen] = useState(false);
+  const [allCompaniesList, setAllCompaniesList] = useState([]);
+  const [unitFormData, setUnitFormData] = useState({
+    empresa_id: '',
+    unidade: '',
+    cnpj: '',
+    modulo: [],
+  });
   const [stats, setStats] = useState({
     total_empresas: '',
     total_usuarios: '',
@@ -304,7 +314,8 @@ function GestaoEmpresas() {
         console.log(formData.modulos)
         setSuccess('Empresa atualizada com sucesso!');
       } else {
-        await createCompanie(formData);
+        const { modulos, ...rest } = formData;
+        await createCompanie({ ...rest, modulo: modulos });
         setSuccess('Empresa cadastrada com sucesso!');
       }
       setTimeout(handleClose, 3000);
@@ -377,6 +388,40 @@ function GestaoEmpresas() {
     }
   }
 
+  const handleUnitOpen = async () => {
+    setError('');
+    setSuccess('');
+    try {
+      const [companiesRes, modulesRes] = await Promise.all([getAllCompanies(), getModules()]);
+      setAllCompaniesList(companiesRes.data || []);
+      setModules(modulesRes.data || []);
+      setUnitFormData({ empresa_id: '', unidade: '', cnpj: '', modulo: [] });
+      setUnitOpen(true);
+    } catch (err) {
+      setError('Erro ao carregar dados necessários.');
+    }
+  };
+
+  const handleUnitClose = () => {
+    setUnitOpen(false);
+  };
+
+  const handleUnitSubmit = async () => {
+    setLoading(true);
+    setError('');
+    setSuccess('');
+    try {
+      const { empresa_id, ...data } = unitFormData;
+      await addUnit(empresa_id, data);
+      setSuccess('Unidade cadastrada com sucesso!');
+      setTimeout(handleUnitClose, 3000);
+    } catch (err) {
+      setError(formatApiError(err));
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <Container maxWidth="xl">
       <Fade in timeout={800}>
@@ -392,7 +437,7 @@ function GestaoEmpresas() {
               </Typography>
             </Box>
             <Box sx={{ display: 'flex', gap: 2 }}>
-              <Button variant="outlined" startIcon={<Business />} onClick={handleClose} sx={{ borderRadius: 2 }}>
+              <Button variant="outlined" startIcon={<Business />} onClick={handleUnitOpen} sx={{ borderRadius: 2 }}>
                 Nova Unidade
               </Button>
               <Button variant="contained" startIcon={<Store />} onClick={handleOpen} sx={{ borderRadius: 2 }}>
@@ -519,6 +564,72 @@ function GestaoEmpresas() {
         <DialogActions>
           <Button onClick={handleClose} disabled={loading}>Cancelar</Button>
           <Button variant="contained" onClick={handleSubmit} disabled={loading}>
+            {loading ? 'Salvando...' : 'Salvar'}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog open={unitOpen} onClose={handleUnitClose} fullWidth maxWidth="sm">
+        <DialogTitle>
+          <Fade in={unitOpen} timeout={800}>
+            <Box sx={{ pt: 2, textAlign: 'center' }}>
+              <Typography variant='h4' component='span' sx={{ fontWeight: 'bold', letterSpacing: 1}}>
+                <Box><Store /></Box>
+                Adicionar Nova Unidade
+              </Typography>
+            </Box>
+          </Fade>
+        </DialogTitle>
+        <DialogContent>
+          {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
+          {success && <Alert severity="success" sx={{ mb: 2 }}>{success}</Alert>}
+          
+          <FormControl fullWidth margin="normal">
+            <InputLabel id="select-company-label">Empresa</InputLabel>
+            <Select
+              labelId="select-company-label"
+              value={unitFormData.empresa_id}
+              onChange={(e) => setUnitFormData({ ...unitFormData, empresa_id: e.target.value })}
+              label="Empresa"
+            >
+              {allCompaniesList.map((emp) => (
+                <MenuItem key={emp.empresa_id} value={emp.empresa_id}>
+                  {emp.nome} {emp.cnpj_base ? `(${emp.cnpj_base})` : ''}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+
+          <TextField label="Nome da Unidade" fullWidth margin="normal" value={unitFormData.unidade} onChange={(e) => setUnitFormData({ ...unitFormData, unidade: e.target.value })} />
+          <TextField label="CNPJ" fullWidth margin="normal" value={unitFormData.cnpj} onChange={(e) => setUnitFormData({ ...unitFormData, cnpj: e.target.value })} />
+
+          <FormControl fullWidth margin="normal">
+            <InputLabel id="select-unit-modulos-label">Módulos</InputLabel>
+            <Select
+              labelId="select-unit-modulos-label"
+              multiple
+              value={unitFormData.modulo}
+              onChange={(e) => setUnitFormData({ ...unitFormData, modulo: e.target.value })}
+              label="Módulos"
+              renderValue={(selected) => {
+                const selectedNames = modules
+                  .filter(mod => selected.includes(mod.public_id))
+                  .map(mod => mod.nome);
+                return selectedNames.join(', ');
+              }}
+            >
+              {modules?.map((mod) => (
+                <MenuItem key={mod.public_id} value={mod.public_id}>
+                  <Checkbox checked={unitFormData.modulo.indexOf(mod.public_id) > -1} />
+                  <ListItemText primary={mod.nome} />
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleUnitClose} disabled={loading}>Cancelar</Button>
+          <Button variant="contained" onClick={handleUnitSubmit} disabled={loading}>
             {loading ? 'Salvando...' : 'Salvar'}
           </Button>
         </DialogActions>

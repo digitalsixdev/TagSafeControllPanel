@@ -38,13 +38,13 @@ export const formatApiError = (error) => {
 
 // controle e gestao master
 
-// empresas
+// empresas & unidades
 export const createCompanie = (data) => {
   const payload = {
     nome: data?.nome,
     cnpj: data?.cnpj,
     unidade: data?.unidade,
-    modulos: data?.modulos,
+    modulo: data?.modulo,
   }
 
   return apiClient.post('/empresas', payload)  
@@ -67,6 +67,20 @@ export const updateCompaniesById = (public_id, data) => {
   }
 
   return apiClient.put(`/empresas/${public_id}`, payload)
+}
+
+export const addUnit = (companyId, data) => {
+  const payload = {
+    unidade: data?.unidade,
+    cnpj: data?.cnpj,
+    modulo: data?.modulo
+  }
+
+  return apiClient.post(`/empresas/${companyId}/unidade`, payload)
+}
+
+export const getAllCompanies = () => {
+  return apiClient.get('/empresas/all_companies')
 }
 
 // trazer todos os modulos disponiveis
