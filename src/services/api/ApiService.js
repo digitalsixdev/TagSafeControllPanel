@@ -58,7 +58,8 @@ export const getAllUsersByIdCompany = (public_id) => {
   return apiClient.get(`/empresas/users/${public_id}`)
 }
 
-export const updateCompaniesById = (public_id, data) => {
+// atualizar unidades pelo public_id da unidade
+export const updateUnitById = (public_id, data) => {
   const payload = {
     nome: data?.nome,
     cnpj: data?.cnpj,
@@ -66,21 +67,37 @@ export const updateCompaniesById = (public_id, data) => {
     modulos: data?.modulos
   }
 
-  return apiClient.put(`/empresas/${public_id}`, payload)
+  return apiClient.put(`/empresas/unit/${public_id}`, payload)
 }
 
-export const addUnit = (companyId, data) => {
+// atualizar empresa pela empresa_id
+export const updateCompanieById = (empresa_id, data) => {
+  const payload = {
+    nome: data?.nome
+  }
+
+  return apiClient.put(`/empresas/company/${empresa_id}`, payload)
+}
+
+// adicionar uma unidade a uma empresa
+export const addUnit = (empresa_id, data) => {
   const payload = {
     unidade: data?.unidade,
     cnpj: data?.cnpj,
     modulo: data?.modulo
   }
 
-  return apiClient.post(`/empresas/${companyId}/unidade`, payload)
+  return apiClient.post(`/empresas/${empresa_id}/unidade`, payload)
 }
 
+// extrair todas as empresas
 export const getAllCompanies = () => {
   return apiClient.get('/empresas/all_companies')
+}
+
+// extrair unidade pelo empresa_id 
+export const getUnitByCompanieId = (empresa_id) => {
+  return apiClient.get(`/empresas/unit_by_companie_id/${empresa_id}`)
 }
 
 // trazer todos os modulos disponiveis

@@ -1,21 +1,18 @@
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useState, useMemo, useCallback } from 'react';
 import {
   createCompanie,
   getModules,
   getStats,
-  getCompanies,
   formatApiError,
-  getAllUsersByIdCompany,
-  updateCompaniesById,
   addUnit,
-  getAllCompanies
+  getAllCompanies,
+  getUnitByCompanieId,
+  updateCompanieById
 } from '../../services/api/ApiService';
-import { 
-  Add, 
-  Business, 
-  ViewModule, 
-  Groups3, 
-  Store, 
+import {
+  Business,
+  ViewModule,
+  Store,
   Search,
   MoreVert,
   Edit,
@@ -109,42 +106,64 @@ function StatCard({ title, value, icon: Icon, gradient, delay = 0, isLoading = f
 }
 
 function GestaoEmpresas() {
+  // "Nova Empresa" dialog
   const [open, setOpen] = useState(false);
+  const [formData, setFormData] = useState({ nome: '', cnpj: '', unidade: '', modulos: [] });
+  const [modules, setModules] = useState([]);
+
+  // "Editar Empresa" dialog
+  const [editCompanieOpen, setEditCompanieOpen] = useState(false);
+  const [editFormData, setEditFormData] = useState({ nome: '' });
+
+  // "Visualizar Unidades" dialog
+  const [unitsOpen, setUnitsOpen] = useState(false);
+  const [units, setUnits] = useState([]);
+  const [unitsLoading, setUnitsLoading] = useState(false);
+
+  // "Nova Unidade" dialog
+  const [unitOpen, setUnitOpen] = useState(false);
+  const [allCompaniesList, setAllCompaniesList] = useState([]);
+  const [unitFormData, setUnitFormData] = useState({ empresa_id: '', unidade: '', cnpj: '', modulo: [] });
+
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
-  const [modules, setModules] = useState([]);
-  const [isEditing, setIsEditing] = useState(false);
   const [statsLoading, setStatsLoading] = useState(true);
   const [companies, setCompanies] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [anchorEl, setAnchorEl] = useState(null);
   const [selectedCompany, setSelectedCompany] = useState(null);
-  const [usersOpen, setUsersOpen] = useState(false);
-  const [editCompanieOpen, setEditCompanieOpen] = useState(false);
-  const [companyUsers, setCompanyUsers] = useState([]);
-  const [usersLoading, setUsersLoading] = useState(false);
-  const [unitOpen, setUnitOpen] = useState(false);
-  const [allCompaniesList, setAllCompaniesList] = useState([]);
-  const [unitFormData, setUnitFormData] = useState({
-    empresa_id: '',
-    unidade: '',
-    cnpj: '',
-    modulo: [],
-  });
   const [stats, setStats] = useState({
     total_empresas: '',
     total_usuarios: '',
     total_modulos: '',
     total_unidades: '',
   });
-  const [formData, setFormData] = useState({
-    nome: '',
-    cnpj: '',
-    unidade: '',
-    modulos: [],
-  });
 
+  const loadData = useCallback(async () => {
+    try {
+      setStatsLoading(true);
+      const [statsRes, companiesRes] = await Promise.all([getStats(), getAllCompanies()]);
+      setStats(statsRes.data);
+      setCompanies(companiesRes.data || []);
+    } finally {
+      setStatsLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    loadData();
+  }, [loadData]);
+
+  const filteredCompanies = useMemo(() => {
+    const term = searchTerm.toLowerCase();
+    return companies.filter((emp) =>
+      emp.nome?.toLowerCase().includes(term) ||
+      emp.cnpj_base?.includes(term)
+    );
+  }, [companies, searchTerm]);
+
+  // ── Colunas da tabela principal ───────────────────────────────────────────
   const columns = useMemo(() => [
     {
       field: 'nome',
@@ -153,48 +172,10 @@ function GestaoEmpresas() {
       minWidth: 200,
     },
     {
-      field: 'unidade',
-      headerName: 'Unidade',
-      width: 300,
-    },
-    {
-      field: 'cnpj',
-      headerName: 'CNPJ',
-      width: 250,
-      renderCell: (params) => {
-        if (!params.value) return '—';
-        return params.value.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})$/, "$1.$2.$3/$4-$5");
-      }
-    },
-    {
-      field: 'modulos',
-      headerName: 'Módulos',
-      flex: 1,
-      minWidth: 200,
-      sortable: false,
-      renderCell: (params) => (
-        <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap', alignItems: 'center' }}>
-          {params.value?.length
-            ? params.value.map((mod) => {
-                const style = getModulesColor(mod.abreviacao);
-                return (
-                  <Chip 
-                    key={mod.id} 
-                    label={mod.abreviacao || mod.nome} 
-                    size="small" 
-                    variant="outlined"
-                    sx={{
-                      color: style.textColor,
-                      backgroundColor: style.backgroundColor,
-                      borderColor: style.border,
-                      fontWeight: 600
-                    }}
-                  />
-              )})
-            : <Typography variant="caption" color="text.disabled">—</Typography>
-          }
-        </Box>
-      ),
+      field: 'cnpj_base',
+      headerName: 'CNPJ Base',
+      width: 200,
+      renderCell: (params) => params.value || '—',
     },
     {
       field: 'actions',
@@ -210,7 +191,7 @@ function GestaoEmpresas() {
             e.stopPropagation();
             handleMenuOpen(e, params.row);
           }}
-          sx={{ 
+          sx={{
             color: 'text.secondary',
             '&:hover': { color: 'primary.main', bgcolor: 'rgba(255,255,255,0.05)' }
           }}
@@ -221,77 +202,58 @@ function GestaoEmpresas() {
     },
   ], []);
 
-  const usersColumns = useMemo(() => [
-    { 
-      field: 'nome', 
-      headerName: 'Nome', 
-      flex: 1
+  // ── Colunas do dialog de unidades ─────────────────────────────────────────
+  const unitsColumns = useMemo(() => [
+    {
+      field: 'unidade',
+      headerName: 'Unidade',
+      flex: 1,
     },
-    { 
-      field: 'email', 
-      headerName: 'E-mail', 
-      flex: 1 
-    },
-    { 
-      field: 'cargo', 
-      headerName: 'Cargo', 
-      width: 150,
+    {
+      field: 'cnpj',
+      headerName: 'CNPJ',
+      width: 220,
       renderCell: (params) => {
-        if (!params.value) return <Typography variant="caption" color="text.disabled">—</Typography>;
-        const style = getRolesColor(params.value);
-        const displayLabel = params.value === 'user_master' ? 'Master' : params.value.replace('_', ' ');
-        return (
-          <Chip 
-            label={displayLabel} 
-            size="small" 
-            variant="outlined"
-            sx={{
-              color: style.textColor,
-              backgroundColor: style.backgroundColor,
-              borderColor: style.border,
-              fontWeight: 600,
-              textTransform: 'capitalize'
-            }}
-          />
-        );
-      }
+        if (!params.value) return '—';
+        return params.value.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})$/, '$1.$2.$3/$4-$5');
+      },
+    },
+    {
+      field: 'modulos',
+      headerName: 'Módulos',
+      flex: 1,
+      sortable: false,
+      renderCell: (params) => (
+        <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', alignItems: 'center', height: '100%' }}>
+          {params.value?.length
+            ? params.value.map((mod) => {
+                const style = getModulesColor(mod.abreviacao);
+                return (
+                  <Chip
+                    key={mod.id}
+                    label={mod.abreviacao || mod.nome}
+                    size="small"
+                    variant="outlined"
+                    sx={{
+                        color: style.textColor, 
+                        backgroundColor: style.backgroundColor, 
+                        borderColor: style.border, 
+                        fontWeight: 700
+                      }}
+                  />
+                );
+              })
+            : <Typography variant="caption" color="text.disabled">—</Typography>
+          }
+        </Box>
+      ),
     },
   ], []);
 
-  useEffect(() => {
-    const loadStats = async () => {
-      try {
-        const response_stats = await getStats();
-        setStats(response_stats.data);
-
-        const response_companies = await getCompanies();
-        setCompanies(response_companies.data || []);
-      } finally {
-        setStatsLoading(false);
-      }
-    };
-
-    if (!open) {
-      loadStats();
-    }
-  }, [open]);
-
-  const filteredCompanies = useMemo(() => {
-    console.log("Filtrando empresas...");
-    const term = searchTerm.toLowerCase();
-
-    return companies.filter((emp) => {
-      return (
-        emp.nome?.toLowerCase().includes(term) ||
-        emp.cnpj?.includes(term)
-      );
-    });
-  }, [companies, searchTerm]);
-
+  // ── "Nova Empresa" handlers ───────────────────────────────────────────────
   const handleOpen = async () => {
     setError('');
     setSuccess('');
-    setIsEditing(false);
     const response = await getModules();
     setModules(response.data);
     setFormData({ nome: '', cnpj: '', unidade: '', modulos: [] });
@@ -309,16 +271,13 @@ function GestaoEmpresas() {
     setError('');
     setSuccess('');
     try {
-      if (isEditing) {
-        await updateCompaniesById(selectedCompany.public_id, formData);
-        console.log(formData.modulos)
-        setSuccess('Empresa atualizada com sucesso!');
-      } else {
-        const { modulos, ...rest } = formData;
-        await createCompanie({ ...rest, modulo: modulos });
-        setSuccess('Empresa cadastrada com sucesso!');
-      }
-      setTimeout(handleClose, 3000);
+      const { modulos, ...rest } = formData;
+      const payload = { ...rest };
+      if (modulos.length) payload.modulo = modulos;
+      await createCompanie(payload);
+      setSuccess('Empresa cadastrada com sucesso!');
+      await loadData();
+      setTimeout(handleClose, 2000);
     } catch (err) {
       setError(formatApiError(err));
     } finally {
@@ -326,68 +285,71 @@ function GestaoEmpresas() {
     }
   };
 
+  // ── Context menu ──────────────────────────────────────────────────────────
   const handleMenuOpen = (event, company) => {
     setAnchorEl(event.currentTarget);
     setSelectedCompany(company);
-  }
+  };
 
   const handleMenuClose = () => setAnchorEl(null);
 
-  const handleViewUsers = async () => {
+  // ── "Visualizar Unidades" handlers ────────────────────────────────────────
+  const handleViewUnits = async () => {
     if (!selectedCompany) return;
-    
     handleMenuClose();
     setError('');
-    setCompanyUsers([]);
-    setUsersOpen(true);
-    setUsersLoading(true);
-    
+    setUnits([]);
+    setUnitsOpen(true);
+    setUnitsLoading(true);
     try {
-      const response = await getAllUsersByIdCompany(selectedCompany.public_id);
-      setCompanyUsers(response.data || []);
+      const response = await getUnitByCompanieId(selectedCompany.empresa_id);
+      setUnits(response.data || []);
     } catch (err) {
       setError(formatApiError(err));
     } finally {
-      setUsersLoading(false);
+      setUnitsLoading(false);
     }
   };
 
-  const handleEditCompanies = async () => {
-    if (!selectedCompany) return;
+  const handleUnitsClose = () => {
+    setUnitsOpen(false);
+    setSelectedCompany(null);
+    setError('');
+  };
 
+  // ── "Editar Empresa" handlers ─────────────────────────────────────────────
+  const handleEditCompanies = () => {
+    if (!selectedCompany) return;
     handleMenuClose();
     setError('');
     setSuccess('');
-    setIsEditing(true);
-    
+    setEditFormData({ nome: selectedCompany.nome || '', cnpj: selectedCompany.cnpj_base || '' });
+    setEditCompanieOpen(true);
+  };
+
+  const handleEditClose = () => {
+    setEditCompanieOpen(false);
+    setError('');
+    setSuccess('');
+  };
+
+  const handleEditSubmit = async () => {
+    setLoading(true);
+    setError('');
+    setSuccess('');
     try {
-      const response = await getModules();
-      setModules(response.data);
-
-      const existingModules = selectedCompany.modulos || [];
-      const selectedPublicIds = response.data
-        .filter(m =>
-          existingModules.some(em =>
-            (em.id && em.id === m.id) ||
-            (em.nome && em.nome === m.nome) ||
-            (em.abreviacao && em.abreviacao === m.abreviacao)
-          )
-        )
-        .map(m => m.public_id);
-
-      setFormData({
-        nome: selectedCompany.nome || '',
-        cnpj: selectedCompany.cnpj || '',
-        unidade: selectedCompany.unidade || '',
-        modulos: selectedPublicIds,
-      });
-
-      setOpen(true);
+      await updateCompanieById(selectedCompany.empresa_id, editFormData);
+      setSuccess('Empresa atualizada com sucesso!');
+      await loadData();
+      setTimeout(handleEditClose, 2000);
     } catch (err) {
-      setError('Erro ao carregar dados para edição.');
+      setError(formatApiError(err));
+    } finally {
+      setLoading(false);
     }
-  }
+  };
 
+  // ── "Nova Unidade" handlers ───────────────────────────────────────────────
   const handleUnitOpen = async () => {
     setError('');
     setSuccess('');
@@ -402,9 +364,7 @@ function GestaoEmpresas() {
     }
   };
 
-  const handleUnitClose = () => {
-    setUnitOpen(false);
-  };
+  const handleUnitClose = () => setUnitOpen(false);
 
   const handleUnitSubmit = async () => {
     setLoading(true);
@@ -414,7 +374,7 @@ function GestaoEmpresas() {
       const { empresa_id, ...data } = unitFormData;
       await addUnit(empresa_id, data);
       setSuccess('Unidade cadastrada com sucesso!');
-      setTimeout(handleUnitClose, 3000);
+      setTimeout(handleUnitClose, 2000);
     } catch (err) {
       setError(formatApiError(err));
     } finally {
@@ -459,15 +419,10 @@ function GestaoEmpresas() {
           </Grid>
 
           <Grow in timeout={1200}>
-            <Card sx={{ 
-              borderRadius: 2, 
-              border: '1px solid rgba(255,255,255,0.08)', 
-              bgcolor: 'background.paper' 
-            }}>
-              
+            <Card sx={{ borderRadius: 2, border: '1px solid rgba(255,255,255,0.08)', bgcolor: 'background.paper' }}>
               <Box sx={{ p: 1, borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
-                <Typography sx={{ p: 2, fontWeight: 'bold'}}>
-                  Encontre todas as {stats.total_empresas} empresas e suas respectivas unidades cadastradas no sistema
+                <Typography sx={{ p: 2, fontWeight: 'bold' }}>
+                  Encontre todas as {stats.total_empresas} empresas cadastradas no sistema
                 </Typography>
                 <TextField
                   size="small"
@@ -481,7 +436,7 @@ function GestaoEmpresas() {
                       </InputAdornment>
                     ),
                   }}
-                  sx={{ p: 1, width: { xs: '100%', sm: 700 } }}
+                  sx={{ p: 1, width: { xs: '100%', sm: 480 }, '& input': {height: '35px'} }}
                 />
               </Box>
 
@@ -490,7 +445,7 @@ function GestaoEmpresas() {
                   rows={filteredCompanies}
                   columns={columns}
                   loading={statsLoading}
-                  getRowId={(row) => row.public_id}
+                  getRowId={(row) => row.empresa_id}
                   localeText={ptBR.components.MuiDataGrid.defaultProps.localeText}
                   initialState={{ pagination: { paginationModel: { pageSize: 10 } } }}
                   pageSizeOptions={[5, 10, 25, 50]}
@@ -510,20 +465,41 @@ function GestaoEmpresas() {
         </Box>
       </Fade>
 
+      {/* Context menu */}
+      <Menu
+        anchorEl={anchorEl}
+        open={Boolean(anchorEl)}
+        onClose={handleMenuClose}
+        PaperProps={{
+          sx: { minWidth: 180, bgcolor: '#1e1e1e', border: '1px solid rgba(255,255,255,0.1)' }
+        }}
+      >
+        <MenuItem onClick={handleEditCompanies}>
+          <Edit fontSize="small" sx={{ mr: 1.5, color: 'primary.main' }} />
+          <Typography variant="body2">Editar Empresa</Typography>
+        </MenuItem>
+
+        <MenuItem onClick={handleViewUnits}>
+          <Business fontSize="small" sx={{ mr: 1.5, color: 'info.main' }} />
+          <Typography variant="body2">Visualizar Unidades</Typography>
+        </MenuItem>
+
+        <Divider sx={{ my: 1, borderColor: 'rgba(255,255,255,0.05)' }} />
+
+        <MenuItem onClick={() => { handleMenuClose(); }} sx={{ color: 'error.main' }}>
+          <Delete fontSize="small" sx={{ mr: 1.5 }} />
+          <Typography variant="body2">Remover Empresa</Typography>
+        </MenuItem>
+      </Menu>
+
+      {/* Nova Empresa dialog */}
       <Dialog open={open} onClose={handleClose} fullWidth maxWidth="sm">
         <DialogTitle>
           <Fade in={open} timeout={800}>
-            <Box
-              sx={{
-                pt: 2,
-                textAlign: 'center',
-              }}
-            >
-              <Typography variant='h4' component='span' sx={{ fontWeight: 'bold', letterSpacing: 1}}>
-                <Box>
-                {isEditing ? <Store /> : <Store />}
-                </Box>
-                {isEditing ? 'Editar Empresa' : 'Vincule uma nova empresa'}
+            <Box sx={{ pt: 2, textAlign: 'center' }}>
+              <Typography variant="h4" component="span" sx={{ fontWeight: 'bold', letterSpacing: 1 }}>
+                <Box><Store /></Box>
+                Vincule uma nova empresa
               </Typography>
             </Box>
           </Fade>
@@ -531,7 +507,7 @@ function GestaoEmpresas() {
         <DialogContent>
           {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
           {success && <Alert severity="success" sx={{ mb: 2 }}>{success}</Alert>}
-          
+
           <TextField label="Nome" fullWidth margin="normal" value={formData.nome} onChange={(e) => setFormData({ ...formData, nome: e.target.value })} />
           <TextField label="CNPJ" fullWidth margin="normal" value={formData.cnpj} onChange={(e) => setFormData({ ...formData, cnpj: e.target.value })} />
           <TextField label="Unidade" fullWidth margin="normal" value={formData.unidade} onChange={(e) => setFormData({ ...formData, unidade: e.target.value })} />
@@ -540,16 +516,13 @@ function GestaoEmpresas() {
             <InputLabel id="select-modulos-label">Módulos</InputLabel>
             <Select
               labelId="select-modulos-label"
-              multiple // atributo para permitir selecionar varios
+              multiple
               value={formData.modulos}
               onChange={(e) => setFormData({ ...formData, modulos: e.target.value })}
               label="Módulos"
-              renderValue={(selected) => {
-                const selectedNames = modules
-                  .filter(mod => selected.includes(mod.public_id))
-                  .map(mod => mod.nome);
-                return selectedNames.join(', ');
-              }}
+              renderValue={(selected) =>
+                modules.filter(mod => selected.includes(mod.public_id)).map(mod => mod.nome).join(', ')
+              }
             >
               {modules?.map((mod) => (
                 <MenuItem key={mod.public_id} value={mod.public_id}>
@@ -559,7 +532,6 @@ function GestaoEmpresas() {
               ))}
             </Select>
           </FormControl>
-
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose} disabled={loading}>Cancelar</Button>
@@ -569,12 +541,39 @@ function GestaoEmpresas() {
         </DialogActions>
       </Dialog>
 
+      {/* Editar Empresa dialog */}
+      <Dialog open={editCompanieOpen} onClose={handleEditClose} fullWidth maxWidth="sm">
+        <DialogTitle>
+          <Fade in={editCompanieOpen} timeout={800}>
+            <Box sx={{ pt: 2, textAlign: 'center' }}>
+              <Typography variant="h4" component="span" sx={{ fontWeight: 'bold', letterSpacing: 1 }}>
+                <Box><Edit /></Box>
+                Editar Empresa
+              </Typography>
+            </Box>
+          </Fade>
+        </DialogTitle>
+        <DialogContent>
+          {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
+          {success && <Alert severity="success" sx={{ mb: 2 }}>{success}</Alert>}
+
+          <TextField label="Nome" fullWidth margin="normal" value={editFormData.nome} onChange={(e) => setEditFormData({ ...editFormData, nome: e.target.value })} />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleEditClose} disabled={loading}>Cancelar</Button>
+          <Button variant="contained" onClick={handleEditSubmit} disabled={loading}>
+            {loading ? 'Salvando...' : 'Salvar'}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Nova Unidade dialog */}
       <Dialog open={unitOpen} onClose={handleUnitClose} fullWidth maxWidth="sm">
         <DialogTitle>
           <Fade in={unitOpen} timeout={800}>
             <Box sx={{ pt: 2, textAlign: 'center' }}>
-              <Typography variant='h4' component='span' sx={{ fontWeight: 'bold', letterSpacing: 1}}>
-                <Box><Store /></Box>
+              <Typography variant="h4" component="span" sx={{ fontWeight: 'bold', letterSpacing: 1 }}>
+                <Box><Business /></Box>
                 Adicionar Nova Unidade
               </Typography>
             </Box>
@@ -583,7 +582,7 @@ function GestaoEmpresas() {
         <DialogContent>
           {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
           {success && <Alert severity="success" sx={{ mb: 2 }}>{success}</Alert>}
-          
+
           <FormControl fullWidth margin="normal">
             <InputLabel id="select-company-label">Empresa</InputLabel>
             <Select
@@ -611,12 +610,9 @@ function GestaoEmpresas() {
               value={unitFormData.modulo}
               onChange={(e) => setUnitFormData({ ...unitFormData, modulo: e.target.value })}
               label="Módulos"
-              renderValue={(selected) => {
-                const selectedNames = modules
-                  .filter(mod => selected.includes(mod.public_id))
-                  .map(mod => mod.nome);
-                return selectedNames.join(', ');
-              }}
+              renderValue={(selected) =>
+                modules.filter(mod => selected.includes(mod.public_id)).map(mod => mod.nome).join(', ')
+              }
             >
               {modules?.map((mod) => (
                 <MenuItem key={mod.public_id} value={mod.public_id}>
@@ -635,47 +631,18 @@ function GestaoEmpresas() {
         </DialogActions>
       </Dialog>
 
-      <Menu
-        anchorEl={anchorEl}
-        open={Boolean(anchorEl)}
-        onClose={handleMenuClose}
-        PaperProps={{
-          sx: { 
-            minWidth: 180, 
-            bgcolor: '#1e1e1e',
-            border: '1px solid rgba(255,255,255,0.1)' 
-          }
-        }}
-      >
-        <MenuItem onClick={handleEditCompanies}>
-          <Edit fontSize="small" sx={{ mr: 1.5, color: 'primary.main' }} />
-          <Typography variant="body2">Editar Empresa</Typography>
-        </MenuItem>
-
-        <MenuItem onClick={handleViewUsers}>
-          <Groups3 fontSize="small" sx={{ mr: 1.5, color: 'info.main' }} />
-          <Typography variant="body2">Visualizar Usuários</Typography>
-        </MenuItem> 
-
-        <Divider sx={{ my: 1, borderColor: 'rgba(255,255,255,0.05)' }} />
-
-        <MenuItem onClick={() => { /* Lógica de Deletar */ handleMenuClose(); }} sx={{ color: 'error.main' }}>
-          <Delete fontSize="small" sx={{ mr: 1.5 }} />
-          <Typography variant="body2">Remover Empresa</Typography>
-        </MenuItem>
-      </Menu>
-
-      <Dialog open={usersOpen} onClose={() => setUsersOpen(false)} fullWidth maxWidth="md">
-        <DialogTitle variant='h4' component='span' sx={{ fontWeight: 'bold', letterSpacing: 1}}>
-          Usuários vinculados - {selectedCompany?.nome}
+      {/* Visualizar Unidades dialog */}
+      <Dialog open={unitsOpen} onClose={handleUnitsClose} fullWidth maxWidth="md">
+        <DialogTitle variant="h4" component="span" sx={{ fontWeight: 'bold', letterSpacing: 1 }}>
+          Unidades — {selectedCompany?.nome}
         </DialogTitle>
         <DialogContent dividers>
           {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
           <Box sx={{ height: 400, width: '100%' }}>
             <DataGrid
-              rows={companyUsers}
-              columns={usersColumns}
-              loading={usersLoading}
+              rows={units}
+              columns={unitsColumns}
+              loading={unitsLoading}
               getRowId={(row) => row.public_id}
               localeText={ptBR.components.MuiDataGrid.defaultProps.localeText}
               pageSizeOptions={[5, 10]}
@@ -686,16 +653,7 @@ function GestaoEmpresas() {
           </Box>
         </DialogContent>
         <DialogActions>
-          <Button 
-            onClick={() => {
-              setUsersOpen(false);
-              setSelectedCompany(null);
-              setError('');
-            }} 
-            variant="outlined"
-          >
-            Fechar
-          </Button>
+          <Button onClick={handleUnitsClose} variant="outlined">Fechar</Button>
         </DialogActions>
       </Dialog>
     </Container>
