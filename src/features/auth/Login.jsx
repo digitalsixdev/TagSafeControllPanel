@@ -13,6 +13,8 @@ import {
   Fade,
   CircularProgress,
   Avatar,
+  ToggleButton,
+  ToggleButtonGroup,
 } from '@mui/material';
 import {
   Email,
@@ -31,6 +33,15 @@ const Login = ({ onLoginSuccess }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [selectedEnv, setSelectedEnv] = useState(
+    () => localStorage.getItem('selected_env') || 'dev'
+  );
+
+  const handleEnvChange = (_, newEnv) => {
+    if (!newEnv) return;
+    setSelectedEnv(newEnv);
+    localStorage.setItem('selected_env', newEnv);
+  };
 
   const handleChange = (field) => (event) => {
     setFormData((prev) => ({ ...prev, [field]: event.target.value }));
@@ -68,6 +79,25 @@ const Login = ({ onLoginSuccess }) => {
       setLoading(false);
     }
   };
+
+  const envSelectedStyles = {
+    dev: {
+      color: 'orange', // Exemplo de cor para dev
+      borderColor: 'orange',
+      bgcolor: 'rgba(255, 165, 0, 0.1)', // Laranja com opacidade
+    },
+    prod: {
+      color: 'red', // Exemplo de cor para prod
+      borderColor: 'red',
+      bgcolor: 'rgba(255, 0, 0, 0.1)', // Vermelho com opacidade
+    },
+    local: {
+      color: 'green', // Exemplo de cor para local
+      borderColor: 'green',
+      bgcolor: 'rgba(0, 128, 0, 0.1)', // Verde com opacidade
+    },
+  };
+
 
   return (
     <Box
@@ -193,6 +223,43 @@ const Login = ({ onLoginSuccess }) => {
                 </Box>
 
                 <Box sx={{ textAlign: 'center', mt: 4 }}>
+                  <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', mb: 1.5 }}>
+                    Ambiente
+                  </Typography>
+                  <ToggleButtonGroup
+                    value={selectedEnv}
+                    exclusive
+                    onChange={handleEnvChange}
+                    size="small"
+                    sx={{ mb: 2 }}
+                  >
+                    {[
+                      { value: 'dev',   label: 'Dev' },
+                      { value: 'prod',  label: 'Prod' },
+                      { value: 'local', label: 'Local' },
+                    ].map(({ value, label }) => (
+                      <ToggleButton
+                        key={value}
+                        value={value}
+                        sx={{
+                          px: 2.5,
+                          fontSize: '0.7rem',
+                          fontWeight: 600,
+                          color: 'text.secondary',
+                          borderColor: 'rgba(255,255,255,0.1)',
+                          '&.Mui-selected': {
+                              ...(envSelectedStyles[value] || {
+                              color: 'primary.main',
+                              borderColor: 'primary.main',
+                              bgcolor: 'rgba(24, 144, 255, 0.08)',
+                            }),
+                          },
+                        }}
+                      >
+                        {label}
+                      </ToggleButton>
+                    ))}
+                  </ToggleButtonGroup>
                   <Typography variant="body2" sx={{ color: 'text.secondary' }}>
                     Painel de Controle TagSafe
                   </Typography>

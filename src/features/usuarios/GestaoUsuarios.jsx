@@ -21,6 +21,8 @@ import {
   MenuItem,
   Select,
   TextField,
+  Checkbox,
+  ListItemText,
   Typography,
   Card,
   CardContent,
@@ -85,7 +87,7 @@ function GestaoUsuarios() {
     email: '',
     senha: '',
     roles: '',
-    unidades_id: '',
+    unidades_id: [],
   });
 
   useEffect(() => {
@@ -107,7 +109,7 @@ function GestaoUsuarios() {
     setRoles(rolesRes.data);
     setCompanies(companiesRes.data);
     setSelectedCompanyName('');
-    setFormData({ nome: '', email: '', senha: '', roles: '', unidades_id: '' });
+    setFormData({ nome: '', email: '', senha: '', roles: '', unidades_id: [] });
     setOpen(true);
   };
 
@@ -211,7 +213,7 @@ function GestaoUsuarios() {
               value={selectedCompanyName} 
               onChange={(e) => {
                 setSelectedCompanyName(e.target.value);
-                setFormData({ ...formData, unidades_id: '' });
+                setFormData({ ...formData, unidades_id: [] });
               }} 
               label="Empresa"
             >
@@ -225,12 +227,19 @@ function GestaoUsuarios() {
             <InputLabel id="select-units-label">Unidade</InputLabel>
             <Select 
               labelId="select-units-label" 
-              value={formData.unidades_id || ''} 
+              multiple
+              value={formData.unidades_id} 
               onChange={(e) => setFormData({ ...formData, unidades_id: e.target.value })} 
               label="Unidade"
+              renderValue={(selected) => (
+                filteredUnits.filter(u => selected.includes(u.public_id)).map(u => u.unidade).join(', ')
+              )}
             >
               {filteredUnits.map((unit) => (
-                <MenuItem key={unit.public_id} value={unit.public_id}>{unit.unidade}</MenuItem>
+                <MenuItem key={unit.public_id} value={unit.public_id}>
+                  <Checkbox checked={formData.unidades_id.includes(unit.public_id)} />
+                  <ListItemText primary={unit.unidade} />
+                </MenuItem>
               ))}
             </Select>
           </FormControl>

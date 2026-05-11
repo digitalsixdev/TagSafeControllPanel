@@ -1,24 +1,26 @@
 import axios from 'axios';
 
-const defaultApiBaseUrl = 'https://dev.api.tagsafeapplication.com';
-const apiBaseUrl = String(
-  import.meta.env.VITE_API_URL || defaultApiBaseUrl
-).replace(/\/+$/, '');
+const ENV_URLS = {
+  dev:   import.meta.env.VITE_API_URL_DEV   || 'https://dev.api.tagsafeapplication.com',
+  prod:  import.meta.env.VITE_API_URL_PROD  || 'https://api.tagsafeapplication.com',
+  local: import.meta.env.VITE_API_URL_LOCAL || 'http://localhost:3000',
+};
 
 const apiClient = axios.create({
-  baseURL: apiBaseUrl,
   timeout: 10000,
   headers: { 'Content-Type': 'application/json' },
 });
 
 apiClient.interceptors.request.use((config) => {
+  const env = localStorage.getItem('selected_env') || 'local';
+  config.baseURL = ENV_URLS[env].replace(/\/+$/, '');
   const token = localStorage.getItem('auth_token');
   if (token) config.headers['authorization'] = `Bearer ${token}`;
   return config;
 });
 
 export const login = (email, senha) =>
-  apiClient.post('/auth/login', { email, senha });
+  apiClient.post('/auth/login-master', { email, senha }); // nova rota de login adicionada
 
 export const verifyToken = () =>
   apiClient.get('/auth/me');
@@ -54,7 +56,7 @@ export const getCompanies = () => {
   return apiClient.get('/empresas')
 }
 
-export const getAllUsersByIdCompany = (public_id) => {
+export const getAllUsersByIdUnit = (public_id) => {
   return apiClient.get(`/empresas/users/${public_id}`)
 }
 

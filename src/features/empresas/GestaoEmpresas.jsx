@@ -7,7 +7,9 @@ import {
   addUnit,
   getAllCompanies,
   getUnitByCompanieId,
-  updateCompanieById
+  updateCompanieById,
+  updateUnitById,
+  getAllUsersByIdUnit
 } from '../../services/api/ApiService';
 import {
   Business,
@@ -16,7 +18,8 @@ import {
   Search,
   MoreVert,
   Edit,
-  Delete
+  Delete,
+  Group
 } from '@mui/icons-material';
 import {
   Alert,
@@ -124,6 +127,20 @@ function GestaoEmpresas() {
   const [unitOpen, setUnitOpen] = useState(false);
   const [allCompaniesList, setAllCompaniesList] = useState([]);
   const [unitFormData, setUnitFormData] = useState({ empresa_id: '', unidade: '', cnpj: '', modulo: [] });
+  const [unitUsersList, setUnitUsersList] = useState([]);
+
+  // Unit context menu
+  const [unitAnchorEl, setUnitAnchorEl] = useState(null);
+  const [selectedUnit, setSelectedUnit] = useState(null);
+
+  // "Visualizar Usuários da Unidade" dialog
+  const [unitUsersOpen, setUnitUsersOpen] = useState(false);
+  const [unitUsers, setUnitUsers] = useState([]);
+  const [unitUsersLoading, setUnitUsersLoading] = useState(false);
+
+  // "Editar Unidade" dialog
+  const [editUnitOpen, setEditUnitOpen] = useState(false);
+  const [editUnitFormData, setEditUnitFormData] = useState({ unidade: '', cnpj: '', modulos: [] });
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -163,7 +180,6 @@ function GestaoEmpresas() {
     );
   }, [companies, searchTerm]);
 
-  // ── Colunas da tabela principal ───────────────────────────────────────────
   const columns = useMemo(() => [
     {
       field: 'nome',
@@ -202,7 +218,6 @@ function GestaoEmpresas() {
     },
   ], []);
 
-  // ── Colunas do dialog de unidades ─────────────────────────────────────────
   const unitsColumns = useMemo(() => [
     {
       field: 'unidade',
@@ -235,9 +250,9 @@ function GestaoEmpresas() {
                     size="small"
                     variant="outlined"
                     sx={{
-                        color: style.textColor, 
-                        backgroundColor: style.backgroundColor, 
-                        borderColor: style.border, 
+                        color: style.textColor,
+                        backgroundColor: style.backgroundColor,
+                        borderColor: style.border,
                         fontWeight: 700
                       }}
                   />
@@ -248,9 +263,73 @@ function GestaoEmpresas() {
         </Box>
       ),
     },
+    {
+      field: 'actions',
+      headerName: 'Ações',
+      width: 80,
+      sortable: false,
+      align: 'center',
+      headerAlign: 'center',
+      renderCell: (params) => (
+        <IconButton
+          size="small"
+          onClick={(e) => {
+            e.stopPropagation();
+            handleUnitMenuOpen(e, params.row);
+          }}
+          sx={{
+            color: 'text.secondary',
+            '&:hover': { color: 'primary.main', bgcolor: 'rgba(255,255,255,0.05)' }
+          }}
+        >
+          <MoreVert fontSize="small" />
+        </IconButton>
+      ),
+    },
   ], []);
 
-  // ── "Nova Empresa" handlers ───────────────────────────────────────────────
+  const unitUsersColumns = useMemo(() => [
+    { field: 'nome', headerName: 'Nome', flex: 1 },
+    { field: 'email', headerName: 'E-mail', flex: 1 },
+    {
+      field: 'cargo',
+      headerName: 'Cargo',
+      width: 160,
+      renderCell: (params) => {
+        const style = getRolesColor(params.value);
+
+        const cargoFormatado = params.value 
+          ? params.value.charAt(0).toUpperCase() + params.value.slice(1).toLowerCase() 
+          : 'Sem Cargo';
+          
+        const cargo = params.value == 'user_master' ? 'Master' : cargoFormatado;
+          
+        return (
+          <Box sx={{ display: 'flex', alignItems: 'center', height: '100%' }}>
+            <Chip
+              label={cargo}
+              size="small"
+              variant="outlined"
+              sx={{ color: style.textColor, backgroundColor: style.backgroundColor, borderColor: style.border, fontWeight: 700 }}
+            />
+          </Box>
+        );
+      },
+    },
+    {
+      field: 'primeiro_acesso',
+      headerName: 'Primeiro Acesso',
+      width: 150,
+      renderCell: (params) => (
+        <Box sx={{ display: 'flex', alignItems: 'center', height: '100%' }}>
+          <Typography variant="body2" color={params.value ? 'warning.main' : 'success.main'}>
+            {params.value ? 'Pendente' : 'Concluído'}
+          </Typography>
+        </Box>
+      ),
+    },
+  ], []);
+
   const handleOpen = async () => {
     setError('');
     setSuccess('');
@@ -285,7 +364,6 @@ function GestaoEmpresas() {
     }
   };
 
-  // ── Context menu ──────────────────────────────────────────────────────────
   const handleMenuOpen = (event, company) => {
     setAnchorEl(event.currentTarget);
     setSelectedCompany(company);
@@ -293,7 +371,6 @@ function GestaoEmpresas() {
 
   const handleMenuClose = () => setAnchorEl(null);
 
-  // ── "Visualizar Unidades" handlers ────────────────────────────────────────
   const handleViewUnits = async () => {
     if (!selectedCompany) return;
     handleMenuClose();
@@ -317,7 +394,6 @@ function GestaoEmpresas() {
     setError('');
   };
 
-  // ── "Editar Empresa" handlers ─────────────────────────────────────────────
   const handleEditCompanies = () => {
     if (!selectedCompany) return;
     handleMenuClose();
@@ -349,7 +425,84 @@ function GestaoEmpresas() {
     }
   };
 
-  // ── "Nova Unidade" handlers ───────────────────────────────────────────────
+  const handleUnitMenuOpen = (event, unit) => {
+    setUnitAnchorEl(event.currentTarget);
+    setSelectedUnit(unit);
+  };
+
+  const handleUnitMenuClose = () => setUnitAnchorEl(null);
+
+  const handleViewUnitUsers = async () => {
+    if (!selectedUnit) return;
+    handleUnitMenuClose();
+    setUnitUsers([]);
+    setUnitUsersOpen(true);
+    setUnitUsersLoading(true);
+    try {
+      const response = await getAllUsersByIdUnit(selectedUnit.public_id);
+      setUnitUsers(response.data || []);
+    } catch (err) {
+      setError(formatApiError(err));
+    } finally {
+      setUnitUsersLoading(false);
+    }
+  };
+
+  const handleUnitUsersClose = () => {
+    setUnitUsersOpen(false);
+    setUnitUsers([]);
+  };
+
+  const handleEditUnit = async () => {
+    if (!selectedUnit) return;
+    handleUnitMenuClose();
+    setError('');
+    setSuccess('');
+    try {
+      const modulesRes = await getModules();
+      const availableModules = modulesRes.data || [];
+      setModules(availableModules);
+
+      const selectedModuleIds = (selectedUnit.modulos || [])
+        .map((unitMod) =>
+          availableModules.find(
+            (m) => m.abreviacao === unitMod.abreviacao || m.nome === unitMod.nome
+          )?.public_id
+        )
+        .filter(Boolean);
+
+      setEditUnitFormData({
+        unidade: selectedUnit.unidade || '',
+        cnpj: selectedUnit.cnpj || '',
+        modulos: selectedModuleIds,
+      });
+    } catch {}
+    setEditUnitOpen(true);
+  };
+
+  const handleEditUnitClose = () => {
+    setEditUnitOpen(false);
+    setError('');
+    setSuccess('');
+  };
+
+  const handleEditUnitSubmit = async () => {
+    setLoading(true);
+    setError('');
+    setSuccess('');
+    try {
+      await updateUnitById(selectedUnit.public_id, editUnitFormData);
+      setSuccess('Unidade atualizada com sucesso!');
+      const response = await getUnitByCompanieId(selectedCompany.empresa_id);
+      setUnits(response.data || []);
+      setTimeout(handleEditUnitClose, 2000);
+    } catch (err) {
+      setError(formatApiError(err));
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleUnitOpen = async () => {
     setError('');
     setSuccess('');
@@ -483,12 +636,24 @@ function GestaoEmpresas() {
           <Business fontSize="small" sx={{ mr: 1.5, color: 'info.main' }} />
           <Typography variant="body2">Visualizar Unidades</Typography>
         </MenuItem>
+      </Menu>
 
-        <Divider sx={{ my: 1, borderColor: 'rgba(255,255,255,0.05)' }} />
-
-        <MenuItem onClick={() => { handleMenuClose(); }} sx={{ color: 'error.main' }}>
-          <Delete fontSize="small" sx={{ mr: 1.5 }} />
-          <Typography variant="body2">Remover Empresa</Typography>
+      {/* Unit context menu */}
+      <Menu
+        anchorEl={unitAnchorEl}
+        open={Boolean(unitAnchorEl)}
+        onClose={handleUnitMenuClose}
+        PaperProps={{
+          sx: { minWidth: 180, bgcolor: '#1e1e1e', border: '1px solid rgba(255,255,255,0.1)' }
+        }}
+      >
+        <MenuItem onClick={handleEditUnit}>
+          <Edit fontSize="small" sx={{ mr: 1.5, color: 'primary.main' }} />
+          <Typography variant="body2">Editar Unidade</Typography>
+        </MenuItem>
+        <MenuItem onClick={handleViewUnitUsers}>
+          <Group fontSize="small" sx={{ mr: 1.5, color: 'info.main' }} />
+          <Typography variant="body2">Visualizar Usuários</Typography>
         </MenuItem>
       </Menu>
 
@@ -654,6 +819,90 @@ function GestaoEmpresas() {
         </DialogContent>
         <DialogActions>
           <Button onClick={handleUnitsClose} variant="outlined">Fechar</Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Visualizar Usuários da Unidade dialog */}
+      <Dialog open={unitUsersOpen} onClose={handleUnitUsersClose} fullWidth maxWidth="md">
+        <DialogTitle variant="h4" component="span" sx={{ fontWeight: 'bold', letterSpacing: 1 }}>
+          Usuários — {selectedUnit?.unidade}
+        </DialogTitle>
+        <DialogContent dividers>
+          <Box sx={{ height: 400, width: '100%' }}>
+            <DataGrid
+              rows={unitUsers}
+              columns={unitUsersColumns}
+              loading={unitUsersLoading}
+              getRowId={(row) => row.public_id}
+              localeText={ptBR.components.MuiDataGrid.defaultProps.localeText}
+              pageSizeOptions={[5, 10]}
+              initialState={{ pagination: { paginationModel: { pageSize: 5 } } }}
+              disableRowSelectionOnClick
+              sx={{ border: 'none' }}
+            />
+          </Box>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleUnitUsersClose} variant="outlined">Fechar</Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Editar Unidade dialog */}
+      <Dialog open={editUnitOpen} onClose={handleEditUnitClose} fullWidth maxWidth="sm">
+        <DialogTitle>
+          <Fade in={editUnitOpen} timeout={800}>
+            <Box sx={{ pt: 2, textAlign: 'center' }}>
+              <Typography variant="h4" component="span" sx={{ fontWeight: 'bold', letterSpacing: 1 }}>
+                <Box><Edit /></Box>
+                Editar Unidade
+              </Typography>
+            </Box>
+          </Fade>
+        </DialogTitle>
+        <DialogContent>
+          {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
+          {success && <Alert severity="success" sx={{ mb: 2 }}>{success}</Alert>}
+
+          <TextField
+            label="Nome da Unidade"
+            fullWidth
+            margin="normal"
+            value={editUnitFormData.unidade}
+            onChange={(e) => setEditUnitFormData({ ...editUnitFormData, unidade: e.target.value })}
+          />
+          <TextField
+            label="CNPJ"
+            fullWidth
+            margin="normal"
+            value={editUnitFormData.cnpj}
+            onChange={(e) => setEditUnitFormData({ ...editUnitFormData, cnpj: e.target.value })}
+          />
+          <FormControl fullWidth margin="normal">
+            <InputLabel id="edit-unit-modulos-label">Módulos</InputLabel>
+            <Select
+              labelId="edit-unit-modulos-label"
+              multiple
+              value={editUnitFormData.modulos}
+              onChange={(e) => setEditUnitFormData({ ...editUnitFormData, modulos: e.target.value })}
+              label="Módulos"
+              renderValue={(selected) =>
+                modules.filter((mod) => selected.includes(mod.public_id)).map((mod) => mod.nome).join(', ')
+              }
+            >
+              {modules?.map((mod) => (
+                <MenuItem key={mod.public_id} value={mod.public_id}>
+                  <Checkbox checked={editUnitFormData.modulos.indexOf(mod.public_id) > -1} />
+                  <ListItemText primary={mod.nome} />
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleEditUnitClose} disabled={loading}>Cancelar</Button>
+          <Button variant="contained" onClick={handleEditUnitSubmit} disabled={loading}>
+            {loading ? 'Salvando...' : 'Salvar'}
+          </Button>
         </DialogActions>
       </Dialog>
     </Container>
