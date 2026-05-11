@@ -82,19 +82,19 @@ const Login = ({ onLoginSuccess }) => {
 
   const envSelectedStyles = {
     dev: {
-      color: 'orange', // Exemplo de cor para dev
+      color: 'orange', // cor laranja para dev
       borderColor: 'orange',
-      bgcolor: 'rgba(255, 165, 0, 0.1)', // Laranja com opacidade
+      bgcolor: 'rgba(255, 165, 0, 0.1)',
     },
     prod: {
-      color: 'red', // Exemplo de cor para prod
+      color: 'red', // cor vermelha para prod (ficar chamativo)
       borderColor: 'red',
-      bgcolor: 'rgba(255, 0, 0, 0.1)', // Vermelho com opacidade
+      bgcolor: 'rgba(255, 0, 0, 0.1)',
     },
     local: {
-      color: 'green', // Exemplo de cor para local
+      color: 'green', // cor verde para local
       borderColor: 'green',
-      bgcolor: 'rgba(0, 128, 0, 0.1)', // Verde com opacidade
+      bgcolor: 'rgba(0, 128, 0, 0.1)',
     },
   };
 
