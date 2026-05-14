@@ -224,7 +224,7 @@ const Login = ({ onLoginSuccess }) => {
 
                 <Box sx={{ textAlign: 'center', mt: 4 }}>
                   <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', mb: 1.5 }}>
-                    Ambiente
+                    Selecione o ambiente
                   </Typography>
                   <ToggleButtonGroup
                     value={selectedEnv}

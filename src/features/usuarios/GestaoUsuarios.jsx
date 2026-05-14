@@ -3,18 +3,26 @@ import {
   createUser,
   getRoles,
   getCompanies,
-  formatApiError
+  formatApiError,
+  getAllCompanies,
+  getInstructorsByCompany,
+  getUnitsByUserId,
+  getUnitByUnitId,
+  setUnitsAttended
 } from '../../services/api/ApiService';
-import { People, Groups3 } from '@mui/icons-material';
+import { People, Groups3, LinkRounded } from '@mui/icons-material';
 import {
   Alert,
   Box,
   Button,
+  Chip,
+  CircularProgress,
   Container,
   Dialog,
   DialogActions,
   DialogContent,
   DialogTitle,
+  Divider,
   Fade,
   FormControl,
   InputLabel,
@@ -90,6 +98,23 @@ function GestaoUsuarios() {
     unidades_id: [],
   });
 
+  // "Vincular Instrutores" dialog
+  const [vincularOpen, setVincularOpen] = useState(false);
+  const [vincularLoading, setVincularLoading] = useState(false);
+  const [vincularError, setVincularError] = useState('');
+  const [vincularSuccess, setVincularSuccess] = useState('');
+  const [allCompaniesList, setAllCompaniesList] = useState([]);
+  const [vincularEmpresaId, setVincularEmpresaId] = useState('');
+  const [instructors, setInstructors] = useState([]);
+  const [instructorsLoading, setInstructorsLoading] = useState(false);
+  const [vincularInstructor, setVincularInstructor] = useState(null);
+  const [instructorUnits, setInstructorUnits] = useState([]);
+  const [unitsLoading, setUnitsLoading] = useState(false);
+  const [vincularUnit, setVincularUnit] = useState(null);
+  const [unitModules, setUnitModules] = useState([]);
+  const [modulesLoading, setModulesLoading] = useState(false);
+  const [vincularModulos, setVincularModulos] = useState([]);
+
   useEffect(() => {
     const loadStats = async () => {
       try {
@@ -144,6 +169,108 @@ function GestaoUsuarios() {
     return companies.filter(c => c.nome === selectedCompanyName);
   }, [companies, selectedCompanyName]);
 
+  // handlers de vincular instrutores
+  const resetVincular = () => {
+    setVincularEmpresaId('');
+    setInstructors([]);
+    setVincularInstructor(null);
+    setInstructorUnits([]);
+    setVincularUnit(null);
+    setUnitModules([]);
+    setVincularModulos([]);
+  };
+
+  const handleVincularOpen = async () => {
+    setVincularError('');
+    setVincularSuccess('');
+    resetVincular();
+    try {
+      const res = await getAllCompanies();
+      setAllCompaniesList(res.data || []);
+    } catch {
+      setVincularError('Erro ao carregar empresas.');
+    }
+    setVincularOpen(true);
+  };
+
+  const handleVincularClose = () => {
+    setVincularOpen(false);
+    setVincularError('');
+    setVincularSuccess('');
+  };
+
+  const handleEmpresaChange = async (empresaId) => {
+    setVincularEmpresaId(empresaId);
+    setInstructors([]);
+    setVincularInstructor(null);
+    setInstructorUnits([]);
+    setVincularUnit(null);
+    setUnitModules([]);
+    setVincularModulos([]);
+    if (!empresaId) return;
+    setInstructorsLoading(true);
+    try {
+      const res = await getInstructorsByCompany(empresaId);
+      setInstructors(res.data || []);
+    } catch {
+      setVincularError('Erro ao carregar instrutores.');
+    } finally {
+      setInstructorsLoading(false);
+    }
+  };
+
+  const handleInstructorChange = async (usuarioId) => {
+    const instructor = instructors.find((i) => i.usuario_id === usuarioId) || null;
+    setVincularInstructor(instructor);
+    setInstructorUnits([]);
+    setVincularUnit(null);
+    setUnitModules([]);
+    setVincularModulos([]);
+    if (!instructor) return;
+    setUnitsLoading(true);
+    try {
+      const res = await getUnitsByUserId(instructor.usuario_id);
+      setInstructorUnits(res.data || []);
+    } catch {
+      setVincularError('Erro ao carregar unidades do instrutor.');
+    } finally {
+      setUnitsLoading(false);
+    }
+  };
+
+  const handleVincularUnitChange = async (publicId) => {
+    const unit = instructorUnits.find((u) => u.public_id === publicId) || null;
+    setVincularUnit(unit);
+    setUnitModules([]);
+    setVincularModulos([]);
+    if (!unit) return;
+    setModulesLoading(true);
+    try {
+      const res = await getUnitByUnitId(unit.public_id);
+      setUnitModules(res.data?.modulos || []);
+    } catch {
+      setVincularError('Erro ao carregar módulos da unidade.');
+    } finally {
+      setModulesLoading(false);
+    }
+  };
+
+  const handleVincularSubmit = async () => {
+    if (!vincularInstructor || !vincularUnit || !vincularModulos.length) return;
+    setVincularLoading(true);
+    setVincularError('');
+    setVincularSuccess('');
+    try {
+      await setUnitsAttended(vincularInstructor.public_id, vincularUnit.public_id, vincularModulos);
+      setVincularSuccess('Instrutor vinculado com sucesso!');
+      setTimeout(handleVincularClose, 2000);
+    } catch (err) {
+      setVincularError(formatApiError(err));
+    } finally {
+      setVincularLoading(false);
+    }
+  };
+
   return (
     <Container maxWidth="xl">
       <Fade in timeout={800}>
@@ -158,9 +285,24 @@ function GestaoUsuarios() {
                 Gerencie os usuários cadastrados na plataforma.
               </Typography>
             </Box>
-            <Button variant="outlined" startIcon={<People />} onClick={handleOpen} sx={{ borderRadius: 2 }}>
-              Novo Usuário
-            </Button>
+            <Box sx={{ display: 'flex', gap: 2 }}>
+              <Button
+                variant="outlined"
+                startIcon={<LinkRounded />}
+                onClick={handleVincularOpen}
+                sx={{
+                  borderRadius: 2,
+                  color: '#a78bfa',
+                  borderColor: '#a78bfa',
+                  '&:hover': { borderColor: '#8B5CF6', bgcolor: 'rgba(139, 92, 246, 0.08)' },
+                }}
+              >
+                Vincular Instrutores
+              </Button>
+              <Button variant="outlined" startIcon={<People />} onClick={handleOpen} sx={{ borderRadius: 2 }}>
+                Novo Usuário
+              </Button>
+            </Box>
           </Box>
 
           <Grid container spacing={3} sx={{ mb: 4, justifyContent: 'left' }}>
@@ -248,6 +390,137 @@ function GestaoUsuarios() {
           <Button onClick={handleClose} disabled={loading}>Cancelar</Button>
           <Button variant="contained" onClick={handleSubmit} disabled={loading}>
             {loading ? 'Salvando...' : 'Salvar'}
+          </Button>
+        </DialogActions>
+      </Dialog>
+      {/* Vincular Instrutores dialog */}
+      <Dialog open={vincularOpen} onClose={handleVincularClose} fullWidth maxWidth="sm">
+        <DialogTitle>
+          <Fade in={vincularOpen} timeout={800}>
+            <Box sx={{ pt: 2, textAlign: 'center' }}>
+              <Typography variant="h4" component="span" sx={{ fontWeight: 'bold', letterSpacing: 1 }}>
+                <Box><LinkRounded /></Box>
+                Vincular Instrutor
+              </Typography>
+            </Box>
+          </Fade>
+        </DialogTitle>
+        <DialogContent>
+          {vincularError && <Alert severity="error" sx={{ mb: 2 }}>{vincularError}</Alert>}
+          {vincularSuccess && <Alert severity="success" sx={{ mb: 2 }}>{vincularSuccess}</Alert>}
+
+          {/* 1. Empresa */}
+          <FormControl fullWidth margin="normal">
+            <InputLabel id="vincular-empresa-label">Empresa</InputLabel>
+            <Select
+              labelId="vincular-empresa-label"
+              value={vincularEmpresaId}
+              onChange={(e) => handleEmpresaChange(e.target.value)}
+              label="Empresa"
+            >
+              {allCompaniesList.map((emp) => (
+                <MenuItem key={emp.empresa_id} value={emp.empresa_id}>
+                  {emp.nome}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+
+          {/* 2. Instrutor */}
+          <FormControl fullWidth margin="normal" disabled={!vincularEmpresaId || instructorsLoading}>
+            <InputLabel id="vincular-instrutor-label">
+              {instructorsLoading ? 'Carregando...' : 'Instrutor'}
+            </InputLabel>
+            <Select
+              labelId="vincular-instrutor-label"
+              value={vincularInstructor?.usuario_id || ''}
+              onChange={(e) => handleInstructorChange(e.target.value)}
+              label={instructorsLoading ? 'Carregando...' : 'Instrutor'}
+              endAdornment={instructorsLoading ? <CircularProgress size={18} sx={{ mr: 2 }} /> : null}
+            >
+              {instructors.map((inst) => (
+                <MenuItem key={inst.usuario_id} value={inst.usuario_id}>
+                  {inst.nome}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+
+          {/* 3. Unidade */}
+          <FormControl fullWidth margin="normal" disabled={!vincularInstructor || unitsLoading}>
+            <InputLabel id="vincular-unidade-label">
+              {unitsLoading ? 'Carregando...' : 'Unidade'}
+            </InputLabel>
+            <Select
+              labelId="vincular-unidade-label"
+              value={vincularUnit?.public_id || ''}
+              onChange={(e) => handleVincularUnitChange(e.target.value)}
+              label={unitsLoading ? 'Carregando...' : 'Unidade'}
+              endAdornment={unitsLoading ? <CircularProgress size={18} sx={{ mr: 2 }} /> : null}
+            >
+              {instructorUnits.map((unit) => (
+                <MenuItem key={unit.public_id} value={unit.public_id}>
+                  {unit.unidade}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+
+          {/* 4. Módulos */}
+          <FormControl fullWidth margin="normal" disabled={!vincularUnit || modulesLoading}>
+            <InputLabel id="vincular-modulos-label">
+              {modulesLoading ? 'Carregando...' : 'Módulos'}
+            </InputLabel>
+            <Select
+              labelId="vincular-modulos-label"
+              multiple
+              value={vincularModulos}
+              onChange={(e) => setVincularModulos(e.target.value)}
+              label={modulesLoading ? 'Carregando...' : 'Módulos'}
+              endAdornment={modulesLoading ? <CircularProgress size={18} sx={{ mr: 2 }} /> : null}
+              renderValue={(selected) =>
+                unitModules
+                  .filter((m) => selected.includes(m.modulo_public_id))
+                  .map((m) => (
+                    <Chip key={m.modulo_public_id} label={m.abreviacao} size="small" sx={{ mr: 0.5 }} />
+                  ))
+              }
+            >
+              {unitModules.map((mod) => (
+                <MenuItem key={mod.modulo_public_id} value={mod.modulo_public_id}>
+                  <Checkbox checked={vincularModulos.includes(mod.modulo_public_id)} />
+                  <ListItemText primary={mod.nome} secondary={mod.abreviacao} />
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+
+          {/* Resumo antes de salvar */}
+          {vincularInstructor && vincularUnit && vincularModulos.length > 0 && (
+            <>
+              <Divider sx={{ my: 2, borderColor: 'rgba(255,255,255,0.08)' }} />
+              <Box sx={{ p: 1.5, borderRadius: 1, bgcolor: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}>
+                <Typography variant="caption" color="text.secondary" display="block" sx={{ mb: 0.5 }}>Resumo do vínculo</Typography>
+                <Typography variant="body2"><strong>{vincularInstructor.nome}</strong> → {vincularUnit.unidade}</Typography>
+                <Box sx={{ display: 'flex', gap: 0.5, mt: 0.5, flexWrap: 'wrap' }}>
+                  {unitModules
+                    .filter((m) => vincularModulos.includes(m.modulo_public_id))
+                    .map((m) => (
+                      <Chip key={m.modulo_public_id} label={m.abreviacao} size="small" variant="outlined" color="primary" />
+                    ))}
+                </Box>
+              </Box>
+            </>
+          )}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleVincularClose} disabled={vincularLoading}>Cancelar</Button>
+          <Button
+            variant="contained"
+            onClick={handleVincularSubmit}
+            disabled={vincularLoading || !vincularInstructor || !vincularUnit || !vincularModulos.length}
+          >
+            {vincularLoading ? 'Salvando...' : 'Vincular'}
           </Button>
         </DialogActions>
       </Dialog>

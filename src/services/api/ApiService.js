@@ -47,17 +47,21 @@ export const createCompanie = (data) => {
     cnpj: data?.cnpj,
     unidade: data?.unidade,
     modulo: data?.modulo,
-  }
+  };
 
-  return apiClient.post('/empresas', payload)  
+  return apiClient.post('/empresas', payload);
 }
 
 export const getCompanies = () => {
-  return apiClient.get('/empresas')
+  return apiClient.get('/empresas');
+}
+
+export const getUnitByUnitId = (public_id) => {
+  return apiClient.get(`/empresas/${public_id}`);
 }
 
 export const getAllUsersByIdUnit = (public_id) => {
-  return apiClient.get(`/empresas/users/${public_id}`)
+  return apiClient.get(`/empresas/users/${public_id}`);
 }
 
 // atualizar unidades pelo public_id da unidade
@@ -67,18 +71,18 @@ export const updateUnitById = (public_id, data) => {
     cnpj: data?.cnpj,
     unidade: data?.unidade,
     modulos: data?.modulos
-  }
+  };
 
-  return apiClient.put(`/empresas/unit/${public_id}`, payload)
+  return apiClient.put(`/empresas/unit/${public_id}`, payload);
 }
 
 // atualizar empresa pela empresa_id
 export const updateCompanieById = (empresa_id, data) => {
   const payload = {
     nome: data?.nome
-  }
+  };
 
-  return apiClient.put(`/empresas/company/${empresa_id}`, payload)
+  return apiClient.put(`/empresas/company/${empresa_id}`, payload);
 }
 
 // adicionar uma unidade a uma empresa
@@ -87,24 +91,24 @@ export const addUnit = (empresa_id, data) => {
     unidade: data?.unidade,
     cnpj: data?.cnpj,
     modulo: data?.modulo
-  }
+  };
 
-  return apiClient.post(`/empresas/${empresa_id}/unidade`, payload)
+  return apiClient.post(`/empresas/${empresa_id}/unidade`, payload);
 }
 
 // extrair todas as empresas
 export const getAllCompanies = () => {
-  return apiClient.get('/empresas/all_companies')
+  return apiClient.get('/empresas/all_companies');
 }
 
 // extrair unidade pelo empresa_id 
 export const getUnitByCompanieId = (empresa_id) => {
-  return apiClient.get(`/empresas/unit_by_companie_id/${empresa_id}`)
+  return apiClient.get(`/empresas/unit_by_companie_id/${empresa_id}`);
 }
 
 // trazer todos os modulos disponiveis
 export const getModules = () => {
-  return apiClient.get('/modulos')
+  return apiClient.get('/modulos');
 }
 
 // criar usuario
@@ -117,15 +121,43 @@ export const createUser = (data) => {
     unidades_id: data?.unidades_id
   }
 
-  return apiClient.post('/auth/registrar', payload)
+  return apiClient.post('/auth/registrar', payload);
 }
 
 // lista todos os cargos disponiveis
 export const getRoles = () => {
-  return apiClient.get('/roles')
+  return apiClient.get('/roles');
 }
 
 // traz quantas empresas, usuarios, unidades e modulos existem atualmente
 export const getStats = () => {
-  return apiClient.get('/admin/stats')
+  return apiClient.get('/admin/stats');
+}
+
+// unidades-atendidas
+export const getUnitsAttended = (instrutor_id) => { 
+  return apiClient.get(`/instrutores/unidades-atendidas/${instrutor_id}`);
+}
+
+export const setUnitsAttended = (usuario_id, unidades_id, modulos) => {
+  const payload = {
+    usuario_id: usuario_id,
+    unidades_atendidas: [
+      {
+        id: unidades_id,
+        modulos: modulos
+      }
+    ],
+  }
+  return apiClient.post(`/instrutores/unidades-atendidas`, payload);
+}
+
+// selecionar o instrutor da empresa
+export const getInstructorsByCompany = (empresa_id) => {
+  return apiClient.get(`/instrutores/instrutores-by-company/${empresa_id}`);
+}
+
+// ter as unidades vinculadas do usuário
+export const getUnitsByUserId = (usuario_id) => {
+  return apiClient.get(`/empresas/units_by_user_id/${usuario_id}`);
 }
