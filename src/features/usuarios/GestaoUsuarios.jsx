@@ -8,7 +8,10 @@ import {
   getInstructorsByCompany,
   getUnitsByUserId,
   getUnitByUnitId,
-  setUnitsAttended
+  setUnitsAttended,
+  getUserByEmail,
+  getUnitByCompanieId,
+  addUnitToUser,
 } from '../../services/api/ApiService';
 import { People, Groups3, LinkRounded } from '@mui/icons-material';
 import {
@@ -114,6 +117,19 @@ function GestaoUsuarios() {
   const [unitModules, setUnitModules] = useState([]);
   const [modulesLoading, setModulesLoading] = useState(false);
   const [vincularModulos, setVincularModulos] = useState([]);
+  const [vincularInfo, setVincularInfo] = useState('');
+
+  // "Vincular Unidades" dialog
+  const [unidadeOpen, setUnidadeOpen] = useState(false);
+  const [unidadeLoading, setUnidadeLoading] = useState(false);
+  const [unidadeError, setUnidadeError] = useState('');
+  const [unidadeSuccess, setUnidadeSuccess] = useState('');
+  const [unidadeEmail, setUnidadeEmail] = useState('');
+  const [unidadeEmailLoading, setUnidadeEmailLoading] = useState(false);
+  const [unidadeUser, setUnidadeUser] = useState(null);
+  const [unidadeUnits, setUnidadeUnits] = useState([]);
+  const [unidadeUnitsLoading, setUnidadeUnitsLoading] = useState(false);
+  const [unidadeSelectedUnit, setUnidadeSelectedUnit] = useState('');
 
   useEffect(() => {
     const loadStats = async () => {
@@ -197,6 +213,7 @@ function GestaoUsuarios() {
     setVincularOpen(false);
     setVincularError('');
     setVincularSuccess('');
+    setVincularInfo('');
   };
 
   const handleEmpresaChange = async (empresaId) => {
@@ -207,18 +224,29 @@ function GestaoUsuarios() {
     setVincularUnit(null);
     setUnitModules([]);
     setVincularModulos([]);
+    setVincularError('');
+    setVincularInfo('');
     if (!empresaId) return;
     setInstructorsLoading(true);
     try {
       const res = await getInstructorsByCompany(empresaId);
-      setInstructors(res.data || []);
-    } catch {
-      setVincularError('Erro ao carregar instrutores.');
+      const list = res.data || [];
+      setInstructors(list);
+      if (list.length === 0) {
+        setVincularInfo('Nenhum instrutor encontrado nessa empresa.');
+      }
+    } catch (err) {
+      const status = err?.response?.status;
+      if (status === 404) {
+        setVincularInfo('Nenhum instrutor encontrado nessa empresa.');
+      } else {
+        setVincularError('Erro ao carregar instrutores.');
+      }
     } finally {
       setInstructorsLoading(false);
     }
   };
-
+  
   const handleInstructorChange = async (usuarioId) => {
     const instructor = instructors.find((i) => i.usuario_id === usuarioId) || null;
     setVincularInstructor(instructor);
@@ -259,6 +287,7 @@ function GestaoUsuarios() {
     if (!vincularInstructor || !vincularUnit || !vincularModulos.length) return;
     setVincularLoading(true);
     setVincularError('');
+    setVincularInfo('');
     setVincularSuccess('');
     try {
       await setUnitsAttended(vincularInstructor.public_id, vincularUnit.public_id, vincularModulos);
@@ -268,6 +297,69 @@ function GestaoUsuarios() {
       setVincularError(formatApiError(err));
     } finally {
       setVincularLoading(false);
+    }
+  };
+
+  // handlers de vincular unidades
+  const handleUnidadeOpen = () => {
+    setUnidadeEmail('');
+    setUnidadeUser(null);
+    setUnidadeUnits([]);
+    setUnidadeSelectedUnit('');
+    setUnidadeError('');
+    setUnidadeSuccess('');
+    setUnidadeOpen(true);
+  };
+
+  const handleUnidadeClose = () => {
+    setUnidadeOpen(false);
+    setUnidadeError('');
+    setUnidadeSuccess('');
+  };
+
+  const handleBuscarUsuario = async () => {
+    if (!unidadeEmail.trim()) return;
+    setUnidadeEmailLoading(true);
+    setUnidadeError('');
+    setUnidadeUser(null);
+    setUnidadeUnits([]);
+    setUnidadeSelectedUnit('');
+    try {
+      const res = await getUserByEmail(unidadeEmail.trim());
+      const user = res.data;
+      setUnidadeUser(user);
+      if (!user.empresa_id) return;
+      setUnidadeUnitsLoading(true);
+      try {
+        const unitsRes = await getUnitByCompanieId(user.empresa_id);
+        const raw = unitsRes.data;
+        setUnidadeUnits(Array.isArray(raw) ? raw : raw ? [raw] : []);
+      } catch (err) {
+        setUnidadeError(`Unidades: ${formatApiError(err)}`);
+      } finally {
+        setUnidadeUnitsLoading(false);
+      }
+    } catch (err) {
+      const status = err?.response?.status;
+      setUnidadeError(status === 404 ? 'Usuário não encontrado.' : formatApiError(err));
+    } finally {
+      setUnidadeEmailLoading(false);
+    }
+  };
+
+  const handleUnidadeSubmit = async () => {
+    if (!unidadeUser || !unidadeSelectedUnit) return;
+    setUnidadeLoading(true);
+    setUnidadeError('');
+    setUnidadeSuccess('');
+    try {
+      await addUnitToUser(unidadeUser.public_id, unidadeSelectedUnit);
+      setUnidadeSuccess('Unidade vinculada com sucesso!');
+      setTimeout(handleUnidadeClose, 2000);
+    } catch (err) {
+      setUnidadeError(formatApiError(err));
+    } finally {
+      setUnidadeLoading(false);
     }
   };
 
@@ -298,6 +390,19 @@ function GestaoUsuarios() {
                 }}
               >
                 Vincular Instrutores
+              </Button>
+              <Button
+                variant="outlined"
+                startIcon={<LinkRounded />}
+                onClick={handleUnidadeOpen}
+                sx={{
+                  borderRadius: 2,
+                  color: '#34d399',
+                  borderColor: '#34d399',
+                  '&:hover': { borderColor: '#10b981', bgcolor: 'rgba(16, 185, 129, 0.08)' },
+                }}
+              >
+                Vincular Unidades
               </Button>
               <Button variant="outlined" startIcon={<People />} onClick={handleOpen} sx={{ borderRadius: 2 }}>
                 Novo Usuário
@@ -338,15 +443,22 @@ function GestaoUsuarios() {
           
           <TextField label="Nome" fullWidth margin="normal" value={formData.nome} onChange={(e) => setFormData({ ...formData, nome: e.target.value })} />
           <TextField label="E-mail" fullWidth margin="normal" value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} />
-          <TextField label="Senha" fullWidth margin="normal" value={formData.senha} onChange={(e) => setFormData({ ...formData, senha: e.target.value })} />
           <FormControl fullWidth margin="normal">
             <InputLabel id="select-roles-label">Cargo</InputLabel>
-            <Select labelId="select-roles-label" value={formData.roles || ''} onChange={(e) => setFormData({ ...formData, roles: e.target.value })} label="Cargo">
+            <Select
+              labelId="select-roles-label"
+              value={formData.roles || ''}
+              onChange={(e) => setFormData({ ...formData, roles: e.target.value, senha: '' })}
+              label="Cargo"
+            >
               {roles?.map((rol) => (
                 <MenuItem key={rol.public_id} value={rol.public_id}>{rol.nome}</MenuItem>
               ))}
             </Select>
           </FormControl>
+          {roles.find(r => r.public_id === formData.roles)?.nome === 'user_master' && (
+            <TextField label="Senha" fullWidth margin="normal" value={formData.senha} onChange={(e) => setFormData({ ...formData, senha: e.target.value })} />
+          )}
           
           <FormControl fullWidth margin="normal">
             <InputLabel id="select-company-name-label">Empresa</InputLabel>
@@ -407,6 +519,7 @@ function GestaoUsuarios() {
         </DialogTitle>
         <DialogContent>
           {vincularError && <Alert severity="error" sx={{ mb: 2 }}>{vincularError}</Alert>}
+          {vincularInfo && <Alert severity="warning" sx={{ mb: 2 }}>{vincularInfo}</Alert>}
           {vincularSuccess && <Alert severity="success" sx={{ mb: 2 }}>{vincularSuccess}</Alert>}
 
           {/* 1. Empresa */}
@@ -521,6 +634,107 @@ function GestaoUsuarios() {
             disabled={vincularLoading || !vincularInstructor || !vincularUnit || !vincularModulos.length}
           >
             {vincularLoading ? 'Salvando...' : 'Vincular'}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Vincular Unidades dialog */}
+      <Dialog open={unidadeOpen} onClose={handleUnidadeClose} fullWidth maxWidth="sm">
+        <DialogTitle>
+          <Fade in={unidadeOpen} timeout={800}>
+            <Box sx={{ pt: 2, textAlign: 'center' }}>
+              <Typography variant="h4" component="span" sx={{ fontWeight: 'bold', letterSpacing: 1 }}>
+                <Box><LinkRounded /></Box>
+                Vincular Unidade
+              </Typography>
+            </Box>
+          </Fade>
+        </DialogTitle>
+        <DialogContent>
+          {unidadeError && <Alert severity="error" sx={{ mb: 2 }}>{unidadeError}</Alert>}
+          {unidadeSuccess && <Alert severity="success" sx={{ mb: 2 }}>{unidadeSuccess}</Alert>}
+
+          {/* 1. Email */}
+          <TextField
+            label="E-mail do usuário"
+            fullWidth
+            margin="normal"
+            value={unidadeEmail}
+            onChange={(e) => { setUnidadeEmail(e.target.value); setUnidadeUser(null); setUnidadeUnits([]); setUnidadeSelectedUnit(''); setUnidadeError(''); }}
+            onKeyDown={(e) => { if (e.key === 'Enter') handleBuscarUsuario(); }}
+            InputProps={{
+              endAdornment: unidadeEmailLoading ? <CircularProgress size={18} sx={{ mr: 1 }} /> : null,
+            }}
+            helperText="Pressione Enter para buscar"
+          />
+
+          {/* 2. Confirmação do usuário */}
+          {unidadeUser && (
+            <Box sx={{ p: 1.5, borderRadius: 1.5, bgcolor: 'rgba(49,173,255,0.06)', border: '1px solid rgba(49,173,255,0.2)', mb: 1, display: 'flex', alignItems: 'center', gap: 1.5 }}>
+              <Avatar sx={{ bgcolor: 'rgba(49,173,255,0.15)', color: '#31adff', width: 38, height: 38 }}>
+                <People fontSize="small" />
+              </Avatar>
+              <Box>
+                <Typography variant="caption" sx={{ color: '#31adff', fontWeight: 600, letterSpacing: 0.5 }} display="block">
+                  Usuário encontrado
+                </Typography>
+                <Typography variant="body2" sx={{ fontWeight: 600, color: 'white' }}>
+                  {unidadeUser.nome_usuario}
+                </Typography>
+                <Typography variant="caption" color="text.secondary">
+                  {unidadeUser.empresa}
+                </Typography>
+              </Box>
+            </Box>
+          )}
+
+          {/* 3. Unidade */}
+          <FormControl fullWidth margin="normal" disabled={!unidadeUser || unidadeUnitsLoading}>
+            <InputLabel id="unidade-select-label">
+              {unidadeUnitsLoading ? 'Carregando...' : 'Unidade'}
+            </InputLabel>
+            <Select
+              labelId="unidade-select-label"
+              value={unidadeSelectedUnit}
+              onChange={(e) => setUnidadeSelectedUnit(e.target.value)}
+              label={unidadeUnitsLoading ? 'Carregando...' : 'Unidade'}
+              endAdornment={unidadeUnitsLoading ? <CircularProgress size={18} sx={{ mr: 2 }} /> : null}
+            >
+              {unidadeUnits.map((unit) => (
+                <MenuItem key={unit.public_id} value={unit.public_id}>
+                  {unit.unidade}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+
+          {/* Resumo */}
+          {unidadeUser && unidadeSelectedUnit && (
+            <>
+              <Divider sx={{ my: 2, borderColor: 'rgba(255,255,255,0.08)' }} />
+              <Box sx={{ p: 1.5, borderRadius: 1.5, bgcolor: 'rgba(49,173,255,0.06)', border: '1px solid rgba(49,173,255,0.15)' }}>
+                <Typography variant="caption" sx={{ color: '#31adff', fontWeight: 600, letterSpacing: 0.5 }} display="block" sx={{ mb: 0.5 }}>
+                  Resumo do vínculo
+                </Typography>
+                <Typography variant="body2" sx={{ mt: 0.5 }}>
+                  <Box component="span" sx={{ color: 'white', fontWeight: 600 }}>{unidadeUser.nome_usuario}</Box>
+                  <Box component="span" sx={{ color: 'text.secondary', mx: 0.75 }}>→</Box>
+                  <Box component="span" sx={{ color: '#31adff' }}>
+                    {unidadeUnits.find(u => u.public_id === unidadeSelectedUnit)?.unidade}
+                  </Box>
+                </Typography>
+              </Box>
+            </>
+          )}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleUnidadeClose} disabled={unidadeLoading}>Cancelar</Button>
+          <Button
+            variant="contained"
+            onClick={handleUnidadeSubmit}
+            disabled={unidadeLoading || !unidadeUser || !unidadeSelectedUnit}
+          >
+            {unidadeLoading ? 'Salvando...' : 'Vincular'}
           </Button>
         </DialogActions>
       </Dialog>

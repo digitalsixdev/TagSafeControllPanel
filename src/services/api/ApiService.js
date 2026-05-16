@@ -161,3 +161,17 @@ export const getInstructorsByCompany = (empresa_id) => {
 export const getUnitsByUserId = (usuario_id) => {
   return apiClient.get(`/empresas/units_by_user_id/${usuario_id}`);
 }
+
+// vincular uma unidade a um usuário
+export const addUnitToUser = (usuario_id, unidade_id) => {
+  const payload = {
+    unidade_id: unidade_id
+  }
+
+  return apiClient.post(`/usuarios/${usuario_id}/unidades`, payload);
+};
+
+// extrair o usuário pelo e-mail
+export const getUserByEmail = (email) => {
+  return apiClient.get(`/usuarios/get_by_email/${email}`);
+}
