@@ -12,8 +12,9 @@ import {
   getUserByEmail,
   getUnitByCompanieId,
   addUnitToUser,
+  getAllUsersQuantity,
 } from '../../services/api/ApiService';
-import { People, Groups3, LinkRounded } from '@mui/icons-material';
+import { People, Groups3, LinkRounded, AdminPanelSettings, School, ManageAccounts } from '@mui/icons-material';
 import {
   Alert,
   Box,
@@ -130,18 +131,27 @@ function GestaoUsuarios() {
   const [unidadeUnits, setUnidadeUnits] = useState([]);
   const [unidadeUnitsLoading, setUnidadeUnitsLoading] = useState(false);
   const [unidadeSelectedUnit, setUnidadeSelectedUnit] = useState('');
+  const [usersQuantity, setUsersQuantity] = useState([]);
 
-  useEffect(() => {
-    const loadStats = async () => {
-      try {
-        const response = await getStats();
-        setStats(response.data);
-      } finally {
-        setStatsLoading(false);
-      }
-    };
-    loadStats();
-  }, []);
+  const roleConfig = {
+    total:       { label: 'Total de Usuários', icon: Groups3,           gradient: 'linear-gradient(135deg, #c33101 0%, #1d757a 100%)' },
+    padrao:      { label: 'Padrão',    icon: People,            gradient: 'linear-gradient(135deg, #1d757a 0%, #ba83bd 100%)' },
+    admin:       { label: 'Administrador',     icon: AdminPanelSettings,gradient: 'linear-gradient(135deg, #4e35f0 0%, #ba83bd 100%)' },
+    instrutor:   { label: 'Instrutor',         icon: School,            gradient: 'linear-gradient(135deg, #ff8a64 0%, #ba83bd 100%)' },
+    user_master: { label: 'Master',            icon: ManageAccounts,    gradient: 'linear-gradient(135deg, #f59e0b 0%, #7c3aed 100%)' },
+  };
+
+  const loadStats = async () => {
+    try {
+      const [statsRes, quantityRes] = await Promise.all([getStats(), getAllUsersQuantity()]);
+      setStats(statsRes.data);
+      setUsersQuantity(quantityRes.data || []);
+    } finally {
+      setStatsLoading(false);
+    }
+  };
+
+  useEffect(() => { loadStats(); }, []);
 
   const handleOpen = async () => {
     setError('');
@@ -167,6 +177,7 @@ function GestaoUsuarios() {
     try {
       await createUser(formData);
       setSuccess('Usuário cadastrado com sucesso!');
+      loadStats();
       setTimeout(handleClose, 3000);
     } catch (err) {
       setError(formatApiError(err));
@@ -410,11 +421,16 @@ function GestaoUsuarios() {
             </Box>
           </Box>
 
-          <Grid container spacing={3} sx={{ mb: 4, justifyContent: 'left' }}>
-            <Grid item xs={12} sm={6} md={3}>
-              <StatCard title="Usuários cadastrados" value={stats.total_usuarios} icon={Groups3} gradient="linear-gradient(135deg, #31adff 0%, #1976b3 100%)" isLoading={statsLoading} />
-            </Grid>
-          </Grid>
+          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 3, mb: 4 }}>
+            {[{ role: 'total', quantidade: stats.total_usuarios }, ...usersQuantity].map((item, i) => {
+              const config = roleConfig[item.role] || { label: item.role, icon: People, gradient: 'linear-gradient(135deg, #64748b 0%, #334155 100%)' };
+              return (
+                <Box key={item.role} sx={{ flex: '1 1 200px', minWidth: 0 }}>
+                  <StatCard title={config.label} value={item.quantidade} icon={config.icon} gradient={config.gradient} delay={i * 100} isLoading={statsLoading} />
+                </Box>
+              );
+            })}
+          </Box>
 
         </Box>
       </Fade>
