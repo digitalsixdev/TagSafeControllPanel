@@ -183,3 +183,7 @@ export const getAllUsers = () => {
 export const getAllUsersQuantity = () => {
   return apiClient.get('/admin/users-quantity');
 }; 
+
+export const getCompanyById = (empresa_id) => {
+  return apiClient.get(`/empresas/company_by_id/${empresa_id}`);
+};

@@ -13,8 +13,11 @@ import {
   getUnitByCompanieId,
   addUnitToUser,
   getAllUsersQuantity,
+  getAllUsers,
+  getCompanyById,
+  getStats,
 } from '../../services/api/ApiService';
-import { People, Groups3, LinkRounded, AdminPanelSettings, School, ManageAccounts } from '@mui/icons-material';
+import { People, Groups3, LinkRounded, AdminPanelSettings, School, ManageAccounts, Search } from '@mui/icons-material';
 import {
   Alert,
   Box,
@@ -29,6 +32,7 @@ import {
   Divider,
   Fade,
   FormControl,
+  InputAdornment,
   InputLabel,
   MenuItem,
   Select,
@@ -43,7 +47,19 @@ import {
   Avatar,
   Grid
 } from '@mui/material';
-import { getStats } from '../../services/api/ApiService';
+import { DataGrid } from '@mui/x-data-grid';
+import { ptBR } from '@mui/x-data-grid/locales';
+
+const getRolesColor = (roleName) => {
+  const colors = {
+    'instrutor':   { backgroundColor: 'rgba(37, 99, 235, 0.1)',   textColor: '#60a5fa', border: 'rgba(59, 130, 246, 0.5)' },
+    'user_master': { backgroundColor: 'rgba(245, 158, 11, 0.1)',  textColor: '#fbbf24', border: 'rgba(245, 158, 11, 0.5)' },
+    'admin':       { backgroundColor: 'rgba(139, 92, 246, 0.1)',  textColor: '#a78bfa', border: 'rgba(139, 92, 246, 0.5)' },
+    'padrao':      { backgroundColor: 'rgba(255, 255, 255, 0.05)', textColor: '#94a3b8', border: 'rgba(255, 255, 255, 0.2)' },
+    'default':     { backgroundColor: 'rgba(255, 255, 255, 0.05)', textColor: '#94a3b8', border: 'rgba(255, 255, 255, 0.2)' },
+  };
+  return colors[roleName] || colors['default'];
+};
 
 function StatCard({ title, value, icon: Icon, gradient, delay = 0, isLoading = false, view = false}) {
   if (isLoading) {
@@ -132,6 +148,10 @@ function GestaoUsuarios() {
   const [unidadeUnitsLoading, setUnidadeUnitsLoading] = useState(false);
   const [unidadeSelectedUnit, setUnidadeSelectedUnit] = useState('');
   const [usersQuantity, setUsersQuantity] = useState([]);
+  const [users, setUsers] = useState([]);
+  const [usersSearchTerm, setUsersSearchTerm] = useState('');
+  const [roleFilter, setRoleFilter] = useState('');
+  const [allRoles, setAllRoles] = useState([]);
 
   const roleConfig = {
     total:       { label: 'Total de Usuários', icon: Groups3,           gradient: 'linear-gradient(135deg, #c33101 0%, #1d757a 100%)' },
@@ -143,9 +163,18 @@ function GestaoUsuarios() {
 
   const loadStats = async () => {
     try {
-      const [statsRes, quantityRes] = await Promise.all([getStats(), getAllUsersQuantity()]);
+      const [statsRes, quantityRes, usersRes, rolesRes] = await Promise.all([
+        getStats(), getAllUsersQuantity(), getAllUsers(), getRoles(),
+      ]);
+      setAllRoles(rolesRes.data || []);
       setStats(statsRes.data);
       setUsersQuantity(quantityRes.data || []);
+      const rawUsers = usersRes.data || [];
+      const uniqueEmpresaIds = [...new Set(rawUsers.map(u => u.empresa_id).filter(Boolean))];
+      const empresaResults = await Promise.all(uniqueEmpresaIds.map(id => getCompanyById(id)));
+      const companiesMap = {};
+      empresaResults.forEach((res, i) => { companiesMap[uniqueEmpresaIds[i]] = res.data?.nome || '—'; });
+      setUsers(rawUsers.map(u => ({ ...u, empresa: companiesMap[u.empresa_id] || '—' })));
     } finally {
       setStatsLoading(false);
     }
@@ -185,6 +214,41 @@ function GestaoUsuarios() {
       setLoading(false);
     }
   };
+
+  const usersColumns = useMemo(() => [
+    { field: 'nome', headerName: 'Nome', flex: 1, minWidth: 160 },
+    { field: 'email', headerName: 'E-mail', flex: 1, minWidth: 200 },
+    { field: 'empresa', headerName: 'Empresa', flex: 1, minWidth: 160, renderCell: (params) => params.value || '—' },
+    {
+      field: 'roles',
+      headerName: 'Cargo',
+      width: 160,
+      sortable: false,
+      renderCell: (params) => {
+        const role = params.value?.[0];
+        if (!role) return <Typography variant="caption" color="text.disabled">—</Typography>;
+        const style = getRolesColor(role.nome);
+        const label = role.nome === 'user_master' ? 'Master' : role.nome.charAt(0).toUpperCase() + role.nome.slice(1);
+        return (
+          <Box sx={{ display: 'flex', alignItems: 'center', height: '100%' }}>
+            <Chip label={label} size="small" variant="outlined" sx={{ color: style.textColor, backgroundColor: style.backgroundColor, borderColor: style.border, fontWeight: 700 }} />
+          </Box>
+        );
+      },
+    },
+  ], []);
+
+  const filteredUsers = useMemo(() => {
+    const term = usersSearchTerm.toLowerCase();
+    return users.filter(u => {
+      const matchSearch =
+        u.nome?.toLowerCase().includes(term) ||
+        u.email?.toLowerCase().includes(term) ||
+        u.empresa?.toLowerCase().includes(term);
+      const matchRole = !roleFilter || u.roles?.[0]?.nome === roleFilter;
+      return matchSearch && matchRole;
+    });
+  }, [users, usersSearchTerm, roleFilter]);
 
   // set para unificar as empresas sem precisar de uma nova rota
   const uniqueCompanyNames = useMemo(() => {
@@ -431,6 +495,71 @@ function GestaoUsuarios() {
               );
             })}
           </Box>
+
+          <Grow in timeout={1200}>
+            <Card sx={{ borderRadius: 2, border: '1px solid rgba(255,255,255,0.08)', bgcolor: 'background.paper' }}>
+              <Box sx={{ p: 2, borderBottom: '1px solid rgba(255,255,255,0.08)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 2 }}>
+                <Typography sx={{ fontWeight: 'bold' }}>
+                  Encontre todos os {stats.total_usuarios} usuários cadastrados no sistema
+                </Typography>
+                <Box sx={{ display: 'flex', gap: 1.5, alignItems: 'center', flexWrap: 'wrap' }}>
+                  <TextField
+                    size="small"
+                    placeholder="Buscar por nome, e-mail ou empresa..."
+                    value={usersSearchTerm}
+                    onChange={(e) => setUsersSearchTerm(e.target.value)}
+                    InputProps={{
+                      startAdornment: (
+                        <InputAdornment position="start">
+                          <Search fontSize="small" />
+                        </InputAdornment>
+                      ),
+                    }}
+                    sx={{ width: { xs: '100%', sm: 400 } }}
+                  />
+                  <Select
+                    size="small"
+                    value={roleFilter}
+                    onChange={(e) => setRoleFilter(e.target.value)}
+                    displayEmpty
+                    renderValue={(val) => {
+                      if (!val) return 'Todos os cargos';
+                      const role = allRoles.find(r => r.nome === val);
+                      return role?.nome === 'user_master' ? 'Master' : role?.nome.charAt(0).toUpperCase() + role?.nome.slice(1);
+                    }}
+                    sx={{ minWidth: 150 }}
+                  >
+                    <MenuItem value="">Todos</MenuItem>
+                    {allRoles.map(r => (
+                      <MenuItem key={r.public_id} value={r.nome}>
+                        {r.nome === 'user_master' ? 'Master' : r.nome.charAt(0).toUpperCase() + r.nome.slice(1)}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </Box>
+              </Box>
+              <Box sx={{ p: 1, height: 500, width: '100%' }}>
+                <DataGrid
+                  rows={filteredUsers}
+                  columns={usersColumns}
+                  loading={statsLoading}
+                  getRowId={(row) => row.public_id}
+                  localeText={ptBR.components.MuiDataGrid.defaultProps.localeText}
+                  initialState={{ pagination: { paginationModel: { pageSize: 10 } } }}
+                  pageSizeOptions={[5, 10, 25, 50]}
+                  rowHeight={64}
+                  disableRowSelectionOnClick
+                  sx={{
+                    border: 'none',
+                    '& .MuiDataGrid-cell': { borderColor: 'rgba(255,255,255,0.05)', display: 'flex', alignItems: 'center' },
+                    '& .MuiDataGrid-columnHeaders': { backgroundColor: 'rgba(255,255,255,0.02)', borderColor: 'rgba(255,255,255,0.05)' },
+                    '& .MuiDataGrid-row:hover': { backgroundColor: 'rgba(255,255,255,0.02)' },
+                    '& .MuiDataGrid-footerContainer': { borderColor: 'rgba(255,255,255,0.05)' },
+                  }}
+                />
+              </Box>
+            </Card>
+          </Grow>
 
         </Box>
       </Fade>
