@@ -549,25 +549,45 @@ function GestaoEmpresas() {
                 Gerencie as empresas cadastradas na plataforma.
               </Typography>
             </Box>
-            <Box sx={{ display: 'flex', gap: 2 }}>
-              <Button variant="outlined" startIcon={<Business />} onClick={handleUnitOpen} sx={{ borderRadius: 2 }}>
-                Nova Unidade
-              </Button>
-              <Button variant="contained" startIcon={<Store />} onClick={handleOpen} sx={{ borderRadius: 2 }}>
-                Nova Empresa
-              </Button>
+            <Box sx={{ display: 'flex', gap: 1.5 }}>
+              {[
+                { label: 'Nova Unidade', icon: <Business />, onClick: handleUnitOpen },
+                { label: 'Nova Empresa', icon: <Store />,    onClick: handleOpen },
+              ].map(({ label, icon, onClick }) => (
+                <Button
+                  key={label}
+                  variant="text"
+                  startIcon={icon}
+                  onClick={onClick}
+                  sx={{
+                    borderRadius: 2,
+                    color: 'rgba(255,255,255,0.65)',
+                    background: 'rgba(255,255,255,0.04)',
+                    border: '1px solid rgba(255,255,255,0.08)',
+                    backdropFilter: 'blur(8px)',
+                    transition: 'all 0.2s ease',
+                    '&:hover': {
+                      background: 'rgba(255,255,255,0.08)',
+                      border: '1px solid rgba(255,255,255,0.16)',
+                      color: 'rgba(255,255,255,0.95)',
+                    },
+                  }}
+                >
+                  {label}
+                </Button>
+              ))}
             </Box>
           </Box>
 
           <Grid container spacing={3} sx={{ mb: 4 }}>
             <Grid item xs={12} sm={6} md={4}>
-              <StatCard title="Empresas cadastradas" value={stats.total_empresas} icon={Business} gradient="linear-gradient(135deg, #2563EB 0%, #3B82F6 100%)" isLoading={statsLoading} />
+              <StatCard title="Empresas cadastradas" value={stats.total_empresas} icon={Business} gradient="linear-gradient(135deg, #0f172a 0%, #1d4ed8 100%)" isLoading={statsLoading} />
             </Grid>
             <Grid item xs={12} sm={6} md={4}>
-              <StatCard title="Unidades cadastradas" value={stats.total_unidades} icon={Store} gradient="linear-gradient(135deg, #5f46ff 0%, #501bff 100%)" isLoading={statsLoading} />
+              <StatCard title="Unidades cadastradas" value={stats.total_unidades} icon={Store} gradient="linear-gradient(135deg, #0f172a 0%, #6d28d9 100%)" isLoading={statsLoading} />
             </Grid>
             <Grid item xs={12} sm={6} md={4}>
-              <StatCard title="Módulos disponíveis" value={stats.total_modulos} icon={ViewModule} gradient="linear-gradient(135deg, #F59E0B 0%, #D97706 100%)" isLoading={statsLoading} delay={200} />
+              <StatCard title="Módulos disponíveis" value={stats.total_modulos} icon={ViewModule} gradient="linear-gradient(135deg, #0f172a 0%, #047857 100%)" isLoading={statsLoading} delay={200} />
             </Grid>
           </Grid>
 

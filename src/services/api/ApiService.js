@@ -176,14 +176,17 @@ export const getUserByEmail = (email) => {
   return apiClient.get(`/usuarios/get_by_email/${email}`);
 };
 
+// extrair todos os usuários com usuário master
 export const getAllUsers = () => {
   return apiClient.get('/usuarios/master');
 };
 
+// extrair quantidade de usuários por role
 export const getAllUsersQuantity = () => {
   return apiClient.get('/admin/users-quantity');
 }; 
 
+// extrair empresa pelo empresa_id
 export const getCompanyById = (empresa_id) => {
   return apiClient.get(`/empresas/company_by_id/${empresa_id}`);
 };

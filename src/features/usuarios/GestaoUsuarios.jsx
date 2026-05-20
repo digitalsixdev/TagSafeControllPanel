@@ -17,7 +17,7 @@ import {
   getCompanyById,
   getStats,
 } from '../../services/api/ApiService';
-import { People, Groups3, LinkRounded, AdminPanelSettings, School, ManageAccounts, Search } from '@mui/icons-material';
+import { People, Groups3, LinkRounded, AdminPanelSettings, School, ManageAccounts, Search, CheckCircle, HourglassEmpty, MoreVert, Edit, Business } from '@mui/icons-material';
 import {
   Alert,
   Box,
@@ -32,8 +32,10 @@ import {
   Divider,
   Fade,
   FormControl,
+  IconButton,
   InputAdornment,
   InputLabel,
+  Menu,
   MenuItem,
   Select,
   TextField,
@@ -152,13 +154,36 @@ function GestaoUsuarios() {
   const [usersSearchTerm, setUsersSearchTerm] = useState('');
   const [roleFilter, setRoleFilter] = useState('');
   const [allRoles, setAllRoles] = useState([]);
+  const [userMenuAnchor, setUserMenuAnchor] = useState(null);
+  const [selectedUser, setSelectedUser] = useState(null);
+  const [viewUnitsOpen, setViewUnitsOpen] = useState(false);
+  const [viewUnitsUser, setViewUnitsUser] = useState(null);
+
+  const handleUserMenuOpen = (event, row) => {
+    setUserMenuAnchor(event.currentTarget);
+    setSelectedUser(row);
+  };
+  const handleUserMenuClose = () => {
+    setUserMenuAnchor(null);
+    setSelectedUser(null);
+  };
+  const handleViewUnits = () => {
+    setViewUnitsUser(selectedUser);
+    setUserMenuAnchor(null);
+    setSelectedUser(null);
+    setViewUnitsOpen(true);
+  };
+  const handleViewUnitsClose = () => {
+    setViewUnitsOpen(false);
+    setViewUnitsUser(null);
+  };
 
   const roleConfig = {
-    total:       { label: 'Total de Usuários', icon: Groups3,           gradient: 'linear-gradient(135deg, #c33101 0%, #1d757a 100%)' },
-    padrao:      { label: 'Padrão',    icon: People,            gradient: 'linear-gradient(135deg, #1d757a 0%, #ba83bd 100%)' },
-    admin:       { label: 'Administrador',     icon: AdminPanelSettings,gradient: 'linear-gradient(135deg, #4e35f0 0%, #ba83bd 100%)' },
-    instrutor:   { label: 'Instrutor',         icon: School,            gradient: 'linear-gradient(135deg, #ff8a64 0%, #ba83bd 100%)' },
-    user_master: { label: 'Master',            icon: ManageAccounts,    gradient: 'linear-gradient(135deg, #f59e0b 0%, #7c3aed 100%)' },
+    total:       { label: 'Total de Usuários', icon: Groups3,            gradient: 'linear-gradient(135deg, #0f172a 0%, #2563eb 100%)' },
+    padrao:      { label: 'Padrão',            icon: People,             gradient: 'linear-gradient(135deg, #0f172a 0%, #1d4ed8 100%)' },
+    admin:       { label: 'Administrador',     icon: AdminPanelSettings, gradient: 'linear-gradient(135deg, #0f172a 0%, #1e40af 100%)' },
+    instrutor:   { label: 'Instrutor',         icon: School,             gradient: 'linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%)' },
+    user_master: { label: 'Master',            icon: ManageAccounts,     gradient: 'linear-gradient(135deg, #0f172a 0%, #172554 100%)' },
   };
 
   const loadStats = async () => {
@@ -220,6 +245,26 @@ function GestaoUsuarios() {
     { field: 'email', headerName: 'E-mail', flex: 1, minWidth: 200 },
     { field: 'empresa', headerName: 'Empresa', flex: 1, minWidth: 160, renderCell: (params) => params.value || '—' },
     {
+      field: 'primeiro_acesso',
+      headerName: 'Primeiro Acesso',
+      width: 140,
+      sortable: false,
+      align: 'center',
+      headerAlign: 'center',
+      renderCell: (params) => {
+        const pendente = params.value === true;
+        return (
+          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
+            {pendente ? (
+              <HourglassEmpty sx={{ color: '#f59e0b', fontSize: 20 }} titleAccess="Aguardando primeiro acesso" />
+            ) : (
+              <CheckCircle sx={{ color: '#10b981', fontSize: 20 }} titleAccess="Primeiro acesso concluído" />
+            )}
+          </Box>
+        );
+      },
+    },
+    {
       field: 'roles',
       headerName: 'Cargo',
       width: 160,
@@ -235,6 +280,26 @@ function GestaoUsuarios() {
           </Box>
         );
       },
+    },
+    {
+      field: 'actions',
+      headerName: 'Ações',
+      width: 80,
+      sortable: false,
+      align: 'center',
+      headerAlign: 'center',
+      renderCell: (params) => (
+        <IconButton
+          size="small"
+          onClick={(e) => {
+            e.stopPropagation();
+            handleUserMenuOpen(e, params.row);
+          }}
+          sx={{ color: 'text.secondary', '&:hover': { color: 'primary.main', bgcolor: 'rgba(255,255,255,0.05)' } }}
+        >
+          <MoreVert fontSize="small" />
+        </IconButton>
+      ),
     },
   ], []);
 
@@ -452,36 +517,34 @@ function GestaoUsuarios() {
                 Gerencie os usuários cadastrados na plataforma.
               </Typography>
             </Box>
-            <Box sx={{ display: 'flex', gap: 2 }}>
-              <Button
-                variant="outlined"
-                startIcon={<LinkRounded />}
-                onClick={handleVincularOpen}
-                sx={{
-                  borderRadius: 2,
-                  color: '#a78bfa',
-                  borderColor: '#a78bfa',
-                  '&:hover': { borderColor: '#8B5CF6', bgcolor: 'rgba(139, 92, 246, 0.08)' },
-                }}
-              >
-                Vincular Instrutores
-              </Button>
-              <Button
-                variant="outlined"
-                startIcon={<LinkRounded />}
-                onClick={handleUnidadeOpen}
-                sx={{
-                  borderRadius: 2,
-                  color: '#34d399',
-                  borderColor: '#34d399',
-                  '&:hover': { borderColor: '#10b981', bgcolor: 'rgba(16, 185, 129, 0.08)' },
-                }}
-              >
-                Vincular Unidades
-              </Button>
-              <Button variant="outlined" startIcon={<People />} onClick={handleOpen} sx={{ borderRadius: 2 }}>
-                Novo Usuário
-              </Button>
+            <Box sx={{ display: 'flex', gap: 1.5 }}>
+              {[
+                { label: 'Vincular Instrutores', icon: <LinkRounded />, onClick: handleVincularOpen },
+                { label: 'Vincular Unidades',    icon: <LinkRounded />, onClick: handleUnidadeOpen },
+                { label: 'Novo Usuário',          icon: <People />,      onClick: handleOpen },
+              ].map(({ label, icon, onClick }) => (
+                <Button
+                  key={label}
+                  variant="text"
+                  startIcon={icon}
+                  onClick={onClick}
+                  sx={{
+                    borderRadius: 2,
+                    color: 'rgba(255,255,255,0.65)',
+                    background: 'rgba(255,255,255,0.04)',
+                    border: '1px solid rgba(255,255,255,0.08)',
+                    backdropFilter: 'blur(8px)',
+                    transition: 'all 0.2s ease',
+                    '&:hover': {
+                      background: 'rgba(255,255,255,0.08)',
+                      border: '1px solid rgba(255,255,255,0.16)',
+                      color: 'rgba(255,255,255,0.95)',
+                    },
+                  }}
+                >
+                  {label}
+                </Button>
+              ))}
             </Box>
           </Box>
 
@@ -883,6 +946,93 @@ function GestaoUsuarios() {
           </Button>
         </DialogActions>
       </Dialog>
+
+      {/* Visualizar Unidades dialog */}
+      <Dialog open={viewUnitsOpen} onClose={handleViewUnitsClose} maxWidth="sm" fullWidth>
+        <DialogTitle sx={{ pb: 0 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+            <Business sx={{ color: 'info.main' }} />
+            Unidades Vinculadas
+          </Box>
+        </DialogTitle>
+        <DialogContent>
+          {viewUnitsUser && (
+            <>
+              <Box sx={{ mb: 2.5, mt: 0.5 }}>
+                <Typography variant="body2" sx={{ fontWeight: 600 }}>{viewUnitsUser.nome}</Typography>
+                <Typography variant="caption" sx={{ color: 'text.secondary' }}>{viewUnitsUser.email}</Typography>
+                {viewUnitsUser.empresa && (
+                  <Typography variant="caption" sx={{ color: 'text.disabled', display: 'block' }}>
+                    {viewUnitsUser.empresa}
+                  </Typography>
+                )}
+              </Box>
+
+              {(!viewUnitsUser.unidades || viewUnitsUser.unidades.length === 0) ? (
+                <Box sx={{ py: 4, textAlign: 'center' }}>
+                  <Business sx={{ fontSize: 40, color: 'text.disabled', mb: 1 }} />
+                  <Typography variant="body2" color="text.secondary">
+                    Nenhuma unidade vinculada a este usuário.
+                  </Typography>
+                </Box>
+              ) : (
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
+                  {viewUnitsUser.unidades.map((unit) => (
+                    <Box
+                      key={unit.public_id}
+                      sx={{
+                        p: 2,
+                        borderRadius: 2,
+                        border: '1px solid rgba(255,255,255,0.08)',
+                        bgcolor: 'rgba(255,255,255,0.03)',
+                      }}
+                    >
+                      <Typography variant="body2" sx={{ fontWeight: 600, mb: unit.modulos?.length > 0 ? 1 : 0 }}>
+                        {unit.nome}
+                      </Typography>
+                      {unit.modulos?.length > 0 && (
+                        <Box sx={{ display: 'flex', gap: 0.75, flexWrap: 'wrap' }}>
+                          {unit.modulos.map((mod) => (
+                            <Chip
+                              key={mod.public_id}
+                              label={mod.abreviacao || mod.nome}
+                              size="small"
+                              variant="outlined"
+                              sx={{ fontSize: '0.7rem', height: 22, borderColor: 'rgba(255,255,255,0.15)', color: 'text.secondary' }}
+                            />
+                          ))}
+                        </Box>
+                      )}
+                    </Box>
+                  ))}
+                </Box>
+              )}
+            </>
+          )}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleViewUnitsClose}>Fechar</Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* User context menu */}
+      <Menu
+        anchorEl={userMenuAnchor}
+        open={Boolean(userMenuAnchor)}
+        onClose={handleUserMenuClose}
+        PaperProps={{
+          sx: { minWidth: 180, bgcolor: '#1e1e1e', border: '1px solid rgba(255,255,255,0.1)' }
+        }}
+      >
+        <MenuItem onClick={handleUserMenuClose}>
+          <Edit fontSize="small" sx={{ mr: 1.5, color: 'primary.main' }} />
+          <Typography variant="body2">Editar Usuário</Typography>
+        </MenuItem>
+        <MenuItem onClick={handleViewUnits}>
+          <Business fontSize="small" sx={{ mr: 1.5, color: 'info.main' }} />
+          <Typography variant="body2">Visualizar Unidades</Typography>
+        </MenuItem>
+      </Menu>
     </Container>
   );
 }
