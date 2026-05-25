@@ -139,16 +139,11 @@ export const getUnitsAttended = (instrutor_id) => {
   return apiClient.get(`/instrutores/unidades-atendidas/${instrutor_id}`);
 };
 
-export const setUnitsAttended = (usuario_id, unidades_id, modulos) => {
+export const setUnitsAttended = (usuario_id, unidades_atendidas) => {
   const payload = {
-    usuario_id: usuario_id,
-    unidades_atendidas: [
-      {
-        id: unidades_id,
-        modulos: modulos
-      }
-    ],
-  }
+    usuario_id,
+    unidades_atendidas,
+  };
   return apiClient.post(`/instrutores/unidades-atendidas`, payload);
 };
 
@@ -206,4 +201,8 @@ export const updateRolesByPublicId = (public_id, roles) => {
   };
 
   return apiClient.put(`/usuarios/update-roles/${public_id}`, payload)
+};
+
+export const getRolesByUserId = (public_id) => {
+  return apiClient.get(`/usuarios/get-roles/${public_id}`);
 };
