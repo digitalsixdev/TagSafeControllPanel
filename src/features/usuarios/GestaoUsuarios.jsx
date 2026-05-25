@@ -16,6 +16,8 @@ import {
   getAllUsers,
   getCompanyById,
   getStats,
+  updateNameByPublicId,
+  updateRolesByPublicId,
 } from '../../services/api/ApiService';
 import { People, Groups3, LinkRounded, AdminPanelSettings, School, ManageAccounts, Search, CheckCircle, HourglassEmpty, MoreVert, Edit, Business } from '@mui/icons-material';
 import {
@@ -159,6 +161,15 @@ function GestaoUsuarios() {
   const [viewUnitsOpen, setViewUnitsOpen] = useState(false);
   const [viewUnitsUser, setViewUnitsUser] = useState(null);
 
+  // "Editar Usuário" dialog
+  const [editOpen, setEditOpen] = useState(false);
+  const [editLoading, setEditLoading] = useState(false);
+  const [editError, setEditError] = useState('');
+  const [editSuccess, setEditSuccess] = useState('');
+  const [editUser, setEditUser] = useState(null);
+  const [editName, setEditName] = useState('');
+  const [editRoles, setEditRoles] = useState([]);
+
   const handleUserMenuOpen = (event, row) => {
     setUserMenuAnchor(event.currentTarget);
     setSelectedUser(row);
@@ -176,6 +187,57 @@ function GestaoUsuarios() {
   const handleViewUnitsClose = () => {
     setViewUnitsOpen(false);
     setViewUnitsUser(null);
+  };
+
+  const handleEditOpen = () => {
+    if (!selectedUser) return;
+    setEditUser(selectedUser);
+    setEditName(selectedUser.nome || '');
+    setEditRoles(selectedUser.roles?.map(r => r.public_id) || []);
+    setEditError('');
+    setEditSuccess('');
+    setUserMenuAnchor(null);
+    setSelectedUser(null);
+    setEditOpen(true);
+  };
+
+  const handleEditClose = () => {
+    setEditOpen(false);
+    setEditError('');
+    setEditSuccess('');
+    setEditUser(null);
+  };
+
+  const handleEditSubmit = async () => {
+    if (!editUser) return;
+
+    const originalRoles = editUser.roles?.map(r => r.public_id) || [];
+    const nameChanged = editName.trim() !== (editUser.nome || '').trim();
+    const rolesChanged =
+      editRoles.length !== originalRoles.length ||
+      editRoles.some(id => !originalRoles.includes(id));
+
+    if (!nameChanged && !rolesChanged) {
+      setEditError('Nenhuma alteração detectada.');
+      return;
+    }
+
+    setEditLoading(true);
+    setEditError('');
+    setEditSuccess('');
+    try {
+      const requests = [];
+      if (nameChanged) requests.push(updateNameByPublicId(editUser.public_id, editName.trim()));
+      if (rolesChanged) requests.push(updateRolesByPublicId(editUser.public_id, editRoles));
+      await Promise.all(requests);
+      setEditSuccess('Usuário atualizado com sucesso!');
+      loadStats();
+      setTimeout(handleEditClose, 2000);
+    } catch (err) {
+      setEditError(formatApiError(err));
+    } finally {
+      setEditLoading(false);
+    }
   };
 
   const roleConfig = {
@@ -1015,6 +1077,73 @@ function GestaoUsuarios() {
         </DialogActions>
       </Dialog>
 
+      {/* Editar Usuário dialog */}
+      <Dialog open={editOpen} onClose={handleEditClose} fullWidth maxWidth="sm">
+        <DialogTitle>
+          <Fade in={editOpen} timeout={800}>
+            <Box sx={{ pt: 2, textAlign: 'center' }}>
+              <Typography variant="h4" component="span" sx={{ fontWeight: 'bold', letterSpacing: 1 }}>
+                <Box><Edit /></Box>
+                Editar Usuário
+              </Typography>
+            </Box>
+          </Fade>
+        </DialogTitle>
+        <DialogContent>
+          {editError && <Alert severity="error" sx={{ mb: 2 }}>{editError}</Alert>}
+          {editSuccess && <Alert severity="success" sx={{ mb: 2 }}>{editSuccess}</Alert>}
+
+          <TextField
+            label="Nome"
+            fullWidth
+            margin="normal"
+            value={editName}
+            onChange={(e) => setEditName(e.target.value)}
+          />
+
+          <FormControl fullWidth margin="normal">
+            <InputLabel id="edit-roles-label">Cargos</InputLabel>
+            <Select
+              labelId="edit-roles-label"
+              multiple
+              value={editRoles}
+              onChange={(e) => setEditRoles(e.target.value)}
+              label="Cargos"
+              renderValue={(selected) => (
+                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                  {allRoles
+                    .filter(r => selected.includes(r.public_id))
+                    .map(r => {
+                      const label = r.nome === 'user_master' ? 'Master' : r.nome.charAt(0).toUpperCase() + r.nome.slice(1);
+                      return <Chip key={r.public_id} label={label} size="small" />;
+                    })}
+                </Box>
+              )}
+            >
+              {allRoles.map((role) => {
+                const label = role.nome === 'user_master' ? 'Master' : role.nome.charAt(0).toUpperCase() + role.nome.slice(1);
+                return (
+                  <MenuItem key={role.public_id} value={role.public_id}>
+                    <Checkbox checked={editRoles.includes(role.public_id)} />
+                    <ListItemText primary={label} />
+                  </MenuItem>
+                );
+              })}
+            </Select>
+          </FormControl>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleEditClose} disabled={editLoading}>Cancelar</Button>
+          <Button
+            variant="contained"
+            onClick={handleEditSubmit}
+            disabled={editLoading || !editName.trim() || editRoles.length === 0}
+          >
+            {editLoading ? 'Salvando...' : 'Salvar'}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
       {/* User context menu */}
       <Menu
         anchorEl={userMenuAnchor}
@@ -1024,7 +1153,7 @@ function GestaoUsuarios() {
           sx: { minWidth: 180, bgcolor: '#1e1e1e', border: '1px solid rgba(255,255,255,0.1)' }
         }}
       >
-        <MenuItem onClick={handleUserMenuClose}>
+        <MenuItem onClick={handleEditOpen}>
           <Edit fontSize="small" sx={{ mr: 1.5, color: 'primary.main' }} />
           <Typography variant="body2">Editar Usuário</Typography>
         </MenuItem>

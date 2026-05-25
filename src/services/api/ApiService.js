@@ -190,3 +190,20 @@ export const getAllUsersQuantity = () => {
 export const getCompanyById = (empresa_id) => {
   return apiClient.get(`/empresas/company_by_id/${empresa_id}`);
 };
+
+// rotas para editar users (name & roles)
+export const updateNameByPublicId = (public_id, name) => {
+  const payload = {
+    'name': name
+  };
+
+  return apiClient.put(`/usuarios/update-name/${public_id}`, payload);
+};
+
+export const updateRolesByPublicId = (public_id, roles) => {
+  const payload = {
+    'roles': roles
+  };
+
+  return apiClient.put(`/usuarios/update-roles/${public_id}`, payload)
+};
