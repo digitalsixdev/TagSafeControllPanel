@@ -1250,7 +1250,7 @@ function GestaoUsuarios() {
             <>
               <Divider sx={{ my: 2, borderColor: 'rgba(255,255,255,0.08)' }} />
               <Box sx={{ p: 1.5, borderRadius: 1.5, bgcolor: 'rgba(49,173,255,0.06)', border: '1px solid rgba(49,173,255,0.15)' }}>
-                <Typography variant="caption" sx={{ color: '#31adff', fontWeight: 600, letterSpacing: 0.5 }} display="block" sx={{ mb: 0.5 }}>
+                <Typography variant="caption" display="block" sx={{ color: '#31adff', fontWeight: 600, letterSpacing: 0.5, mb: 0.5 }}>
                   Resumo do vínculo
                 </Typography>
                 <Typography variant="body2" sx={{ mt: 0.5 }}>
