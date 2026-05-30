@@ -19,7 +19,8 @@ import {
   MoreVert,
   Edit,
   Delete,
-  Group
+  Group,
+  FileDownload
 } from '@mui/icons-material';
 import {
   Alert,
@@ -107,6 +108,23 @@ function StatCard({ title, value, icon: Icon, gradient, delay = 0, isLoading = f
     </Grow>
   );
 }
+
+const exportCSV = (rows, filename) => {
+  const columns = [
+    { label: 'Nome',      get: r => r.nome || '' },
+    { label: 'CNPJ Base', get: r => r.cnpj_base || '' },
+  ];
+  const escape = v => v.includes(',') || v.includes('"') || v.includes('\n') ? `"${v.replace(/"/g, '""')}"` : v;
+  const header = columns.map(c => c.label).join(',');
+  const body = rows.map(r => columns.map(c => escape(c.get(r))).join(',')).join('\n');
+  const blob = new Blob(['﻿' + header + '\n' + body], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(url);
+};
 
 function GestaoEmpresas() {
   // "Nova Empresa" dialog
@@ -593,24 +611,49 @@ function GestaoEmpresas() {
 
           <Grow in timeout={1200}>
             <Card sx={{ borderRadius: 2, border: '1px solid rgba(255,255,255,0.08)', bgcolor: 'background.paper' }}>
-              <Box sx={{ p: 1, borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
-                <Typography sx={{ p: 2, fontWeight: 'bold' }}>
+              <Box sx={{ p: 2, borderBottom: '1px solid rgba(255,255,255,0.08)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 2 }}>
+                <Typography sx={{ fontWeight: 'bold' }}>
                   Encontre todas as {stats.total_empresas} empresas cadastradas no sistema
                 </Typography>
-                <TextField
-                  size="small"
-                  placeholder="Buscar empresa por nome ou CNPJ..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  InputProps={{
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        <Search fontSize="small" />
-                      </InputAdornment>
-                    ),
-                  }}
-                  sx={{ p: 1, width: { xs: '100%', sm: 480 }, '& input': {height: '35px'} }}
-                />
+                <Box sx={{ display: 'flex', gap: 1.5, alignItems: 'center', flexWrap: 'wrap' }}>
+                  <TextField
+                    size="small"
+                    placeholder="Buscar empresa por nome ou CNPJ..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    InputProps={{
+                      startAdornment: (
+                        <InputAdornment position="start">
+                          <Search fontSize="small" />
+                        </InputAdornment>
+                      ),
+                    }}
+                    sx={{ width: { xs: '100%', sm: 400 } }}
+                  />
+                  <Button
+                    variant="text"
+                    size="small"
+                    startIcon={<FileDownload />}
+                    onClick={() => exportCSV(filteredCompanies, `empresas_${new Date().toISOString().slice(0,10)}.csv`)}
+                    disabled={filteredCompanies.length === 0}
+                    sx={{
+                      borderRadius: 2,
+                      color: 'rgba(255,255,255,0.65)',
+                      background: 'rgba(255,255,255,0.04)',
+                      border: '1px solid rgba(255,255,255,0.08)',
+                      backdropFilter: 'blur(8px)',
+                      whiteSpace: 'nowrap',
+                      transition: 'all 0.2s ease',
+                      '&:hover': {
+                        background: 'rgba(255,255,255,0.08)',
+                        border: '1px solid rgba(255,255,255,0.16)',
+                        color: 'rgba(255,255,255,0.95)',
+                      },
+                    }}
+                  >
+                    Exportar CSV
+                  </Button>
+                </Box>
               </Box>
 
               <Box sx={{ p: 1, height: 500, width: '100%' }}>

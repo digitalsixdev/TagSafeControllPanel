@@ -20,7 +20,7 @@ apiClient.interceptors.request.use((config) => {
 });
 
 export const login = (email, senha) =>
-  apiClient.post('/auth/login-master', { email, senha }); // nova rota de login adicionada
+  apiClient.post('/auth/login-master', { email, senha });
 
 export const verifyToken = () =>
   apiClient.get('/auth/me');
@@ -136,7 +136,7 @@ export const getStats = () => {
 
 // unidades-atendidas
 export const getUnitsAttended = (instrutor_id) => { 
-  return apiClient.get(`/instrutores/unidades-atendidas/${instrutor_id}`);
+  return apiClient.get(`/instrutores/unidades_atendidas/${instrutor_id}`);
 };
 
 export const setUnitsAttended = (usuario_id, unidades_atendidas) => {
@@ -144,12 +144,12 @@ export const setUnitsAttended = (usuario_id, unidades_atendidas) => {
     usuario_id,
     unidades_atendidas,
   };
-  return apiClient.post(`/instrutores/unidades-atendidas`, payload);
+  return apiClient.post(`/instrutores/unidades_atendidas`, payload);
 };
 
 // selecionar o instrutor da empresa
 export const getInstructorsByCompany = (empresa_id) => {
-  return apiClient.get(`/instrutores/instrutores-by-company/${empresa_id}`);
+  return apiClient.get(`/instrutores/instrutores_by_company/${empresa_id}`);
 };
 
 // ter as unidades vinculadas do usuário
@@ -178,7 +178,7 @@ export const getAllUsers = () => {
 
 // extrair quantidade de usuários por role
 export const getAllUsersQuantity = () => {
-  return apiClient.get('/admin/users-quantity');
+  return apiClient.get('/admin/users_quantity');
 }; 
 
 // extrair empresa pelo empresa_id
@@ -192,7 +192,7 @@ export const updateNameByPublicId = (public_id, name) => {
     'name': name
   };
 
-  return apiClient.put(`/usuarios/update-name/${public_id}`, payload);
+  return apiClient.put(`/usuarios/update_name/${public_id}`, payload);
 };
 
 export const updateRolesByPublicId = (public_id, roles) => {
@@ -200,9 +200,9 @@ export const updateRolesByPublicId = (public_id, roles) => {
     'roles': roles
   };
 
-  return apiClient.put(`/usuarios/update-roles/${public_id}`, payload)
+  return apiClient.put(`/usuarios/update_roles/${public_id}`, payload)
 };
 
 export const getRolesByUserId = (public_id) => {
-  return apiClient.get(`/usuarios/get-roles/${public_id}`);
+  return apiClient.get(`/usuarios/get_roles/${public_id}`);
 };

@@ -33,9 +33,10 @@ const Login = ({ onLoginSuccess }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
-  const [selectedEnv, setSelectedEnv] = useState(
-    () => localStorage.getItem('selected_env') || 'dev'
-  );
+  const [selectedEnv, setSelectedEnv] = useState(() => {
+    const saved = localStorage.getItem('selected_env');
+    return saved === 'local' ? 'dev' : saved || 'dev';
+  });
 
   const handleEnvChange = (_, newEnv) => {
     if (!newEnv) return;
@@ -234,9 +235,8 @@ const Login = ({ onLoginSuccess }) => {
                     sx={{ mb: 2 }}
                   >
                     {[
-                      { value: 'dev',   label: 'Dev' },
-                      { value: 'prod',  label: 'Prod' },
-                      { value: 'local', label: 'Local' },
+                      { value: 'dev',  label: 'Dev' },
+                      { value: 'prod', label: 'Prod' },
                     ].map(({ value, label }) => (
                       <ToggleButton
                         key={value}

@@ -17,9 +17,10 @@ import {
   updateRolesByPublicId,
   getRolesByUserId,
 } from '../../services/api/ApiService';
-import { People, Groups3, LinkRounded, AdminPanelSettings, School, ManageAccounts, Search, CheckCircle, HourglassEmpty, MoreVert, Edit, Business, Close } from '@mui/icons-material';
+import { People, Groups3, LinkRounded, AdminPanelSettings, School, ManageAccounts, Search, CheckCircle, HourglassEmpty, MoreVert, Edit, Business, Close, FileDownload } from '@mui/icons-material';
 import {
   Alert,
+  Tooltip,
   Box,
   Button,
   Chip,
@@ -96,6 +97,31 @@ function StatCard({ title, value, icon: Icon, gradient, delay = 0, isLoading = f
     </Grow>
   );
 }
+
+const exportCSV = (rows, filename) => {
+  const columns = [
+    { label: 'Nome',            get: r => r.nome || '' },
+    { label: 'E-mail',          get: r => r.email || '' },
+    { label: 'Empresa',         get: r => r.empresa || '' },
+    { label: 'Cargo',           get: r => {
+      const nome = r.roles?.[0]?.nome;
+      if (!nome) return '';
+      if (nome === 'user_master') return 'Master';
+      return nome.charAt(0).toUpperCase() + nome.slice(1);
+    }},
+    { label: 'Primeiro Acesso', get: r => r.primeiro_acesso ? 'Pendente' : 'Concluído' },
+  ];
+  const escape = v => v.includes(',') || v.includes('"') || v.includes('\n') ? `"${v.replace(/"/g, '""')}"` : v;
+  const header = columns.map(c => c.label).join(',');
+  const body = rows.map(r => columns.map(c => escape(c.get(r))).join(',')).join('\n');
+  const blob = new Blob(['﻿' + header + '\n' + body], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(url);
+};
 
 function GestaoUsuarios() {
   const [open, setOpen] = useState(false);
@@ -755,6 +781,29 @@ function GestaoUsuarios() {
                       </MenuItem>
                     ))}
                   </Select>
+                  <Button
+                    variant="text"
+                    size="small"
+                    startIcon={<FileDownload />}
+                    onClick={() => exportCSV(filteredUsers, `usuarios_${new Date().toISOString().slice(0,10)}.csv`)}
+                    disabled={filteredUsers.length === 0}
+                    sx={{
+                      borderRadius: 2,
+                      color: 'rgba(255,255,255,0.65)',
+                      background: 'rgba(255,255,255,0.04)',
+                      border: '1px solid rgba(255,255,255,0.08)',
+                      backdropFilter: 'blur(8px)',
+                      whiteSpace: 'nowrap',
+                      transition: 'all 0.2s ease',
+                      '&:hover': {
+                        background: 'rgba(255,255,255,0.08)',
+                        border: '1px solid rgba(255,255,255,0.16)',
+                        color: 'rgba(255,255,255,0.95)',
+                      },
+                    }}
+                  >
+                    Exportar CSV
+                  </Button>
                 </Box>
               </Box>
               <Box sx={{ p: 1, height: 500, width: '100%' }}>
