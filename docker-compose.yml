@@ -1,6 +1,6 @@
 services:
   tagsafe-panel:
-    image: tagsafe-panel:1.0
+    image: tagsafe-panel:1.1
     #pull_policy: always
     container_name: tagsafe-control-panel
     restart: always

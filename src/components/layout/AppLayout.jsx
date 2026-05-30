@@ -30,6 +30,12 @@ import { useAuth } from '../../features/auth/AuthContext';
 
 const drawerWidth = 280;
 
+const envConfig = {
+  dev:   { label: 'DEV',   color: '#f97316', bg: 'rgba(249,115,22,0.12)',  border: 'rgba(249,115,22,0.35)',  appBarBorder: '#f97316' },
+  prod:  { label: 'PROD',  color: '#ef4444', bg: 'rgba(239,68,68,0.12)',   border: 'rgba(239,68,68,0.35)',   appBarBorder: '#ef4444' },
+  local: { label: 'LOCAL', color: '#22c55e', bg: 'rgba(34,197,94,0.12)',   border: 'rgba(34,197,94,0.35)',   appBarBorder: '#22c55e' },
+};
+
 function AppLayout({ children, menuItems: menuItemsProp = [] }) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [userMenuAnchor, setUserMenuAnchor] = useState(null);
@@ -37,6 +43,9 @@ function AppLayout({ children, menuItems: menuItemsProp = [] }) {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('lg'));
   const { user, logout, isMaster } = useAuth();
+
+  const currentEnv = localStorage.getItem('selected_env') || 'dev';
+  const env = envConfig[currentEnv] ?? envConfig.dev;
 
   const menuItems = menuItemsProp;
 
@@ -61,6 +70,9 @@ function AppLayout({ children, menuItems: menuItemsProp = [] }) {
 
   const drawer = (
     <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+      {/* Env bar */}
+      <Box sx={{ height: 4, bgcolor: env.appBarBorder, flexShrink: 0 }} />
+
       {/* Logo Section */}
       <Box sx={{ p: 3, borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
         <Box sx={{ display: 'flex', justifyContent: 'center' }}>
@@ -69,6 +81,21 @@ function AppLayout({ children, menuItems: menuItemsProp = [] }) {
             src="/Principal.png"
             alt="TagSafe Admin"
             sx={{ width: '100%', maxWidth: 250, height: 'auto', objectFit: 'contain' }}
+          />
+        </Box>
+        <Box sx={{ display: 'flex', justifyContent: 'center', mt: 1.5 }}>
+          <Chip
+            label={`Ambiente: ${env.label}`}
+            size="small"
+            sx={{
+              fontWeight: 700,
+              fontSize: '0.65rem',
+              letterSpacing: 0.5,
+              color: env.color,
+              bgcolor: env.bg,
+              border: `1px solid ${env.border}`,
+              height: 22,
+            }}
           />
         </Box>
       </Box>
@@ -180,6 +207,7 @@ function AppLayout({ children, menuItems: menuItemsProp = [] }) {
           zIndex: (theme) => theme.zIndex.drawer + 1,
           ml: { lg: `${drawerWidth}px` },
           width: { lg: `calc(100% - ${drawerWidth}px)` },
+          borderBottom: `2px solid ${env.appBarBorder}`,
         }}
       >
         <Toolbar sx={{ minHeight: 70, px: 3 }}>
@@ -189,6 +217,30 @@ function AppLayout({ children, menuItems: menuItemsProp = [] }) {
             </IconButton>
           )}
           <Box sx={{ flexGrow: 1 }} />
+
+          {/* Env badge */}
+          <Chip
+            label={env.label}
+            size="small"
+            sx={{
+              mr: 2,
+              fontWeight: 800,
+              fontSize: '0.65rem',
+              letterSpacing: 1,
+              color: env.color,
+              bgcolor: env.bg,
+              border: `1px solid ${env.border}`,
+              height: 24,
+              ...(currentEnv === 'prod' && {
+                animation: 'pulse 2s ease-in-out infinite',
+                '@keyframes pulse': {
+                  '0%, 100%': { boxShadow: `0 0 0 0 ${env.border}` },
+                  '50%': { boxShadow: `0 0 0 4px transparent` },
+                },
+              }),
+            }}
+          />
+
           <Box
             sx={{
               display: 'flex',
