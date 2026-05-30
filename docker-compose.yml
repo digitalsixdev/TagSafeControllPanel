@@ -1,0 +1,10 @@
+services:
+  tagsafe-panel:
+    image: tagsafe-panel:1.0
+    #pull_policy: always
+    container_name: tagsafe-control-panel
+    restart: always
+    ports:
+      - "8083:80"
+    env_file:
+      - ./.env.local

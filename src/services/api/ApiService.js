@@ -168,7 +168,7 @@ export const addUnitToUser = (usuario_id, unidade_id) => {
 
 // extrair o usuário pelo e-mail
 export const getUserByEmail = (email) => {
-  return apiClient.get(`/usuarios/get_by_email/${email}`);
+  return apiClient.get(`/usuarios/get_by_email/${encodeURIComponent(email)}`);
 };
 
 // extrair todos os usuários com usuário master

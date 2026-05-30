@@ -120,6 +120,17 @@ function GestaoUsuarios() {
     unidades_id: [],
   });
 
+  // seção de unidades atendidas no dialog de criar usuário (instrutor)
+  const [instrEmpresaListLoading, setInstrEmpresaListLoading] = useState(false);
+  const [instrEmpresaId, setInstrEmpresaId] = useState('');
+  const [instrUnits, setInstrUnits] = useState([]);
+  const [instrUnitsLoading, setInstrUnitsLoading] = useState(false);
+  const [instrUnit, setInstrUnit] = useState(null);
+  const [instrUnitModules, setInstrUnitModules] = useState([]);
+  const [instrModulos, setInstrModulos] = useState([]);
+  const [instrUnidades, setInstrUnidades] = useState([]);
+  const [instrError, setInstrError] = useState('');
+
   // "Vincular Instrutores" dialog
   const [vincularOpen, setVincularOpen] = useState(false);
   const [vincularLoading, setVincularLoading] = useState(false);
@@ -266,6 +277,16 @@ function GestaoUsuarios() {
 
   useEffect(() => { loadStats(); }, []);
 
+  useEffect(() => {
+    const isInstrutor = roles.find(r => r.public_id === formData.roles)?.nome === 'instrutor';
+    if (!isInstrutor || allCompaniesList.length > 0) return;
+    setInstrEmpresaListLoading(true);
+    getAllCompanies()
+      .then(res => setAllCompaniesList(res.data || []))
+      .catch(() => {})
+      .finally(() => setInstrEmpresaListLoading(false));
+  }, [formData.roles]); // eslint-disable-line react-hooks/exhaustive-deps
+
   const handleOpen = async () => {
     setError('');
     setSuccess('');
@@ -281,6 +302,13 @@ function GestaoUsuarios() {
     setError('');
     setSuccess('');
     setOpen(false);
+    setInstrEmpresaId('');
+    setInstrUnits([]);
+    setInstrUnit(null);
+    setInstrUnitModules([]);
+    setInstrModulos([]);
+    setInstrUnidades([]);
+    setInstrError('');
   };
 
   const handleSubmit = async () => {
@@ -289,6 +317,16 @@ function GestaoUsuarios() {
     setSuccess('');
     try {
       await createUser(formData);
+      if (instrUnidades.length > 0) {
+        const allUsersRes = await getAllUsers();
+        const newUser = (allUsersRes.data || []).find(u => u.email === formData.email);
+        const newUserPublicId = newUser?.public_id;
+        const unidades_atendidas = instrUnidades.map(({ unit, modulos }) => ({
+          id: unit.public_id,
+          modulos,
+        }));
+        await setUnitsAttended(newUserPublicId, unidades_atendidas);
+      }
       setSuccess('Usuário cadastrado com sucesso!');
       loadStats();
       setTimeout(handleClose, 3000);
@@ -384,6 +422,53 @@ function GestaoUsuarios() {
     return companies.filter(c => c.nome === selectedCompanyName);
   }, [companies, selectedCompanyName]);
 
+  // handlers da seção de instrutor no dialog de criar usuário
+  const handleInstrEmpresaChange = async (empresaId) => {
+    setInstrEmpresaId(empresaId);
+    setInstrUnits([]);
+    setInstrUnit(null);
+    setInstrUnitModules([]);
+    setInstrModulos([]);
+    setInstrError('');
+    if (!empresaId) return;
+    setInstrUnitsLoading(true);
+    try {
+      const res = await getUnitByCompanieId(empresaId);
+      const raw = res.data;
+      setInstrUnits(Array.isArray(raw) ? raw : raw ? [raw] : []);
+    } catch {
+      setInstrError('Erro ao carregar unidades.');
+    } finally {
+      setInstrUnitsLoading(false);
+    }
+  };
+
+  const handleInstrUnitChange = (publicId) => {
+    const unit = instrUnits.find(u => u.public_id === publicId) || null;
+    setInstrUnit(unit);
+    setInstrUnitModules(unit?.modulos || []);
+    setInstrModulos([]);
+  };
+
+  const handleInstrAdicionarUnidade = () => {
+    if (!instrUnit || !instrModulos.length) return;
+    const jaAdicionada = instrUnidades.some(u => u.unit.public_id === instrUnit.public_id);
+    if (jaAdicionada) {
+      setInstrError('Essa unidade já foi adicionada.');
+      return;
+    }
+    const empresa = allCompaniesList.find(e => e.empresa_id === instrEmpresaId)?.nome || '';
+    setInstrUnidades(prev => [...prev, { unit: instrUnit, modulos: instrModulos, empresa }]);
+    setInstrUnit(null);
+    setInstrUnitModules([]);
+    setInstrModulos([]);
+    setInstrError('');
+  };
+
+  const handleInstrRemoverUnidade = (index) => {
+    setInstrUnidades(prev => prev.filter((_, i) => i !== index));
+  };
+
   // handlers de vincular instrutores
   const resetVincular = () => {
     setVincularEmail('');
@@ -474,8 +559,8 @@ function GestaoUsuarios() {
 
   const handleAdicionarUnidade = () => {
     if (!vincularUnit || !vincularModulos.length) return;
-    const jáAdicionada = unidadesAdicionadas.some(u => u.unit.public_id === vincularUnit.public_id);
-    if (jáAdicionada) {
+    const jaAdicionada = unidadesAdicionadas.some(u => u.unit.public_id === vincularUnit.public_id);
+    if (jaAdicionada) {
       setVincularError('Essa unidade já foi adicionada.');
       return;
     }
@@ -727,7 +812,11 @@ function GestaoUsuarios() {
             <Select
               labelId="select-roles-label"
               value={formData.roles || ''}
-              onChange={(e) => setFormData({ ...formData, roles: e.target.value, senha: '' })}
+              onChange={(e) => {
+                setFormData({ ...formData, roles: e.target.value, senha: '' });
+                setInstrEmpresaId(''); setInstrUnits([]); setInstrUnit(null);
+                setInstrUnitModules([]); setInstrModulos([]); setInstrUnidades([]); setInstrError('');
+              }}
               label="Cargo"
             >
               {roles?.map((rol) => (
@@ -738,7 +827,7 @@ function GestaoUsuarios() {
           {roles.find(r => r.public_id === formData.roles)?.nome === 'user_master' && (
             <TextField label="Senha" fullWidth margin="normal" value={formData.senha} onChange={(e) => setFormData({ ...formData, senha: e.target.value })} />
           )}
-          
+
           <FormControl fullWidth margin="normal">
             <InputLabel id="select-company-name-label">Empresa</InputLabel>
             <Select 
@@ -776,6 +865,116 @@ function GestaoUsuarios() {
               ))}
             </Select>
           </FormControl>
+
+          {roles.find(r => r.public_id === formData.roles)?.nome === 'instrutor' && (
+            <>
+              <Divider sx={{ my: 2, borderColor: 'rgba(255,255,255,0.08)' }} />
+              <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 0.5 }}>
+                Unidades atendidas pelo instrutor
+              </Typography>
+
+              {instrError && <Alert severity="error" sx={{ mt: 1, mb: 1 }}>{instrError}</Alert>}
+
+              <FormControl fullWidth margin="normal" disabled={instrEmpresaListLoading}>
+                <InputLabel id="instr-empresa-label">{instrEmpresaListLoading ? 'Carregando...' : 'Empresa'}</InputLabel>
+                <Select
+                  labelId="instr-empresa-label"
+                  value={instrEmpresaId}
+                  onChange={(e) => handleInstrEmpresaChange(e.target.value)}
+                  label={instrEmpresaListLoading ? 'Carregando...' : 'Empresa'}
+                  endAdornment={instrEmpresaListLoading ? <CircularProgress size={18} sx={{ mr: 2 }} /> : null}
+                >
+                  {allCompaniesList.map(emp => (
+                    <MenuItem key={emp.empresa_id} value={emp.empresa_id}>{emp.nome}</MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+
+              {instrEmpresaId && (
+                <FormControl fullWidth margin="normal" disabled={instrUnitsLoading}>
+                  <InputLabel id="instr-unit-label">{instrUnitsLoading ? 'Carregando...' : 'Unidade'}</InputLabel>
+                  <Select
+                    labelId="instr-unit-label"
+                    value={instrUnit?.public_id || ''}
+                    onChange={(e) => handleInstrUnitChange(e.target.value)}
+                    label={instrUnitsLoading ? 'Carregando...' : 'Unidade'}
+                    endAdornment={instrUnitsLoading ? <CircularProgress size={18} sx={{ mr: 2 }} /> : null}
+                  >
+                    {instrUnits.map(unit => (
+                      <MenuItem key={unit.public_id} value={unit.public_id}>{unit.unidade}</MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              )}
+
+              {instrUnit && (
+                <FormControl fullWidth margin="normal">
+                  <InputLabel id="instr-modulos-label">Módulos</InputLabel>
+                  <Select
+                    labelId="instr-modulos-label"
+                    multiple
+                    value={instrModulos}
+                    onChange={(e) => setInstrModulos(e.target.value)}
+                    label="Módulos"
+                    renderValue={(selected) => (
+                      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                        {instrUnitModules.filter(m => selected.includes(m.public_id)).map(m => (
+                          <Chip key={m.public_id} label={m.abreviacao} size="small" />
+                        ))}
+                      </Box>
+                    )}
+                  >
+                    {instrUnitModules.map(mod => (
+                      <MenuItem key={mod.public_id} value={mod.public_id}>
+                        <Checkbox checked={instrModulos.includes(mod.public_id)} />
+                        <ListItemText primary={mod.nome} secondary={mod.abreviacao} />
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              )}
+
+              {instrUnit && instrModulos.length > 0 && (
+                <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 1 }}>
+                  <Button variant="outlined" size="small" onClick={handleInstrAdicionarUnidade}>
+                    + Adicionar unidade
+                  </Button>
+                </Box>
+              )}
+
+              {instrUnidades.length > 0 && (
+                <>
+                  <Divider sx={{ my: 2, borderColor: 'rgba(255,255,255,0.08)' }} />
+                  <Typography variant="caption" color="text.secondary" sx={{ mb: 1, display: 'block' }}>
+                    Unidades a vincular ({instrUnidades.length})
+                  </Typography>
+                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                    {instrUnidades.map(({ unit, modulos, empresa }, index) => (
+                      <Box
+                        key={unit.public_id}
+                        sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', p: 1.5, borderRadius: 1.5, bgcolor: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)' }}
+                      >
+                        <Box>
+                          <Typography variant="body2" sx={{ fontWeight: 600, mb: 0.5 }}>
+                            {empresa && <Box component="span" sx={{ color: 'text.secondary', fontWeight: 400 }}>{empresa} · </Box>}
+                            {unit.unidade}
+                          </Typography>
+                          <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap' }}>
+                            {unit.modulos?.filter(m => modulos.includes(m.public_id)).map(m => (
+                              <Chip key={m.public_id} label={m.abreviacao} size="small" variant="outlined" color="primary" />
+                            ))}
+                          </Box>
+                        </Box>
+                        <IconButton size="small" onClick={() => handleInstrRemoverUnidade(index)} sx={{ color: 'text.disabled', '&:hover': { color: 'error.main' } }}>
+                          <Close fontSize="small" />
+                        </IconButton>
+                      </Box>
+                    ))}
+                  </Box>
+                </>
+              )}
+            </>
+          )}
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose} disabled={loading}>Cancelar</Button>
