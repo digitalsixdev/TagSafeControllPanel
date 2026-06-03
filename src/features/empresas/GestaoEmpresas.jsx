@@ -54,6 +54,8 @@ import {
 } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
 import { ptBR } from '@mui/x-data-grid/locales';
+import { useTranslation } from 'react-i18next';
+import '../../app/i18n';
 
 const getModulesColor = (moduleName) => {
   const colors = {
@@ -127,6 +129,7 @@ const exportCSV = (rows, filename) => {
 };
 
 function GestaoEmpresas() {
+  const { t } = useTranslation();
   // "Nova Empresa" dialog
   const [open, setOpen] = useState(false);
   const [formData, setFormData] = useState({ nome: '', cnpj: '', unidade: '', modulos: [] });
@@ -201,19 +204,19 @@ function GestaoEmpresas() {
   const columns = useMemo(() => [
     {
       field: 'nome',
-      headerName: 'Empresa',
+      headerName: t("gestaoEmpresas.components.table.companiesColumn"),
       flex: 1,
       minWidth: 200,
     },
     {
       field: 'cnpj_base',
-      headerName: 'CNPJ Base',
+      headerName: t("gestaoEmpresas.components.table.cnpjBaseColumn"),
       width: 200,
       renderCell: (params) => params.value || '—',
     },
     {
       field: 'actions',
-      headerName: 'Ações',
+      headerName: t("gestaoEmpresas.components.table.actionsColumn"),
       width: 80,
       sortable: false,
       align: 'center',
@@ -561,16 +564,16 @@ function GestaoEmpresas() {
           <Box sx={{ mb: 4, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', flexWrap: 'wrap', gap: 2 }}>
             <Box>
               <Typography variant="h3" gutterBottom sx={{ fontWeight: 700 }}>
-                Painel de Empresas
+                {t("gestaoEmpresas.components.title")}
               </Typography>
               <Typography variant="body1" sx={{ color: 'text.secondary', fontSize: '1.1rem' }}>
-                Gerencie as empresas cadastradas na plataforma.
+                {t("gestaoEmpresas.components.subtitle")}
               </Typography>
             </Box>
             <Box sx={{ display: 'flex', gap: 1.5 }}>
               {[
-                { label: 'Nova Unidade', icon: <Business />, onClick: handleUnitOpen },
-                { label: 'Nova Empresa', icon: <Store />,    onClick: handleOpen },
+                { label: t("gestaoEmpresas.components.buttons.newUnitButton"), icon: <Business />, onClick: handleUnitOpen },
+                { label: t("gestaoEmpresas.components.buttons.newCompanyButton"), icon: <Store />,    onClick: handleOpen },
               ].map(({ label, icon, onClick }) => (
                 <Button
                   key={label}
@@ -597,28 +600,28 @@ function GestaoEmpresas() {
             </Box>
           </Box>
 
-          <Grid container spacing={3} sx={{ mb: 4 }}>
-            <Grid item xs={12} sm={6} md={4}>
-              <StatCard title="Empresas cadastradas" value={stats.total_empresas} icon={Business} gradient="linear-gradient(135deg, #0f172a 0%, #1d4ed8 100%)" isLoading={statsLoading} />
-            </Grid>
-            <Grid item xs={12} sm={6} md={4}>
-              <StatCard title="Unidades cadastradas" value={stats.total_unidades} icon={Store} gradient="linear-gradient(135deg, #0f172a 0%, #6d28d9 100%)" isLoading={statsLoading} />
-            </Grid>
-            <Grid item xs={12} sm={6} md={4}>
-              <StatCard title="Módulos disponíveis" value={stats.total_modulos} icon={ViewModule} gradient="linear-gradient(135deg, #0f172a 0%, #047857 100%)" isLoading={statsLoading} delay={200} />
-            </Grid>
-          </Grid>
+          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 3, mb: 4 }}>
+            <Box sx={{ flex: '1 1 200px', minWidth: 0 }}>
+              <StatCard title={t("gestaoEmpresas.components.cards.companies")} value={stats.total_empresas} icon={Business} gradient="linear-gradient(135deg, #0f172a 0%, #1d4ed8 100%)" isLoading={statsLoading} />
+            </Box>
+            <Box sx={{ flex: '1 1 200px', minWidth: 0 }}>
+              <StatCard title={t("gestaoEmpresas.components.cards.units")} value={stats.total_unidades} icon={Store} gradient="linear-gradient(135deg, #0f172a 0%, #6d28d9 100%)" isLoading={statsLoading} />
+            </Box>
+            <Box sx={{ flex: '1 1 200px', minWidth: 0 }}>
+              <StatCard title={t("gestaoEmpresas.components.cards.modules")} value={stats.total_modulos} icon={ViewModule} gradient="linear-gradient(135deg, #0f172a 0%, #047857 100%)" isLoading={statsLoading} delay={200} />
+            </Box>
+          </Box>
 
           <Grow in timeout={1200}>
             <Card sx={{ borderRadius: 2, border: '1px solid rgba(255,255,255,0.08)', bgcolor: 'background.paper' }}>
               <Box sx={{ p: 2, borderBottom: '1px solid rgba(255,255,255,0.08)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 2 }}>
                 <Typography sx={{ fontWeight: 'bold' }}>
-                  Encontre todas as {stats.total_empresas} empresas cadastradas no sistema
+                  {t("gestaoEmpresas.components.table.title", { quantity: stats.total_empresas})}
                 </Typography>
                 <Box sx={{ display: 'flex', gap: 1.5, alignItems: 'center', flexWrap: 'wrap' }}>
                   <TextField
                     size="small"
-                    placeholder="Buscar empresa por nome ou CNPJ..."
+                    placeholder={t("gestaoEmpresas.components.table.field")}
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     InputProps={{
@@ -651,7 +654,7 @@ function GestaoEmpresas() {
                       },
                     }}
                   >
-                    Exportar CSV
+                    {t("gestaoEmpresas.components.buttons.csvButton")}
                   </Button>
                 </Box>
               </Box>
@@ -692,12 +695,12 @@ function GestaoEmpresas() {
       >
         <MenuItem onClick={handleEditCompanies}>
           <Edit fontSize="small" sx={{ mr: 1.5, color: 'primary.main' }} />
-          <Typography variant="body2">Editar Empresa</Typography>
+          <Typography variant="body2">{t("gestaoEmpresas.components.table.actions.editCompany")}</Typography>
         </MenuItem>
 
         <MenuItem onClick={handleViewUnits}>
           <Business fontSize="small" sx={{ mr: 1.5, color: 'info.main' }} />
-          <Typography variant="body2">Visualizar Unidades</Typography>
+          <Typography variant="body2">{t("gestaoEmpresas.components.table.actions.viewUnits")}</Typography>
         </MenuItem>
       </Menu>
 

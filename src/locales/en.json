@@ -1,0 +1,81 @@
+{
+    "login": {
+        "components": {
+            "welcome": "Welcome to the TagSafe Panel",
+            "email": "E-mail",
+            "password": "Password",
+            "signIn": "Sign in",
+            "selectEnvironment": "Select an environment"
+        },
+        "messages": {
+            "success": "Login successful!",
+            "errorEmptyFields": "Please fill in all fields",
+            "errorInvalidUser": "Invalid user data.",
+            "errorNoToken": "Authentication token not found."
+        },
+        "api_codes": {
+
+        }
+    },
+    
+    "gestaoMaster": {
+        "components": {
+            
+        },
+        "messages": {
+
+        },
+        "api_codes": {
+
+        }
+    },
+
+    "gestaoEmpresas": {
+        "components": {
+            "title": "Companies Panel",
+            "subtitle": "Manage the companies registered on the platform",
+        
+            "cards": {
+                "companies": "Registered companies",
+                "units": "Registered units",
+                "modules": "Available modules"
+            },
+
+            "table": {
+                "title": "Find all {{quantity}} companies registered in the system",
+                "field": "Search for a company by name or CNPJ",
+                "companiesColumn": "Company",
+                "cnpjBaseColumn": "CNPJ Base",
+                "actionsColumn": "Actions",
+                "actions": {
+                    "editCompany": "Edit Company",
+                    "viewUnits": "View Units"
+                }
+            },
+
+            "buttons": {
+                "csvButton": "Export CSV",
+                "newUnitButton": "New unit",
+                "newCompanyButton": "New company"
+            }
+        },
+        "messages": {
+
+        },
+        "api_codes": {
+
+        }
+    },
+
+    "gestaoUsuarios": {
+        "components": {
+            
+        },
+        "messages": {
+
+        },
+        "api_codes": {
+
+        }
+    }
+}

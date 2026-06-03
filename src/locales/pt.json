@@ -1,0 +1,81 @@
+{
+    "login": {
+        "components": {
+            "welcome": "Bem-vindo ao Painel do TagSafe",
+            "email": "E-mail",
+            "password": "Senha",
+            "signIn": "Entrar",
+            "selectEnvironment": "Selecione um ambiente"
+        },
+        "messages": {
+            "success": "Login realizado com sucesso!",
+            "errorEmptyFields": "Por favor, preencha todos os campos",
+            "errorInvalidUser": "Dados do usuário inválidos.",
+            "errorNoToken": "Token de autenticação não encontrado."
+        },
+        "api_codes": {
+            
+        }
+    },
+
+    "gestaoMaster": {
+        "components": {
+            
+        },
+        "messages": {
+
+        },
+        "api_codes": {
+
+        }
+    },
+
+    "gestaoEmpresas": {
+        "components": {
+            "title": "Painel de Empresas",
+            "subtitle": "Gerencie as empresas cadastradas na plataforma",
+        
+            "cards": {
+                "companies": "Empresas cadastradas",
+                "units": "Unidades cadastradas",
+                "modules": "Módulos disponíveis"
+            },
+
+            "table": {
+                "title": "Encontre todas as {{quantity}} empresas cadastradas no sistema",
+                "field": "Buscar empresa por nome ou CNPJ...",
+                "companiesColumn": "Empresa",
+                "cnpjBaseColumn": "CNPJ Base",
+                "actionsColumn": "Ações",
+                "actions": {
+                    "editCompany": "Editar Empresa",
+                    "viewUnits": "Visualizar Unidades"
+                }
+            },
+
+            "buttons": {
+                "csvButton": "Exportar CSV",
+                "newUnitButton": "Nova unidade",
+                "newCompanyButton": "Nova empresa"
+            }
+        },
+        "messages": {
+
+        },
+        "api_codes": {
+
+        }
+    },
+
+    "gestaoUsuarios": {
+        "components": {
+            
+        },
+        "messages": {
+
+        },
+        "api_codes": {
+
+        }
+    }
+}
