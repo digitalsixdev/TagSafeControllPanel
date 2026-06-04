@@ -51,7 +51,9 @@ import {
   Grid
 } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
-import { ptBR } from '@mui/x-data-grid/locales';
+import { ptBR, enUS } from '@mui/x-data-grid/locales';
+import { useTranslation } from 'react-i18next';
+import '../../app/i18n';
 
 const getRolesColor = (roleName) => {
   const colors = {
@@ -124,6 +126,7 @@ const exportCSV = (rows, filename) => {
 };
 
 function GestaoUsuarios() {
+  const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -275,11 +278,11 @@ function GestaoUsuarios() {
   };
 
   const roleConfig = {
-    total:       { label: 'Total de Usuários', icon: Groups3,            gradient: 'linear-gradient(135deg, #0f172a 0%, #2563eb 100%)' },
-    padrao:      { label: 'Padrão',            icon: People,             gradient: 'linear-gradient(135deg, #0f172a 0%, #1d4ed8 100%)' },
-    admin:       { label: 'Administrador',     icon: AdminPanelSettings, gradient: 'linear-gradient(135deg, #0f172a 0%, #1e40af 100%)' },
-    instrutor:   { label: 'Instrutor',         icon: School,             gradient: 'linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%)' },
-    user_master: { label: 'Master',            icon: ManageAccounts,     gradient: 'linear-gradient(135deg, #0f172a 0%, #172554 100%)' },
+    total:       { label: t("gestaoUsuarios.components.cards.allUsers"), icon: Groups3,            gradient: 'linear-gradient(135deg, #0f172a 0%, #2563eb 100%)' },
+    padrao:      { label: t("gestaoUsuarios.components.cards.default"),           icon: People,             gradient: 'linear-gradient(135deg, #0f172a 0%, #1d4ed8 100%)' },
+    admin:       { label: t("gestaoUsuarios.components.cards.admin"),     icon: AdminPanelSettings, gradient: 'linear-gradient(135deg, #0f172a 0%, #1e40af 100%)' },
+    instrutor:   { label: t("gestaoUsuarios.components.cards.instructor"),         icon: School,             gradient: 'linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%)' },
+    user_master: { label: t("gestaoUsuarios.components.cards.master"),            icon: ManageAccounts,     gradient: 'linear-gradient(135deg, #0f172a 0%, #172554 100%)' },
   };
 
   const loadStats = async () => {
@@ -364,12 +367,12 @@ function GestaoUsuarios() {
   };
 
   const usersColumns = useMemo(() => [
-    { field: 'nome', headerName: 'Nome', flex: 1, minWidth: 160 },
-    { field: 'email', headerName: 'E-mail', flex: 1, minWidth: 200 },
-    { field: 'empresa', headerName: 'Empresa', flex: 1, minWidth: 160, renderCell: (params) => params.value || '—' },
+    { field: 'nome', headerName: t("gestaoUsuarios.components.table.nameColumn"), flex: 1, minWidth: 160 },
+    { field: 'email', headerName: t("gestaoUsuarios.components.table.emailColumn"), flex: 1, minWidth: 200 },
+    { field: 'empresa', headerName: t("gestaoUsuarios.components.table.companyColumn"), flex: 1, minWidth: 160, renderCell: (params) => params.value || '—' },
     {
       field: 'primeiro_acesso',
-      headerName: 'Primeiro Acesso',
+      headerName: t("gestaoUsuarios.components.table.firstAccessColumn"),
       width: 140,
       sortable: false,
       align: 'center',
@@ -379,9 +382,9 @@ function GestaoUsuarios() {
         return (
           <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
             {pendente ? (
-              <HourglassEmpty sx={{ color: '#f59e0b', fontSize: 20 }} titleAccess="Aguardando primeiro acesso" />
+              <HourglassEmpty sx={{ color: '#f59e0b', fontSize: 20 }} titleAccess={t("gestaoUsuarios.components.table.firstAccessPendingText")} />
             ) : (
-              <CheckCircle sx={{ color: '#10b981', fontSize: 20 }} titleAccess="Primeiro acesso concluído" />
+              <CheckCircle sx={{ color: '#10b981', fontSize: 20 }} titleAccess={t("gestaoUsuarios.components.table.firstAccessCompletedText")} />
             )}
           </Box>
         );
@@ -389,7 +392,7 @@ function GestaoUsuarios() {
     },
     {
       field: 'roles',
-      headerName: 'Cargo',
+      headerName: t("gestaoUsuarios.components.table.roleColumn"),
       width: 160,
       sortable: false,
       renderCell: (params) => {
@@ -406,7 +409,7 @@ function GestaoUsuarios() {
     },
     {
       field: 'actions',
-      headerName: 'Ações',
+      headerName: t("gestaoUsuarios.components.table.actionsColumn"),
       width: 80,
       sortable: false,
       align: 'center',
@@ -693,17 +696,17 @@ function GestaoUsuarios() {
           <Box sx={{ mb: 4, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', flexWrap: 'wrap', gap: 2 }}>
             <Box>
               <Typography variant="h3" gutterBottom sx={{ fontWeight: 700 }}>
-                Painel de Usuários
+                {t("gestaoUsuarios.components.title")}
               </Typography>
               <Typography variant="body1" sx={{ color: 'text.secondary', fontSize: '1.1rem' }}>
-                Gerencie os usuários cadastrados na plataforma.
+                {t("gestaoUsuarios.components.subtitle")}
               </Typography>
             </Box>
             <Box sx={{ display: 'flex', gap: 1.5 }}>
               {[
-                { label: 'Vincular Instrutores', icon: <LinkRounded />, onClick: handleVincularOpen },
-                { label: 'Vincular Unidades',    icon: <LinkRounded />, onClick: handleUnidadeOpen },
-                { label: 'Novo Usuário',          icon: <People />,      onClick: handleOpen },
+                { label: t("gestaoUsuarios.components.buttons.linkInstructorsButton"), icon: <LinkRounded />, onClick: handleVincularOpen },
+                { label: t("gestaoUsuarios.components.buttons.linkUnitsButton"),    icon: <LinkRounded />, onClick: handleUnidadeOpen },
+                { label: t("gestaoUsuarios.components.buttons.newUserButton"),          icon: <People />,      onClick: handleOpen },
               ].map(({ label, icon, onClick }) => (
                 <Button
                   key={label}
@@ -745,12 +748,12 @@ function GestaoUsuarios() {
             <Card sx={{ borderRadius: 2, border: '1px solid rgba(255,255,255,0.08)', bgcolor: 'background.paper' }}>
               <Box sx={{ p: 2, borderBottom: '1px solid rgba(255,255,255,0.08)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 2 }}>
                 <Typography sx={{ fontWeight: 'bold' }}>
-                  Encontre todos os {stats.total_usuarios} usuários cadastrados no sistema
+                  {t("gestaoUsuarios.components.table.title", { quantity: stats.total_usuarios })}
                 </Typography>
                 <Box sx={{ display: 'flex', gap: 1.5, alignItems: 'center', flexWrap: 'wrap' }}>
                   <TextField
                     size="small"
-                    placeholder="Buscar por nome, e-mail ou empresa..."
+                    placeholder={t("gestaoUsuarios.components.table.field")}
                     value={usersSearchTerm}
                     onChange={(e) => setUsersSearchTerm(e.target.value)}
                     InputProps={{
@@ -768,13 +771,13 @@ function GestaoUsuarios() {
                     onChange={(e) => setRoleFilter(e.target.value)}
                     displayEmpty
                     renderValue={(val) => {
-                      if (!val) return 'Todos os cargos';
+                      if (!val) return t("gestaoUsuarios.components.table.allRolesField");
                       const role = allRoles.find(r => r.nome === val);
                       return role?.nome === 'user_master' ? 'Master' : role?.nome.charAt(0).toUpperCase() + role?.nome.slice(1);
                     }}
                     sx={{ minWidth: 150 }}
                   >
-                    <MenuItem value="">Todos</MenuItem>
+                    <MenuItem value="">{t("gestaoUsuarios.components.table.allRolesFieldSelected")}</MenuItem>
                     {allRoles.map(r => (
                       <MenuItem key={r.public_id} value={r.nome}>
                         {r.nome === 'user_master' ? 'Master' : r.nome.charAt(0).toUpperCase() + r.nome.slice(1)}
@@ -802,7 +805,7 @@ function GestaoUsuarios() {
                       },
                     }}
                   >
-                    Exportar CSV
+                    {t("gestaoUsuarios.components.buttons.csvButton")}
                   </Button>
                 </Box>
               </Box>
@@ -1330,7 +1333,7 @@ function GestaoUsuarios() {
         <DialogTitle sx={{ pb: 0 }}>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
             <Business sx={{ color: 'info.main' }} />
-            Unidades Vinculadas
+            {t("gestaoUsuarios.components.dialogViewUnits.title")}
           </Box>
         </DialogTitle>
         <DialogContent>
@@ -1350,7 +1353,7 @@ function GestaoUsuarios() {
                 <Box sx={{ py: 4, textAlign: 'center' }}>
                   <Business sx={{ fontSize: 40, color: 'text.disabled', mb: 1 }} />
                   <Typography variant="body2" color="text.secondary">
-                    Nenhuma unidade vinculada a este usuário.
+                    {t("gestaoUsuarios.components.dialogViewUnits.nothingUnitsMessage")}
                   </Typography>
                 </Box>
               ) : (
@@ -1389,7 +1392,7 @@ function GestaoUsuarios() {
           )}
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleViewUnitsClose}>Fechar</Button>
+          <Button onClick={handleViewUnitsClose}>{t("common.close")}</Button>
         </DialogActions>
       </Dialog>
 
@@ -1400,7 +1403,7 @@ function GestaoUsuarios() {
             <Box sx={{ pt: 2, textAlign: 'center' }}>
               <Typography variant="h4" component="span" sx={{ fontWeight: 'bold', letterSpacing: 1 }}>
                 <Box><Edit /></Box>
-                Editar Usuário
+                {t("gestaoUsuarios.components.dialogEditUser.title")}
               </Typography>
             </Box>
           </Fade>
@@ -1410,7 +1413,7 @@ function GestaoUsuarios() {
           {editSuccess && <Alert severity="success" sx={{ mb: 2 }}>{editSuccess}</Alert>}
 
           <TextField
-            label="Nome"
+            label={t("gestaoUsuarios.components.dialogEditUser.fields.nameUserField")}
             fullWidth
             margin="normal"
             value={editName}
@@ -1418,13 +1421,13 @@ function GestaoUsuarios() {
           />
 
           <FormControl fullWidth margin="normal">
-            <InputLabel id="edit-roles-label">Cargos</InputLabel>
+            <InputLabel id="edit-roles-label">{t("gestaoUsuarios.components.dialogEditUser.fields.roleUserField")}</InputLabel>
             <Select
               labelId="edit-roles-label"
               multiple
               value={editRoles}
               onChange={(e) => setEditRoles(e.target.value)}
-              label="Cargos"
+              label={t("gestaoUsuarios.components.dialogEditUser.fields.roleUserField")}
               renderValue={(selected) => (
                 <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
                   {allRoles
@@ -1449,13 +1452,13 @@ function GestaoUsuarios() {
           </FormControl>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleEditClose} disabled={editLoading}>Cancelar</Button>
+          <Button onClick={handleEditClose} disabled={editLoading}>{t("common.cancel")}</Button>
           <Button
             variant="contained"
             onClick={handleEditSubmit}
             disabled={editLoading || !editName.trim() || editRoles.length === 0}
           >
-            {editLoading ? 'Salvando...' : 'Salvar'}
+            {editLoading ? 'Salvando...' : t("common.save")}
           </Button>
         </DialogActions>
       </Dialog>
@@ -1471,11 +1474,11 @@ function GestaoUsuarios() {
       >
         <MenuItem onClick={handleEditOpen}>
           <Edit fontSize="small" sx={{ mr: 1.5, color: 'primary.main' }} />
-          <Typography variant="body2">Editar Usuário</Typography>
+          <Typography variant="body2">{t("gestaoUsuarios.components.table.actions.editUser")}</Typography>
         </MenuItem>
         <MenuItem onClick={handleViewUnits}>
           <Business fontSize="small" sx={{ mr: 1.5, color: 'info.main' }} />
-          <Typography variant="body2">Visualizar Unidades</Typography>
+          <Typography variant="body2">{t("gestaoUsuarios.components.table.actions.viewUnits")}</Typography>
         </MenuItem>
       </Menu>
     </Container>

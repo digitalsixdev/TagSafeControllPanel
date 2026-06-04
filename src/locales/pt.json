@@ -57,6 +57,68 @@
                 "csvButton": "Exportar CSV",
                 "newUnitButton": "Nova unidade",
                 "newCompanyButton": "Nova empresa"
+            },
+
+            "dialogEditCompany": {
+                "title": "Editar Empresa",
+                "fieldEditName": "Nome"
+            },
+
+            "dialogViewUnits": {
+                "title": "Unidades — {{company}}",
+                "table": {
+                    "unitColumn": "Unidade",
+                    "cnpjColumn": "CNPJ",
+                    "modulesColumn": "Módulos",
+                    "actionsColumn": "Ações",
+                    "actions": {
+                        "editUnit": "Editar Unidade",
+                        "viewUsers": "Visualizar Usuários"
+                    }
+                }
+            },
+
+            "dialogViewUnitUsers": {
+                "title": "Usuários — {{unit}}",
+                "table": {
+                    "nameColumn": "Nome",
+                    "emailColumn": "E-mail",
+                    "roleColumn": "Cargo",
+                    "firstAccessColumn": "Primeiro Acesso",
+                    "firstAccessStatus": {
+                        "completed": "Concluído",
+                        "pending": "Pendente"
+                    }
+                }
+            },
+
+            "dialogEditUnit": {
+                "title": "Editar Unidade",
+                "fields": {
+                    "nameUnitField": "Nome da Unidade",
+                    "cnpjField": "CNPJ",
+                    "modulesField": "Módulos"
+                }
+            },
+
+            "dialogAddNewUnit": {
+                "title": "Adicionar Nova Unidade",
+                "fields": {
+                    "companyField": "Empresa",
+                    "nameUnitField": "Nome da Unidade",
+                    "cnpjField": "CNPJ",
+                    "modulesField": "Módulos"
+                }
+            },
+
+            "dialogAddNewCompany": {
+                "title": "Vincule uma nova empresa",
+                "fields": {
+                    "nameField": "Nome",
+                    "cnpjField": "CNPJ",
+                    "unitField": "Unidade",
+                    "modulesField": "Módulos"
+                }
             }
         },
         "messages": {
@@ -69,7 +131,55 @@
 
     "gestaoUsuarios": {
         "components": {
-            
+            "title": "Painel de Usuários",
+            "subtitle": "Gerencie os usuários cadastrados na plataforma.",
+        
+            "cards": {
+                "allUsers": "Total de Usuários",
+                "default": "Padrão",
+                "instructor": "Instrutor",
+                "admin": "Administrador",
+                "master": "Master"
+            },
+
+            "table": {
+                "title": "Encontre todos os {{quantity}} usuários cadastrados no sistema",
+                "field": "Buscar por nome, e-mail ou empresa...",
+                "allRolesField": "Todos os cargos",
+                "allRolesFieldSelected": "Todos",
+                "nameColumn": "Nome",
+                "emailColumn": "E-mail",
+                "companyColumn": "Empresa",
+                "firstAccessColumn": "Primeiro Acesso",
+                "firstAccessPendingText": "Aguardando primeiro acesso",
+                "firstAccessCompletedText": "Primeiro acesso concluído",
+                "roleColumn": "Cargo",
+                "actionsColumn": "Ações",
+                "actions": {
+                    "editUser": "Editar Usuário",
+                    "viewUnits": "Visualizar Unidades"
+                }
+            },
+
+            "buttons": {
+                "csvButton": "Exportar CSV",
+                "newUserButton": "Novo Usuário",
+                "linkUnitsButton": "Vincular Unidades",
+                "linkInstructorsButton": "Vincular Instrutores"
+            },
+
+            "dialogEditUser": {
+                "title": "Editar Usuário",
+                "fields": {
+                    "nameUserField": "Nome",
+                    "roleUserField": "Cargos"
+                }
+            },
+
+            "dialogViewUnits": {
+                "title": "Unidades Vinculadas",
+                "nothingUnitsMessage": "Nenhuma unidade vinculada a este usuário."
+            }
         },
         "messages": {
 
@@ -77,5 +187,13 @@
         "api_codes": {
 
         }
+    },
+
+    "common": {
+        "save": "Salvar",
+        "cancel": "Cancelar",
+        "edit": "Editar",
+        "delete": "Deletar",
+        "close": "Fechar"
     }
 }

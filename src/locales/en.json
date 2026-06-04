@@ -17,10 +17,10 @@
 
         }
     },
-    
+
     "gestaoMaster": {
         "components": {
-            
+
         },
         "messages": {
 
@@ -34,7 +34,7 @@
         "components": {
             "title": "Companies Panel",
             "subtitle": "Manage the companies registered on the platform",
-        
+
             "cards": {
                 "companies": "Registered companies",
                 "units": "Registered units",
@@ -57,6 +57,68 @@
                 "csvButton": "Export CSV",
                 "newUnitButton": "New unit",
                 "newCompanyButton": "New company"
+            },
+
+            "dialogEditCompany": {
+                "title": "Edit Company",
+                "fieldEditName": "Name"
+            },
+
+            "dialogViewUnits": {
+                "title": "Units — {{company}}",
+                "table": {
+                    "unitColumn": "Unit",
+                    "cnpjColumn": "CNPJ",
+                    "modulesColumn": "Modules",
+                    "actionsColumn": "Actions",
+                    "actions": {
+                        "editUnit": "Edit Unit",
+                        "viewUsers": "View Users"
+                    }
+                }
+            },
+
+            "dialogViewUnitUsers": {
+                "title": "Users — {{unit}}",
+                "table": {
+                    "nameColumn": "Name",
+                    "emailColumn": "E-mail",
+                    "roleColumn": "Role",
+                    "firstAccessColumn": "First Access",
+                    "firstAccessStatus": {
+                        "completed": "Completed",
+                        "pending": "Pending"
+                    }
+                }
+            },
+
+            "dialogEditUnit": {
+                "title": "Edit Unit",
+                "fields": {
+                    "nameUnitField": "Unit Name",
+                    "cnpjField": "CNPJ",
+                    "modulesField": "Modules"
+                }
+            },
+
+            "dialogAddNewUnit": {
+                "title": "Add New Unit",
+                "fields": {
+                    "companyField": "Company",
+                    "nameUnitField": "Unit Name",
+                    "cnpjField": "CNPJ",
+                    "modulesField": "Modules"
+                }
+            },
+
+            "dialogAddNewCompany": {
+                "title": "Create a new company",
+                "fields": {
+                    "nameField": "Name",
+                    "cnpjField": "CNPJ",
+                    "unitField": "Unit",
+                    "modulesField": "Modules"
+                }
             }
         },
         "messages": {
@@ -69,7 +131,55 @@
 
     "gestaoUsuarios": {
         "components": {
-            
+            "title": "Users Panel",
+            "subtitle": "Manage the users registered on the platform.",
+
+            "cards": {
+                "allUsers": "Total Users",
+                "default": "Default",
+                "instructor": "Instructor",
+                "admin": "Administrator",
+                "master": "Master"
+            },
+
+            "table": {
+                "title": "Find all {{quantity}} users registered in the system",
+                "field": "Search by name, e-mail or company...",
+                "allRolesField": "All roles",
+                "allRolesFieldSelected": "All",
+                "nameColumn": "Name",
+                "emailColumn": "E-mail",
+                "companyColumn": "Company",
+                "firstAccessColumn": "First Access",
+                "firstAccessPendingText": "Awaiting first access",
+                "firstAccessCompletedText": "First access completed",
+                "roleColumn": "Role",
+                "actionsColumn": "Actions",
+                "actions": {
+                    "editUser": "Edit User",
+                    "viewUnits": "View Units"
+                }
+            },
+
+            "buttons": {
+                "csvButton": "Export CSV",
+                "newUserButton": "New User",
+                "linkUnitsButton": "Link Units",
+                "linkInstructorsButton": "Link Instructors"
+            },
+
+            "dialogEditUser": {
+                "title": "Edit User",
+                "fields": {
+                    "nameUserField": "Name",
+                    "roleUserField": "Roles"
+                }
+            },
+
+            "dialogViewUnits": {
+                "title": "Linked Units",
+                "nothingUnitsMessage": "No units linked to this user."
+            }
         },
         "messages": {
 
@@ -77,5 +187,13 @@
         "api_codes": {
 
         }
+    },
+
+    "common": {
+        "save": "Save",
+        "cancel": "Cancel",
+        "edit": "Edit",
+        "delete": "Delete",
+        "close": "Close"
     }
 }
