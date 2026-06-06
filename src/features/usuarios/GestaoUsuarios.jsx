@@ -255,7 +255,7 @@ function GestaoUsuarios() {
       editRoles.some(id => !originalRoles.includes(id));
 
     if (!nameChanged && !rolesChanged) {
-      setEditError('Nenhuma alteração detectada.');
+      setEditError(t('gestaoUsuarios.messages.noChanges'));
       return;
     }
 
@@ -267,7 +267,7 @@ function GestaoUsuarios() {
       if (nameChanged) requests.push(updateNameByPublicId(editUser.public_id, editName.trim()));
       if (rolesChanged) requests.push(updateRolesByPublicId(editUser.public_id, editRoles));
       await Promise.all(requests);
-      setEditSuccess('Usuário atualizado com sucesso!');
+      setEditSuccess(t('gestaoUsuarios.messages.userUpdated'));
       loadStats();
       setTimeout(handleEditClose, 2000);
     } catch (err) {
@@ -356,7 +356,7 @@ function GestaoUsuarios() {
         }));
         await setUnitsAttended(newUserPublicId, unidades_atendidas);
       }
-      setSuccess('Usuário cadastrado com sucesso!');
+      setSuccess(t('gestaoUsuarios.messages.userCreated'));
       loadStats();
       setTimeout(handleClose, 3000);
     } catch (err) {
@@ -466,7 +466,7 @@ function GestaoUsuarios() {
       const raw = res.data;
       setInstrUnits(Array.isArray(raw) ? raw : raw ? [raw] : []);
     } catch {
-      setInstrError('Erro ao carregar unidades.');
+      setInstrError(t('gestaoUsuarios.messages.errorLoadingUnits'));
     } finally {
       setInstrUnitsLoading(false);
     }
@@ -483,7 +483,7 @@ function GestaoUsuarios() {
     if (!instrUnit || !instrModulos.length) return;
     const jaAdicionada = instrUnidades.some(u => u.unit.public_id === instrUnit.public_id);
     if (jaAdicionada) {
-      setInstrError('Essa unidade já foi adicionada.');
+      setInstrError(t('gestaoUsuarios.messages.errorUnitAlreadyAdded'));
       return;
     }
     const empresa = allCompaniesList.find(e => e.empresa_id === instrEmpresaId)?.nome || '';
@@ -518,7 +518,7 @@ function GestaoUsuarios() {
       const res = await getAllCompanies();
       setAllCompaniesList(res.data || []);
     } catch {
-      setVincularError('Erro ao carregar empresas.');
+      setVincularError(t('gestaoUsuarios.messages.errorLoadingCompanies'));
     }
     setVincularOpen(true);
   };
@@ -547,13 +547,13 @@ function GestaoUsuarios() {
       const roles = rolesRes.data || [];
       const isInstrutor = roles.some(r => r.nome === 'instrutor');
       if (!isInstrutor) {
-        setVincularError('O usuário existe, mas não é um instrutor.');
+        setVincularError(t('gestaoUsuarios.messages.errorNotInstructor'));
         return;
       }
       setVincularUser(user);
     } catch (err) {
       const status = err?.response?.status;
-      setVincularError(status === 404 ? 'Usuário não encontrado.' : formatApiError(err));
+      setVincularError(status === 404 ? t('gestaoUsuarios.messages.errorUserNotFound') : formatApiError(err));
     } finally {
       setVincularEmailLoading(false);
     }
@@ -573,7 +573,7 @@ function GestaoUsuarios() {
       const raw = res.data;
       setVincularUnits(Array.isArray(raw) ? raw : raw ? [raw] : []);
     } catch {
-      setVincularError('Erro ao carregar unidades.');
+      setVincularError(t('gestaoUsuarios.messages.errorLoadingUnits'));
     } finally {
       setVincularUnitsLoading(false);
     }
@@ -590,7 +590,7 @@ function GestaoUsuarios() {
     if (!vincularUnit || !vincularModulos.length) return;
     const jaAdicionada = unidadesAdicionadas.some(u => u.unit.public_id === vincularUnit.public_id);
     if (jaAdicionada) {
-      setVincularError('Essa unidade já foi adicionada.');
+      setVincularError(t('gestaoUsuarios.messages.errorUnitAlreadyAdded'));
       return;
     }
     const empresa = allCompaniesList.find(e => e.empresa_id === vincularEmpresaId)?.nome || '';
@@ -616,7 +616,7 @@ function GestaoUsuarios() {
         modulos,
       }));
       await setUnitsAttended(vincularUser.public_id, unidades_atendidas);
-      setVincularSuccess('Instrutor vinculado com sucesso!');
+      setVincularSuccess(t('gestaoUsuarios.messages.instructorLinked'));
       setTimeout(handleVincularClose, 2000);
     } catch (err) {
       setVincularError(formatApiError(err));
@@ -666,7 +666,7 @@ function GestaoUsuarios() {
       }
     } catch (err) {
       const status = err?.response?.status;
-      setUnidadeError(status === 404 ? 'Usuário não encontrado.' : formatApiError(err));
+      setUnidadeError(status === 404 ? t('gestaoUsuarios.messages.errorUserNotFound') : formatApiError(err));
     } finally {
       setUnidadeEmailLoading(false);
     }
@@ -679,7 +679,7 @@ function GestaoUsuarios() {
     setUnidadeSuccess('');
     try {
       await addUnitToUser(unidadeUser.public_id, unidadeSelectedUnit);
-      setUnidadeSuccess('Unidade vinculada com sucesso!');
+      setUnidadeSuccess(t('gestaoUsuarios.messages.unitLinked'));
       setTimeout(handleUnidadeClose, 2000);
     } catch (err) {
       setUnidadeError(formatApiError(err));
@@ -848,7 +848,7 @@ function GestaoUsuarios() {
                 <Box>
                   <People />
                 </Box>
-                {'Cadastre um novo usuário'}
+                {t("gestaoUsuarios.components.dialogNewUser.title")}
               </Typography>
             </Box>
           </Fade>
@@ -857,10 +857,10 @@ function GestaoUsuarios() {
           {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
           {success && <Alert severity="success" sx={{ mb: 2 }}>{success}</Alert>}
           
-          <TextField label="Nome" fullWidth margin="normal" value={formData.nome} onChange={(e) => setFormData({ ...formData, nome: e.target.value })} />
-          <TextField label="E-mail" fullWidth margin="normal" value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} />
+          <TextField label={t("gestaoUsuarios.components.dialogNewUser.nameField")} fullWidth margin="normal" value={formData.nome} onChange={(e) => setFormData({ ...formData, nome: e.target.value })} />
+          <TextField label={t("gestaoUsuarios.components.dialogNewUser.emailField")} fullWidth margin="normal" value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} />
           <FormControl fullWidth margin="normal">
-            <InputLabel id="select-roles-label">Cargo</InputLabel>
+            <InputLabel id="select-roles-label">{t("gestaoUsuarios.components.dialogNewUser.roleField")}</InputLabel>
             <Select
               labelId="select-roles-label"
               value={formData.roles || ''}
@@ -869,7 +869,7 @@ function GestaoUsuarios() {
                 setInstrEmpresaId(''); setInstrUnits([]); setInstrUnit(null);
                 setInstrUnitModules([]); setInstrModulos([]); setInstrUnidades([]); setInstrError('');
               }}
-              label="Cargo"
+              label={t("gestaoUsuarios.components.dialogNewUser.roleField")}
             >
               {roles?.map((rol) => (
                 <MenuItem key={rol.public_id} value={rol.public_id}>{rol.nome}</MenuItem>
@@ -877,11 +877,11 @@ function GestaoUsuarios() {
             </Select>
           </FormControl>
           {roles.find(r => r.public_id === formData.roles)?.nome === 'user_master' && (
-            <TextField label="Senha" fullWidth margin="normal" value={formData.senha} onChange={(e) => setFormData({ ...formData, senha: e.target.value })} />
+            <TextField label={t("gestaoUsuarios.components.dialogNewUser.passwordField")} fullWidth margin="normal" value={formData.senha} onChange={(e) => setFormData({ ...formData, senha: e.target.value })} />
           )}
 
           <FormControl fullWidth margin="normal">
-            <InputLabel id="select-company-name-label">Empresa</InputLabel>
+            <InputLabel id="select-company-name-label">{t("gestaoUsuarios.components.dialogNewUser.companyField")}</InputLabel>
             <Select 
               labelId="select-company-name-label" 
               value={selectedCompanyName} 
@@ -889,7 +889,7 @@ function GestaoUsuarios() {
                 setSelectedCompanyName(e.target.value);
                 setFormData({ ...formData, unidades_id: [] });
               }} 
-              label="Empresa"
+              label={t("gestaoUsuarios.components.dialogNewUser.companyField")}
             >
               {uniqueCompanyNames.map((name) => (
                 <MenuItem key={name} value={name}>{name}</MenuItem>
@@ -898,13 +898,13 @@ function GestaoUsuarios() {
           </FormControl>
 
           <FormControl fullWidth margin="normal" disabled={!selectedCompanyName}>
-            <InputLabel id="select-units-label">Unidade</InputLabel>
+            <InputLabel id="select-units-label">{t("gestaoUsuarios.components.dialogNewUser.unitField")}</InputLabel>
             <Select 
               labelId="select-units-label" 
               multiple
               value={formData.unidades_id} 
               onChange={(e) => setFormData({ ...formData, unidades_id: e.target.value })} 
-              label="Unidade"
+              label={t("gestaoUsuarios.components.dialogNewUser.unitField")}
               renderValue={(selected) => (
                 filteredUnits.filter(u => selected.includes(u.public_id)).map(u => u.unidade).join(', ')
               )}
@@ -922,18 +922,18 @@ function GestaoUsuarios() {
             <>
               <Divider sx={{ my: 2, borderColor: 'rgba(255,255,255,0.08)' }} />
               <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 0.5 }}>
-                Unidades atendidas pelo instrutor
+                {t("gestaoUsuarios.components.dialogNewUser.unitsLinkFields.firstSubtitle")}
               </Typography>
 
               {instrError && <Alert severity="error" sx={{ mt: 1, mb: 1 }}>{instrError}</Alert>}
 
               <FormControl fullWidth margin="normal" disabled={instrEmpresaListLoading}>
-                <InputLabel id="instr-empresa-label">{instrEmpresaListLoading ? 'Carregando...' : 'Empresa'}</InputLabel>
+                <InputLabel id="instr-empresa-label">{instrEmpresaListLoading ? t("common.loading") : t("gestaoUsuarios.components.dialogNewUser.companyField")}</InputLabel>
                 <Select
                   labelId="instr-empresa-label"
                   value={instrEmpresaId}
                   onChange={(e) => handleInstrEmpresaChange(e.target.value)}
-                  label={instrEmpresaListLoading ? 'Carregando...' : 'Empresa'}
+                  label={instrEmpresaListLoading ? t('common.loading') : t("gestaoUsuarios.components.dialogNewUser.companyField")}
                   endAdornment={instrEmpresaListLoading ? <CircularProgress size={18} sx={{ mr: 2 }} /> : null}
                 >
                   {allCompaniesList.map(emp => (
@@ -944,12 +944,12 @@ function GestaoUsuarios() {
 
               {instrEmpresaId && (
                 <FormControl fullWidth margin="normal" disabled={instrUnitsLoading}>
-                  <InputLabel id="instr-unit-label">{instrUnitsLoading ? 'Carregando...' : 'Unidade'}</InputLabel>
+                  <InputLabel id="instr-unit-label">{instrUnitsLoading ? t("common.loading") : t("gestaoUsuarios.components.dialogNewUser.unitField")}</InputLabel>
                   <Select
                     labelId="instr-unit-label"
                     value={instrUnit?.public_id || ''}
                     onChange={(e) => handleInstrUnitChange(e.target.value)}
-                    label={instrUnitsLoading ? 'Carregando...' : 'Unidade'}
+                    label={instrUnitsLoading ? t('common.loading') : t("gestaoUsuarios.components.dialogNewUser.unitField")}
                     endAdornment={instrUnitsLoading ? <CircularProgress size={18} sx={{ mr: 2 }} /> : null}
                   >
                     {instrUnits.map(unit => (
@@ -961,13 +961,13 @@ function GestaoUsuarios() {
 
               {instrUnit && (
                 <FormControl fullWidth margin="normal">
-                  <InputLabel id="instr-modulos-label">Módulos</InputLabel>
+                  <InputLabel id="instr-modulos-label">{t("gestaoUsuarios.components.dialogNewUser.modulesField")}</InputLabel>
                   <Select
                     labelId="instr-modulos-label"
                     multiple
                     value={instrModulos}
                     onChange={(e) => setInstrModulos(e.target.value)}
-                    label="Módulos"
+                    label={t("gestaoUsuarios.components.dialogNewUser.modulesField")}
                     renderValue={(selected) => (
                       <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
                         {instrUnitModules.filter(m => selected.includes(m.public_id)).map(m => (
@@ -989,7 +989,7 @@ function GestaoUsuarios() {
               {instrUnit && instrModulos.length > 0 && (
                 <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 1 }}>
                   <Button variant="outlined" size="small" onClick={handleInstrAdicionarUnidade}>
-                    + Adicionar unidade
+                    {t("gestaoUsuarios.components.dialogNewUser.unitsLinkFields.addUnitButton")}
                   </Button>
                 </Box>
               )}
@@ -998,7 +998,7 @@ function GestaoUsuarios() {
                 <>
                   <Divider sx={{ my: 2, borderColor: 'rgba(255,255,255,0.08)' }} />
                   <Typography variant="caption" color="text.secondary" sx={{ mb: 1, display: 'block' }}>
-                    Unidades a vincular ({instrUnidades.length})
+                    {t("gestaoUsuarios.components.dialogNewUser.unitsLinkFields.secondSubtitle", { quantity: instrUnidades.length })}
                   </Typography>
                   <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
                     {instrUnidades.map(({ unit, modulos, empresa }, index) => (
@@ -1029,9 +1029,9 @@ function GestaoUsuarios() {
           )}
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleClose} disabled={loading}>Cancelar</Button>
+          <Button onClick={handleClose} disabled={loading}>{t("common.cancel")}</Button>
           <Button variant="contained" onClick={handleSubmit} disabled={loading}>
-            {loading ? 'Salvando...' : 'Salvar'}
+            {loading ? t("common.saving") : t("common.save")}
           </Button>
         </DialogActions>
       </Dialog>
@@ -1042,7 +1042,7 @@ function GestaoUsuarios() {
             <Box sx={{ pt: 2, textAlign: 'center' }}>
               <Typography variant="h4" component="span" sx={{ fontWeight: 'bold', letterSpacing: 1 }}>
                 <Box><LinkRounded /></Box>
-                Vincular Instrutor
+                {t("gestaoUsuarios.components.dialogLinkInstructors.title")}
               </Typography>
             </Box>
           </Fade>
@@ -1053,7 +1053,7 @@ function GestaoUsuarios() {
 
           {/* 1. Email */}
           <TextField
-            label="E-mail do instrutor"
+            label={t("gestaoUsuarios.components.dialogLinkInstructors.emailField")}
             fullWidth
             margin="normal"
             value={vincularEmail}
@@ -1071,7 +1071,7 @@ function GestaoUsuarios() {
             InputProps={{
               endAdornment: vincularEmailLoading ? <CircularProgress size={18} sx={{ mr: 1 }} /> : null,
             }}
-            helperText="Pressione Enter para buscar"
+            helperText={t("gestaoUsuarios.components.dialogLinkInstructors.emailMessage")}
           />
 
           {/* 2. Confirmação do instrutor */}
@@ -1082,7 +1082,7 @@ function GestaoUsuarios() {
               </Avatar>
               <Box>
                 <Typography variant="caption" sx={{ color: '#31adff', fontWeight: 600, letterSpacing: 0.5 }} display="block">
-                  Instrutor encontrado
+                  {t("gestaoUsuarios.components.dialogLinkInstructors.cardTitle")}
                 </Typography>
                 <Typography variant="body2" sx={{ fontWeight: 600, color: 'white' }}>
                   {vincularUser.nome_usuario}
@@ -1097,7 +1097,7 @@ function GestaoUsuarios() {
           {/* 3. Empresa */}
           {vincularUser && (
             <FormControl fullWidth margin="normal">
-              <InputLabel id="vincular-empresa-label">Empresa</InputLabel>
+              <InputLabel id="vincular-empresa-label">{t("gestaoUsuarios.components.dialogLinkInstructors.companyField")}</InputLabel>
               <Select
                 labelId="vincular-empresa-label"
                 value={vincularEmpresaId}
@@ -1117,13 +1117,13 @@ function GestaoUsuarios() {
           {vincularUser && vincularEmpresaId && (
             <FormControl fullWidth margin="normal" disabled={vincularUnitsLoading}>
               <InputLabel id="vincular-unidade-label">
-                {vincularUnitsLoading ? 'Carregando...' : 'Unidade'}
+                {vincularUnitsLoading ? t('common.loading') : t("gestaoUsuarios.components.dialogLinkInstructors.unitField")}
               </InputLabel>
               <Select
                 labelId="vincular-unidade-label"
                 value={vincularUnit?.public_id || ''}
                 onChange={(e) => handleVincularUnitChange(e.target.value)}
-                label={vincularUnitsLoading ? 'Carregando...' : 'Unidade'}
+                label={vincularUnitsLoading ? t('common.loading') : t("gestaoUsuarios.components.dialogLinkInstructors.unitField")}
                 endAdornment={vincularUnitsLoading ? <CircularProgress size={18} sx={{ mr: 2 }} /> : null}
               >
                 {vincularUnits.map((unit) => (
@@ -1138,13 +1138,13 @@ function GestaoUsuarios() {
           {/* 5. Módulos */}
           {vincularUnit && (
             <FormControl fullWidth margin="normal">
-              <InputLabel id="vincular-modulos-label">Módulos</InputLabel>
+              <InputLabel id="vincular-modulos-label">{t("gestaoUsuarios.components.dialogLinkInstructors.modulesField")}</InputLabel>
               <Select
                 labelId="vincular-modulos-label"
                 multiple
                 value={vincularModulos}
                 onChange={(e) => setVincularModulos(e.target.value)}
-                label="Módulos"
+                label={t("gestaoUsuarios.components.dialogLinkInstructors.modulesField")}
                 renderValue={(selected) => (
                   <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
                     {unitModules
@@ -1167,7 +1167,7 @@ function GestaoUsuarios() {
           {vincularUnit && vincularModulos.length > 0 && (
             <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 1 }}>
               <Button variant="outlined" size="small" onClick={handleAdicionarUnidade}>
-                + Adicionar unidade
+                {t("gestaoUsuarios.components.dialogLinkInstructors.addUnitButton")}
               </Button>
             </Box>
           )}
@@ -1177,7 +1177,7 @@ function GestaoUsuarios() {
             <>
               <Divider sx={{ my: 2, borderColor: 'rgba(255,255,255,0.08)' }} />
               <Typography variant="caption" color="text.secondary" sx={{ mb: 1, display: 'block' }}>
-                Unidades a vincular ({unidadesAdicionadas.length})
+                {t("gestaoUsuarios.components.dialogLinkInstructors.unitsTitle", { quantity: unidadesAdicionadas.length })}
               </Typography>
               <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
                 {unidadesAdicionadas.map(({ unit, modulos, empresa }, index) => (
@@ -1216,13 +1216,13 @@ function GestaoUsuarios() {
           )}
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleVincularClose} disabled={vincularLoading}>Cancelar</Button>
+          <Button onClick={handleVincularClose} disabled={vincularLoading}>{t("common.cancel")}</Button>
           <Button
             variant="contained"
             onClick={handleVincularSubmit}
             disabled={vincularLoading || !vincularUser || !unidadesAdicionadas.length}
           >
-            {vincularLoading ? 'Vinculando...' : `Vincular${unidadesAdicionadas.length > 1 ? ` (${unidadesAdicionadas.length})` : ''}`}
+            {vincularLoading ? t("common.linking") : t("gestaoUsuarios.components.dialogLinkInstructors.linkInstructorButton", { quantity: unidadesAdicionadas.length > 1 ? ` (${unidadesAdicionadas.length})` : ''})}
           </Button>
         </DialogActions>
       </Dialog>
@@ -1234,7 +1234,7 @@ function GestaoUsuarios() {
             <Box sx={{ pt: 2, textAlign: 'center' }}>
               <Typography variant="h4" component="span" sx={{ fontWeight: 'bold', letterSpacing: 1 }}>
                 <Box><LinkRounded /></Box>
-                Vincular Unidade
+                {t("gestaoUsuarios.components.dialogLinkUnits.title")}
               </Typography>
             </Box>
           </Fade>
@@ -1245,7 +1245,7 @@ function GestaoUsuarios() {
 
           {/* 1. Email */}
           <TextField
-            label="E-mail do usuário"
+            label={t("gestaoUsuarios.components.dialogLinkUnits.emailField")}
             fullWidth
             margin="normal"
             value={unidadeEmail}
@@ -1254,7 +1254,7 @@ function GestaoUsuarios() {
             InputProps={{
               endAdornment: unidadeEmailLoading ? <CircularProgress size={18} sx={{ mr: 1 }} /> : null,
             }}
-            helperText="Pressione Enter para buscar"
+            helperText={t("gestaoUsuarios.components.dialogLinkUnits.emailMessage")}
           />
 
           {/* 2. Confirmação do usuário */}
@@ -1265,7 +1265,7 @@ function GestaoUsuarios() {
               </Avatar>
               <Box>
                 <Typography variant="caption" sx={{ color: '#31adff', fontWeight: 600, letterSpacing: 0.5 }} display="block">
-                  Usuário encontrado
+                  {t("gestaoUsuarios.components.dialogLinkUnits.firstCardTitle")}
                 </Typography>
                 <Typography variant="body2" sx={{ fontWeight: 600, color: 'white' }}>
                   {unidadeUser.nome_usuario}
@@ -1280,13 +1280,13 @@ function GestaoUsuarios() {
           {/* 3. Unidade */}
           <FormControl fullWidth margin="normal" disabled={!unidadeUser || unidadeUnitsLoading}>
             <InputLabel id="unidade-select-label">
-              {unidadeUnitsLoading ? 'Carregando...' : 'Unidade'}
+              {unidadeUnitsLoading ? t('common.loading') : t("gestaoUsuarios.components.dialogLinkUnits.unitField")}
             </InputLabel>
             <Select
               labelId="unidade-select-label"
               value={unidadeSelectedUnit}
               onChange={(e) => setUnidadeSelectedUnit(e.target.value)}
-              label={unidadeUnitsLoading ? 'Carregando...' : 'Unidade'}
+              label={unidadeUnitsLoading ? t('common.loading') : t("gestaoUsuarios.components.dialogLinkUnits.unitField")}
               endAdornment={unidadeUnitsLoading ? <CircularProgress size={18} sx={{ mr: 2 }} /> : null}
             >
               {unidadeUnits.map((unit) => (
@@ -1303,7 +1303,7 @@ function GestaoUsuarios() {
               <Divider sx={{ my: 2, borderColor: 'rgba(255,255,255,0.08)' }} />
               <Box sx={{ p: 1.5, borderRadius: 1.5, bgcolor: 'rgba(49,173,255,0.06)', border: '1px solid rgba(49,173,255,0.15)' }}>
                 <Typography variant="caption" display="block" sx={{ color: '#31adff', fontWeight: 600, letterSpacing: 0.5, mb: 0.5 }}>
-                  Resumo do vínculo
+                  {t("gestaoUsuarios.components.dialogLinkUnits.secondCardTitle")}
                 </Typography>
                 <Typography variant="body2" sx={{ mt: 0.5 }}>
                   <Box component="span" sx={{ color: 'white', fontWeight: 600 }}>{unidadeUser.nome_usuario}</Box>
@@ -1317,13 +1317,13 @@ function GestaoUsuarios() {
           )}
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleUnidadeClose} disabled={unidadeLoading}>Cancelar</Button>
+          <Button onClick={handleUnidadeClose} disabled={unidadeLoading}>{t("common.cancel")}</Button>
           <Button
             variant="contained"
             onClick={handleUnidadeSubmit}
             disabled={unidadeLoading || !unidadeUser || !unidadeSelectedUnit}
           >
-            {unidadeLoading ? 'Salvando...' : 'Vincular'}
+            {unidadeLoading ? t('common.saving') : t("common.link")}
           </Button>
         </DialogActions>
       </Dialog>
@@ -1458,7 +1458,7 @@ function GestaoUsuarios() {
             onClick={handleEditSubmit}
             disabled={editLoading || !editName.trim() || editRoles.length === 0}
           >
-            {editLoading ? 'Salvando...' : t("common.save")}
+            {editLoading ? t('common.saving') : t("common.save")}
           </Button>
         </DialogActions>
       </Dialog>

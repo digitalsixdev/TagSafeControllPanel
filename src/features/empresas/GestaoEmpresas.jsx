@@ -378,7 +378,7 @@ function GestaoEmpresas() {
       const payload = { ...rest };
       if (modulos.length) payload.modulo = modulos;
       await createCompanie(payload);
-      setSuccess('Empresa cadastrada com sucesso!');
+      setSuccess(t('gestaoEmpresas.messages.companyCreated'));
       await loadData();
       setTimeout(handleClose, 2000);
     } catch (err) {
@@ -439,7 +439,7 @@ function GestaoEmpresas() {
     setSuccess('');
     try {
       await updateCompanieById(selectedCompany.empresa_id, editFormData);
-      setSuccess('Empresa atualizada com sucesso!');
+      setSuccess(t('gestaoEmpresas.messages.companyUpdated'));
       await loadData();
       setTimeout(handleEditClose, 2000);
     } catch (err) {
@@ -516,7 +516,7 @@ function GestaoEmpresas() {
     setSuccess('');
     try {
       await updateUnitById(selectedUnit.public_id, editUnitFormData);
-      setSuccess('Unidade atualizada com sucesso!');
+      setSuccess(t('gestaoEmpresas.messages.unitUpdated'));
       const response = await getUnitByCompanieId(selectedCompany.empresa_id);
       setUnits(response.data || []);
       setTimeout(handleEditUnitClose, 2000);
@@ -537,7 +537,7 @@ function GestaoEmpresas() {
       setUnitFormData({ empresa_id: '', unidade: '', cnpj: '', modulo: [] });
       setUnitOpen(true);
     } catch (err) {
-      setError('Erro ao carregar dados necessários.');
+      setError(t('gestaoEmpresas.messages.errorLoadingData'));
     }
   };
 
@@ -550,7 +550,7 @@ function GestaoEmpresas() {
     try {
       const { empresa_id, ...data } = unitFormData;
       await addUnit(empresa_id, data);
-      setSuccess('Unidade cadastrada com sucesso!');
+      setSuccess(t('gestaoEmpresas.messages.unitCreated'));
       setTimeout(handleUnitClose, 2000);
     } catch (err) {
       setError(formatApiError(err));
@@ -770,7 +770,7 @@ function GestaoEmpresas() {
         <DialogActions>
           <Button onClick={handleClose} disabled={loading}>{t("common.cancel")}</Button>
           <Button variant="contained" onClick={handleSubmit} disabled={loading}>
-            {loading ? 'Salvando...' : t("common.save")}
+            {loading ? t('common.saving') : t("common.save")}
           </Button>
         </DialogActions>
       </Dialog>
@@ -796,7 +796,7 @@ function GestaoEmpresas() {
         <DialogActions>
           <Button onClick={handleEditClose} disabled={loading}>{t("common.cancel")}</Button>
           <Button variant="contained" onClick={handleEditSubmit} disabled={loading}>
-            {loading ? 'Salvando...' : t("common.save")}
+            {loading ? t('common.saving') : t("common.save")}
           </Button>
         </DialogActions>
       </Dialog>
@@ -823,7 +823,7 @@ function GestaoEmpresas() {
               labelId="select-company-label"
               value={unitFormData.empresa_id}
               onChange={(e) => setUnitFormData({ ...unitFormData, empresa_id: e.target.value })}
-              label="Empresa"
+              label={t("gestaoEmpresas.components.dialogAddNewUnit.fields.companyField")}
             >
               {allCompaniesList.map((emp) => (
                 <MenuItem key={emp.empresa_id} value={emp.empresa_id}>
@@ -860,7 +860,7 @@ function GestaoEmpresas() {
         <DialogActions>
           <Button onClick={handleUnitClose} disabled={loading}>{t("common.close")}</Button>
           <Button variant="contained" onClick={handleUnitSubmit} disabled={loading}>
-            {loading ? 'Salvando...' : t("common.save")}
+            {loading ? t('common.saving') : t("common.save")}
           </Button>
         </DialogActions>
       </Dialog>
@@ -970,7 +970,7 @@ function GestaoEmpresas() {
         <DialogActions>
           <Button onClick={handleEditUnitClose} disabled={loading}>{t("common.cancel")}</Button>
           <Button variant="contained" onClick={handleEditUnitSubmit} disabled={loading}>
-            {loading ? 'Salvando...' : t("common.save")}
+            {loading ? t('common.saving') : t("common.save")}
           </Button>
         </DialogActions>
       </Dialog>

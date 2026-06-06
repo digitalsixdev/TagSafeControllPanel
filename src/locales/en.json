@@ -122,7 +122,11 @@
             }
         },
         "messages": {
-
+            "companyCreated": "Company registered successfully!",
+            "companyUpdated": "Company updated successfully!",
+            "unitCreated": "Unit registered successfully!",
+            "unitUpdated": "Unit updated successfully!",
+            "errorLoadingData": "Error loading required data."
         },
         "api_codes": {
 
@@ -179,10 +183,57 @@
             "dialogViewUnits": {
                 "title": "Linked Units",
                 "nothingUnitsMessage": "No units linked to this user."
+            },
+
+            "dialogLinkInstructors": {
+                "title": "Link Instructor",
+                "emailField": "Instructor e-mail",
+                "emailMessage": "Press Enter to search",
+                "cardTitle": "Instructor found",
+                "companyField": "Company",
+                "unitField": "Unit",
+                "modulesField": "Modules",
+                "addUnitButton": "+ Add unit",
+                "linkInstructorButton": "Link {{quantity}}",
+                "unitsTitle": "Units to link ({{quantity}})"
+            },
+
+            "dialogLinkUnits": {
+                "title": "Link Unit",
+                "emailField": "User e-mail",
+                "emailMessage": "Press Enter to search",
+                "firstCardTitle": "User Found",
+                "unitField": "Unit",
+                "secondCardTitle": "Link summary"
+            },
+
+            "dialogNewUser": {
+                "title": "Register a new user",
+                "nameField": "Name",
+                "emailField": "E-mail",
+                "roleField": "Role",
+                "companyField": "Company",
+                "unitField": "Unit",
+                "passwordField": "Password",
+                "modulesField": "Modules",
+                "unitsLinkFields": {
+                    "firstSubtitle": "Units attended by the instructor",
+                    "secondSubtitle": "Units to link ({{quantity}})",
+                    "addUnitButton": "+ Add unit"
+                }
             }
         },
         "messages": {
-
+            "userCreated": "User registered successfully!",
+            "userUpdated": "User updated successfully!",
+            "noChanges": "No changes detected.",
+            "instructorLinked": "Instructor linked successfully!",
+            "unitLinked": "Unit linked successfully!",
+            "errorLoadingUnits": "Error loading units.",
+            "errorLoadingCompanies": "Error loading companies.",
+            "errorUnitAlreadyAdded": "This unit has already been added.",
+            "errorUserNotFound": "User not found.",
+            "errorNotInstructor": "The user exists but is not an instructor."
         },
         "api_codes": {
 
@@ -194,6 +245,10 @@
         "cancel": "Cancel",
         "edit": "Edit",
         "delete": "Delete",
-        "close": "Close"
+        "close": "Close",
+        "link": "Link",
+        "loading": "Loading...",
+        "saving": "Saving...",
+        "linking": "Linking..."
     }
 }

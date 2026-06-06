@@ -122,7 +122,11 @@
             }
         },
         "messages": {
-
+            "companyCreated": "Empresa cadastrada com sucesso!",
+            "companyUpdated": "Empresa atualizada com sucesso!",
+            "unitCreated": "Unidade cadastrada com sucesso!",
+            "unitUpdated": "Unidade atualizada com sucesso!",
+            "errorLoadingData": "Erro ao carregar dados necessários."
         },
         "api_codes": {
 
@@ -179,10 +183,57 @@
             "dialogViewUnits": {
                 "title": "Unidades Vinculadas",
                 "nothingUnitsMessage": "Nenhuma unidade vinculada a este usuário."
+            },
+
+            "dialogLinkInstructors": {
+                "title": "Vincular Instrutor",
+                "emailField": "E-mail do instrutor",
+                "emailMessage": "Pressione Enter para buscar",
+                "cardTitle": "Instrutor encontrado",
+                "companyField": "Empresa",
+                "unitField": "Unidade",
+                "modulesField": "Módulos",
+                "addUnitButton": "+ Adicionar unidade",
+                "linkInstructorButton": "Vincular {{quantity}}",
+                "unitsTitle": "Unidades a vincular ({{quantity}})"
+            },
+
+            "dialogLinkUnits": {
+                "title": "Vincular Unidade",
+                "emailField": "E-mail do usuário",
+                "emailMessage": "Pressione Enter para buscar",
+                "firstCardTitle": "Usuário Encontrado",
+                "unitField": "Unidade",
+                "secondCardTitle": "Resumo do vínculo"
+            },
+
+            "dialogNewUser": {
+                "title": "Cadastre um novo usuário",
+                "nameField": "Nome",
+                "emailField": "E-mail",
+                "roleField": "Cargo",
+                "companyField": "Empresa",
+                "unitField": "Unidade",
+                "passwordField": "Senha",
+                "modulesField": "Módulos",
+                "unitsLinkFields": {
+                    "firstSubtitle": "Unidades atendidas pelo instrutor",
+                    "secondSubtitle": "Unidades a vincular ({{quantity}})",
+                    "addUnitButton": "+ Adicionar unidade"
+                }
             }
         },
         "messages": {
-
+            "userCreated": "Usuário cadastrado com sucesso!",
+            "userUpdated": "Usuário atualizado com sucesso!",
+            "noChanges": "Nenhuma alteração detectada.",
+            "instructorLinked": "Instrutor vinculado com sucesso!",
+            "unitLinked": "Unidade vinculada com sucesso!",
+            "errorLoadingUnits": "Erro ao carregar unidades.",
+            "errorLoadingCompanies": "Erro ao carregar empresas.",
+            "errorUnitAlreadyAdded": "Essa unidade já foi adicionada.",
+            "errorUserNotFound": "Usuário não encontrado.",
+            "errorNotInstructor": "O usuário existe, mas não é um instrutor."
         },
         "api_codes": {
 
@@ -194,6 +245,10 @@
         "cancel": "Cancelar",
         "edit": "Editar",
         "delete": "Deletar",
-        "close": "Fechar"
+        "close": "Fechar",
+        "link": "Vincular",
+        "loading": "Carregando...",
+        "saving": "Salvando...",
+        "linking": "Vinculando..."
     }
 }
