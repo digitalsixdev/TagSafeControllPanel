@@ -182,7 +182,6 @@
                     "nameColumn": "Nome",
                     "emailColumn": "E-mail",
                     "roleColumn": "Cargo",
-                    "noRole": "Sem Cargo",
                     "firstAccessColumn": "Primeiro Acesso",
                     "firstAccessStatus": {
                         "completed": "Concluído",
@@ -395,10 +394,6 @@
             "searchButton": "Buscar",
             "loadingText": "Buscando evidência da sessão...",
 
-            "jsonViewer": {
-                "simple": "Simples"
-            },
-
             "cards": {
                 "session": {
                     "title": "Sessão",
@@ -480,18 +475,7 @@
             }
         },
         "messages": {
-            "not_id_session": "Informe o ID da sessão para buscar a evidência.",
-            "bryValidatedConcluded": "Validação na Bry concluída.",
-            "tstFileGenerated": "Arquivo .tst gerado.",
-            "couldNotCopyContent": "Não foi possível copiar o conteúdo.",
-            "labelComplete": "Completo",
-            "labelCopied": "copiado",
-            "labelProcessed": "processado",
-            "yes": "Sim",
-            "no": "Não",
-            "valid": "Válido",
-            "notValidated": "Não validado",
-            "concluded": "Concluído"
+            "NOT_ID_SESSION": "Informe o ID da sessão para buscar a evidência."
         },
         "api_codes": {
             "REQUIRED_SESSION_ID": "ID da sessão é obrigatório",

@@ -325,7 +325,7 @@ function GestaoEmpresas() {
 
         const cargoFormatado = params.value 
           ? params.value.charAt(0).toUpperCase() + params.value.slice(1).toLowerCase() 
-          : 'Sem Cargo';
+          : t("gestaoEmpresas.components.dialogViewUnitUsers.table.noRole");
           
         const cargo = params.value == 'user_master' ? 'Master' : cargoFormatado;
           

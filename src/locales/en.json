@@ -125,12 +125,6 @@
                     "about": "Module focused on the management and control of workplace gymnastics sessions carried out in units."
                 }
             }
-        },
-        "messages": {
-
-        },
-        "api_codes": {
-
         }
     },
 
@@ -188,6 +182,7 @@
                     "nameColumn": "Name",
                     "emailColumn": "E-mail",
                     "roleColumn": "Role",
+                    "noRole": "No Role",
                     "firstAccessColumn": "First Access",
                     "firstAccessStatus": {
                         "completed": "Completed",
@@ -400,6 +395,10 @@
             "searchButton": "Search",
             "loadingText": "Fetching session evidence...",
 
+            "jsonViewer": {
+                "simple": "Simple"
+            },
+
             "cards": {
                 "session": {
                     "title": "Session",
@@ -472,11 +471,25 @@
                 }
             }
         },
-        "messages": {},
+        "messages": {
+            "not_id_session": "Enter the session ID to fetch the evidence.",
+            "bryValidatedConcluded": "Bry validation completed.",
+            "tstFileGenerated": ".tst file generated.",
+            "couldNotCopyContent": "Could not copy content.",
+            "labelComplete": "Complete",
+            "labelCopied": "copied",
+            "labelProcessed": "processed",
+            "yes": "Yes",
+            "no": "No",
+            "valid": "Valid",
+            "notValidated": "Not validated",
+            "concluded": "Completed"
+        },
         "api_codes": {
             "REQUIRED_SESSION_ID": "Session ID is required",
             "EVIDENCE_NOT_FOUND": "Evidence not found",
-            "INVALID_STAMP": "Invalid stamp ID"
+            "INVALID_STAMP": "Invalid stamp ID",
+            "STAMP_NOT_FOUND": "Evidence stamp not found"
         }
     }
 }

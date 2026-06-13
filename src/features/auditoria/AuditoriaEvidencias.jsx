@@ -110,9 +110,9 @@ const formatDateTime = (value) => {
   return date.toLocaleString('pt-BR');
 };
 
-const formatYesNo = (value) => {
-  if (value === true) return 'Sim';
-  if (value === false) return 'Não';
+const formatYesNo = (value, t) => {
+  if (value === true) return t('evidences.messages.yes');
+  if (value === false) return t('evidences.messages.no');
   return value;
 };
 
@@ -130,18 +130,18 @@ const normalizeParticipants = (items = []) => {
   }));
 };
 
-const formatBryValidationStatus = (value) => {
-  if (value === true) return 'Válido';
-  if (value === false) return 'Não validado';
-  if (typeof value === 'number' && value >= 200 && value < 300) return 'Concluído';
+const formatBryValidationStatus = (value, t) => {
+  if (value === true) return t('evidences.messages.valid');
+  if (value === false) return t('evidences.messages.notValidated');
+  if (typeof value === 'number' && value >= 200 && value < 300) return t('evidences.messages.concluded');
   const normalized = String(value ?? '').trim();
   if (!normalized) return '-';
   const lower = normalized.toLowerCase();
   if (['valid', 'valido', 'validado', 'válido', 'success', 'sucesso', 'approved', 'aprovado', 'ok'].includes(lower)) {
-    return 'Válido';
+    return t('evidences.messages.valid');
   }
   if (['invalid', 'invalido', 'inválido', 'failed', 'erro', 'error', 'rejected', 'rejeitado'].includes(lower)) {
-    return 'Não validado';
+    return t('evidences.messages.notValidated');
   }
   return normalized;
 };
@@ -286,12 +286,12 @@ function AuditoriaEvidencias() {
 
     return [
       {
-        label: t('evidences.components.cards.validate.hashSubtitle', { defaultValue: 'Hash enviado' }),
+        label: t('evidences.components.cards.validate.sendedCard.hashSubtitle', { defaultValue: 'Hash enviado' }),
         value: firstDefined(firstTimestamp?.documentHash, parsedRequest?.documentHash, findDeepValue(parsedRequest, ['documentHash', 'document_hash'])),
         mono: true,
       },
       {
-        label: t('evidences.components.cards.validate.tokenSubtitle', { defaultValue: 'Token enviado' }),
+        label: t('evidences.components.cards.validate.sendedCard.tokenSubtitle', { defaultValue: 'Token enviado' }),
         value: firstDefined(firstTimestamp?.content, parsedRequest?.content, findDeepValue(parsedRequest, ['content', 'timestamp_token'])),
         mono: true,
       },
@@ -325,7 +325,7 @@ function AuditoriaEvidencias() {
     return [
       {
         label: t("evidences.components.cards.validate.resultCard.resultSubtitle", { defaultValue: 'Resultado' }),
-        value: formatBryValidationStatus(result),
+        value: formatBryValidationStatus(result, t),
       },
       {
         label: t("evidences.components.cards.validate.resultCard.stampHourSubtitle", { defaultValue: 'Horário do carimbo' }),
@@ -441,7 +441,7 @@ function AuditoriaEvidencias() {
   );
   const bryResponseSummary = buildBryResponseSummary(validationResponse || bryValidation?.response || bryValidation);
   const payloadSections = useMemo(() => {
-    const sections = [{ value: 'completo', label: 'Completo', data: snapshotPayload }];
+    const sections = [{ value: 'completo', label: t("evidences.messages.labelComplete"), data: snapshotPayload }];
     Object.entries(snapshotPayload || {}).forEach(([key, value]) => {
       if (value && typeof value === 'object') {
         sections.push({ value: key, label: key.replace(/_/g, ' '), data: value });
@@ -458,7 +458,7 @@ function AuditoriaEvidencias() {
   const loadEvidence = async (value = sessaoId) => {
     const cleanValue = String(value || '').trim();
     if (!cleanValue) {
-      setError('Informe o ID da sessão para buscar a evidência.');
+      setError(t("evidences.messages.not_id_session"));
       return;
     }
 
@@ -498,7 +498,7 @@ function AuditoriaEvidencias() {
       const normalizedResponse = normalizeEvidenceResponse(response.data);
       const nextCarimbo = normalizedResponse.carimbo || response.data?.carimbo || response.data?.data?.carimbo;
       setBryValidation(response.data);
-      showFeedback('Validação na Bry concluída.');
+      showFeedback(t("evidences.messages.bryValidatedConcluded"));
       setEvidence((current) => ({
         ...current,
         carimbo: {
@@ -507,7 +507,8 @@ function AuditoriaEvidencias() {
         },
       }));
     } catch (err) {
-      showFeedback(formatApiError(err), 'error');
+      const code = getApiCode(err);
+      showFeedback(code ? t(`evidences.api_codes.${code}`, { defaultValue: formatApiError(err) }) : formatApiError(err), 'error');
     } finally {
       setActionLoading('');
     }
@@ -519,9 +520,10 @@ function AuditoriaEvidencias() {
       setActionLoading('download');
       const response = await baixarEvidenciaCarimboTst(carimboId);
       downloadBlob(response.data, `carimbo-sessao-${sessaoId || snapshot?.sessao_id || snapshotId}.tst`);
-      showFeedback('Arquivo .tst gerado.');
+      showFeedback(t("evidences.messages.tstFileGenerated"));
     } catch (err) {
-      showFeedback(formatApiError(err), 'error');
+      const code = getApiCode(err);
+      showFeedback(code ? t(`evidences.api_codes.${code}`, { defaultValue: formatApiError(err) }) : formatApiError(err), 'error');
     } finally {
       setActionLoading('');
     }
@@ -531,9 +533,9 @@ function AuditoriaEvidencias() {
     if (!value) return;
     try {
       await navigator.clipboard.writeText(String(value));
-      showFeedback(`${label} copiado.`);
+      showFeedback(`${label} ${t("evidences.messages.labelCopied")}.`);
     } catch (error) {
-      showFeedback('Não foi possível copiar o conteúdo.', 'error');
+      showFeedback(t("evidences.messages.couldNotCopyContent"), 'error');
     }
   };
 
@@ -660,7 +662,7 @@ function AuditoriaEvidencias() {
 
             <Section icon={History} title={t("evidences.components.cards.processing.title")}>
               <Stack spacing={2}>
-                <Field label={t("evidences.components.cards.processing.jobField")} value={firstDefined(job?.status, job?.job_status, carimbo ? 'processado' : null)} />
+                <Field label={t("evidences.components.cards.processing.jobField")} value={firstDefined(job?.status, job?.job_status, carimbo ? t("evidences.messages.labelProcessed") : null)} />
                 <Field label={t("evidences.components.cards.processing.attemptsField")} value={firstDefined(job?.attempts, job?.tentativas, job?.tentativas_realizadas)} />
                 <Field label={t("evidences.components.cards.processing.lastErrorField")} value={firstDefined(job?.last_erro, job?.last_error, job?.erro)} />
                 <Field label={t("evidences.components.cards.processing.updatedAtField")} value={formatDateTime(firstDefined(job?.atualizado_em, job?.updated_at))} />
@@ -730,7 +732,7 @@ function AuditoriaEvidencias() {
                   },
                   endAdornment: (
                     <InputAdornment position="end">
-                      <Tooltip title="Copiar hash">
+                      <Tooltip title={t("evidences.components.cards.hashAndStamp.payloadHashTextField")}>
                         <span>
                           <IconButton onClick={() => handleCopy(hash, 'Hash')} disabled={!hash}>
                             <ContentCopy />
@@ -757,7 +759,7 @@ function AuditoriaEvidencias() {
                   },
                   endAdornment: (
                     <InputAdornment position="end">
-                      <Tooltip title="Copiar token">
+                      <Tooltip title={t("evidences.components.cards.hashAndStamp.timestampTextField")}>
                         <span>
                           <IconButton onClick={() => handleCopy(token, 'Token')} disabled={!token}>
                             <ContentCopy />
@@ -815,7 +817,7 @@ function AuditoriaEvidencias() {
                             <Field
                               key={item.label}
                               label={item.label}
-                              value={formatYesNo(item.value)}
+                              value={formatYesNo(item.value, t)}
                               mono={item.mono}
                             />
                           ))}
@@ -844,7 +846,7 @@ function AuditoriaEvidencias() {
                               <Field
                                 key={item.label}
                                 label={item.label}
-                                value={formatYesNo(item.value)}
+                                value={formatYesNo(item.value, t)}
                                 mono={item.mono}
                               />
                             ))}
