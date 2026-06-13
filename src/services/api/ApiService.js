@@ -28,6 +28,8 @@ export const verifyToken = () =>
 export const logout = () =>
   apiClient.post('/auth/logout');
 
+export const getApiCode = (error) => error?.response?.data?.code ?? null;
+
 export const formatApiError = (error) => {
   if (error?.response?.data?.error) return error.response.data.error;
   if (error?.response?.status === 401) return 'Sessão expirada. Faça login novamente.';
@@ -205,4 +207,22 @@ export const updateRolesByPublicId = (public_id, roles) => {
 
 export const getRolesByUserId = (public_id) => {
   return apiClient.get(`/usuarios/get_roles/${public_id}`);
+};
+
+// rotas evidência carimbo
+export const baixarEvidenciaCarimboTst = (carimboId) => {
+  return apiClient.get(`/evidencias/carimbos/${encodeURIComponent(carimboId)}/tst`, {
+    responseType: 'blob',
+    timeout: 30000,
+  });
+};
+
+export const getEvidenciaBySessao = (sessaoId, unidadeId) => {
+  return apiClient.get(
+    `/evidencias/sessoes/master/${encodeURIComponent(sessaoId)}`
+  );
+};
+
+export const validarEvidenciaCarimboBry = (carimboId) => {
+  return apiClient.post(`/evidencias/carimbos/${encodeURIComponent(carimboId)}/validar`);
 };

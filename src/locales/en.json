@@ -11,7 +11,8 @@
             "success": "Login successful!",
             "errorEmptyFields": "Please fill in all fields",
             "errorInvalidUser": "Invalid user data.",
-            "errorNoToken": "Authentication token not found."
+            "errorNoToken": "Authentication token not found.",
+            "errorConnection": "Error connecting to the server!"
         },
         "api_codes": {
 
@@ -20,7 +21,110 @@
 
     "gestaoMaster": {
         "components": {
+            "title": "Master Panel",
+            "subtitle": "Control center of the TagSafe ecosystem.",
 
+            "cards": {
+                "registeredCompanies": "Registered companies",
+                "availableModules": "Available modules",
+                "registeredUsers": "Registered users",
+                "registeredUnits": "Registered units"
+            },
+
+            "aboutContainer": {
+                "title": "TagSafe Control Panel",
+                "subtitle": "Centralized management platform for master administrators of the TagSafe ecosystem.",
+
+                "explication": {
+                    "about": {
+                        "title": "WHAT IT'S FOR",
+                        "text": "This panel allows <role/> users to manage the entire platform structure: from registering companies and their units to controlling users, roles, and links to available modules."
+                    },
+                    "howToAccess": {
+                        "title": "HOW TO ACCESS",
+                        "firstStep": "Log in with an account with the Master role.",
+                        "secondStep": "Use the side menu to navigate between panels",
+                        "thirdStep": "Manage companies, units, and users independently."
+                    }
+                }
+            },
+
+            "panelsContainer": {
+                "title": "Available panels",
+                "subtitle": "The control panel is divided into two main sections, accessible from the side menu.",
+
+                "companiesCard": {
+                    "title": "Companies Panel",
+                    "subtitle": "Manage all companies and their units registered on the platform.",
+
+                    "features": {
+                        "first": "Register new companies with CNPJ and modules",
+                        "second": "Add and edit units per company",
+                        "third": "Link modules (TR, GL) to each unit",
+                        "fourty": "Search companies by name or CNPJ",
+                        "fifth": "View users linked to each unit",
+                        "sixth": "Edit company and unit data"
+                    }
+                },
+
+                "usersCard": {
+                    "title": "Users Panel",
+                    "subtitle": "Full control over users, roles, links, and instructors.",
+
+                    "features": {
+                        "first": "Register users with role and linked unit",
+                        "second": "Register instructors with attended units and modules",
+                        "third": "Link existing instructors to new units",
+                        "fourty": "Link users to additional units",
+                        "fifth": "Edit name and roles of any user",
+                        "sixth": "Filter users by name, e-mail, company, or role"
+                    }
+                }
+            },
+
+            "rolesContainer": {
+                "title": "Platform roles",
+                "subtitle": "Each user has a role that defines their access level within the system.",
+
+                "roles": {
+                    "default": {
+                        "name": "Default",
+                        "about": "Basic platform access"
+                    },
+
+                    "admin": {
+                        "name": "Admin",
+                        "about": "Administrative permissions"
+                    },
+
+                    "instructor": {
+                        "name": "Instructor",
+                        "about": "Access to attended units"
+                    },
+
+                    "master": {
+                        "name": "Master",
+                        "about": "Full access to the control panel"
+                    }
+                }
+            },
+
+            "modulesContainer": {
+                "title": "Available modules",
+                "subtitle": "Modules define which features are active in each registered unit.",
+
+                "tr": {
+                    "name": "Training Safe",
+                    "prefix": "TR",
+                    "about": "Module focused on the management and control of safety training sessions carried out in units."
+                },
+
+                "gl": {
+                    "name": "GL Safe",
+                    "prefix": "GL",
+                    "about": "Module focused on the management and control of workplace gymnastics sessions carried out in units."
+                }
+            }
         },
         "messages": {
 
@@ -129,7 +233,19 @@
             "errorLoadingData": "Error loading required data."
         },
         "api_codes": {
-
+            "COMPANY_NOT_FOUND": "Company not found",
+            "ACCESS_DENIED": "Access denied",
+            "COMPANY_ID_INVALID": "Invalid company ID",
+            "REQUIRED_UNIT_AND_CNPJ": "Unit and CNPJ are required",
+            "FILL_ALL_INFORMATION": "Fill in all information",
+            "UNIT_NOT_FOUND": "Unit not found",
+            "USERS_NOT_FOUND": "Users not found",
+            "UNITS_NOT_FOUND": "Units not found",
+            "INVALID_MODULES_ID": "Invalid module IDs",
+            "INVALID_CNPJ": "Invalid CNPJ",
+            "INVALID_CNPJ_ROOT_FOR_COMPANY": "CNPJ root does not match the provided company",
+            "UNIT_CNPJ_ALREADY_REGISTERED": "Unit with this CNPJ already registered",
+            "INVALID_LINKED_COMPANY_CNPJ_BASE": "CNPJ base does not match the linked company"
         }
     },
 
@@ -233,10 +349,31 @@
             "errorLoadingCompanies": "Error loading companies.",
             "errorUnitAlreadyAdded": "This unit has already been added.",
             "errorUserNotFound": "User not found.",
-            "errorNotInstructor": "The user exists but is not an instructor."
+            "errorNotInstructor": "The user exists but is not an instructor.",
+            "errorUnits": "Units: {{error}}"
         },
         "api_codes": {
 
+        }
+    },
+
+    "app": {
+        "menuItems": {
+            "masterPanel": "Master Panel",
+            "companiesPanel": "Companies Panel",
+            "usersPanel": "Users Panel",
+            "audit": "Audit"
+        },
+        "environment": "Environment",
+        "logout": "Sign out",
+        "userFallback": "User",
+        "unauthorized": {
+            "title": "Unauthorized access",
+            "description": "Your account does not have permission to access this panel."
+        },
+        "loading": {
+            "auth": "Verifying authentication...",
+            "app": "Loading application..."
         }
     },
 
@@ -250,5 +387,94 @@
         "loading": "Loading...",
         "saving": "Saving...",
         "linking": "Linking..."
+    },
+
+    "evidences": {
+        "components": {
+            "title": "Evidence Audit",
+            "subtitle": "Consult the official session snapshot, check the SHA256 hash and validate the ICP timestamp issued by Bry.",
+            "warningBox": "Enter a completed session to consult the snapshot, hash and timestamp",
+            "sessionField": "Session ID",
+            "searchButton": "Search",
+            "loadingText": "Fetching session evidence...",
+
+            "cards": {
+                "session": {
+                    "title": "Session",
+                    "sessionField": "Session",
+                    "trainingField": "Training",
+                    "openingField": "Opening",
+                    "closingField": "Closing"
+                },
+                "context": {
+                    "title": "Context",
+                    "companyField": "Company",
+                    "unitField": "Unit",
+                    "instructorField": "Instructor",
+                    "participantsField": "Participants"
+                },
+                "integrity": {
+                    "title": "Integrity",
+                    "snapshotField": "Snapshot",
+                    "schemaField": "Schema",
+                    "algorithmField": "Algorithm",
+                    "createdAtField": "Created at"
+                },
+                "processing": {
+                    "title": "Processing",
+                    "jobField": "Job",
+                    "attemptsField": "Attempts",
+                    "lastErrorField": "Last error",
+                    "updatedAtField": "Updated at"
+                },
+                "trainingParticipants": {
+                    "title": "Training Participants",
+                    "nameColumn": "Name",
+                    "sectorColumn": "Sector",
+                    "levelColumn": "Level",
+                    "methodColumn": "Method",
+                    "registryColumn": "Record"
+                },
+                "hashAndStamp": {
+                    "title": "Hash & ICP-Brasil Timestamp",
+                    "provider": "Provider",
+                    "environment": "Environment",
+                    "nonce": "Nonce",
+                    "payloadHashTextField": "Payload Hash",
+                    "timestampTextField": "Timestamp Token",
+                    "validationButton": "Validate",
+                    "downloadTstButton": "Download .tst"
+                },
+                "validate": {
+                    "concludedMessage": "Validation completed. Bry verified the timestamp of this session.",
+                    "bryNotReturnMessage": "Bry completed the validation but did not return additional details.",
+                    "sendedCard": {
+                        "title": "Sent to BRY",
+                        "hashSubtitle": "Sent hash",
+                        "tokenSubtitle": "Sent token"
+                    },
+                    "resultCard": {
+                        "title": "Bry Result",
+                        "resultSubtitle": "Result",
+                        "stampHourSubtitle": "Timestamp time",
+                        "validationHashSubtitle": "Validated hash",
+                        "algorithmSubtitle": "Algorithm",
+                        "stampNumberSubtitle": "Stamp number",
+                        "issuerSubtitle": "Issuer"
+                    },
+                    "evidencePayload": {
+                        "title": "Evidence Payload",
+                        "sectionField": "Payload section",
+                        "visualizationField": "View"
+                    }
+                }
+            }
+        },
+        "messages": {},
+        "api_codes": {
+            "REQUIRED_SESSION_ID": "Session ID is required",
+            "EVIDENCE_NOT_FOUND": "Evidence not found",
+            "INVALID_STAMP": "Invalid stamp ID"
+        }
     }
 }

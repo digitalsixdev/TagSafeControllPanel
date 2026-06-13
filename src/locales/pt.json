@@ -11,7 +11,8 @@
             "success": "Login realizado com sucesso!",
             "errorEmptyFields": "Por favor, preencha todos os campos",
             "errorInvalidUser": "Dados do usuário inválidos.",
-            "errorNoToken": "Token de autenticação não encontrado."
+            "errorNoToken": "Token de autenticação não encontrado.",
+            "errorConnection": "Erro ao conectar com o servidor!"
         },
         "api_codes": {
             
@@ -20,13 +21,110 @@
 
     "gestaoMaster": {
         "components": {
-            
-        },
-        "messages": {
+            "title": "Painel Master",
+            "subtitle": "Central de controle do ecossistema TagSafe.",
 
-        },
-        "api_codes": {
+            "cards": {
+                "registeredCompanies": "Empresas cadastradas",
+                "availableModules": "Módulos disponíveis",
+                "registeredUsers": "Usuários cadastrados",
+                "registeredUnits": "Unidades cadastradas"
+            },
 
+            "aboutContainer": {
+                "title": "TagSafe Control Panel",
+                "subtitle": "Plataforma centralizada de gestão para administradores master do ecossistema TagSafe.",
+
+                "explication": {
+                    "about": {
+                        "title": "PARA QUE SERVE",
+                        "text": "Este painel permite que usuários <role/> gerenciem toda a estrutura da plataforma: desde o cadastro de empresas e suas unidades até o controle de usuários, cargos e vínculos com módulos disponíveis."
+                    },
+                    "howToAccess": {
+                        "title": "COMO ACESSAR",
+                        "firstStep": "Faça login com uma conta com o cargo Master.",
+                        "secondStep": "Use o menu lateral para navegar entre os painéis",
+                        "thirdStep": "Gerencie empresas, unidades e usuários de forma independente."
+                    }
+                }
+            },
+
+            "panelsContainer": {
+                "title": "Painéis disponíveis",
+                "subtitle": "O painel de controle é divido em duas seções principais, acessíveis pelo menu lateral.",
+
+                "companiesCard": {
+                    "title": "Painel de Empresas",
+                    "subtitle": "Gerencie todas as empresas e suas unidades cadastradas na plataforma.",
+                    
+                    "features": {
+                        "first": "Cadastrar novas empresas com CNPJ e módulos",
+                        "second": "Adicionar e editar unidades por empresa",
+                        "third": "Vincular módulos (TR, GL) a cada unidade",
+                        "fourty": "Buscar empresas por nome ou CNPJ",
+                        "fifth": "Visualizar usuários vinculados a cada unidade",
+                        "sixth": "Editar dados de empresas e unidades"
+                    }
+                },
+
+                "usersCard": {
+                    "title": "Painel de Usuários",
+                    "subtitle": "Controle completo sobre usuários, cargos, vínculos e instrutores.",
+                    
+                    "features": {
+                        "first": "Cadastrar usuários com cargo e unidade vinculada",
+                        "second": "Registrar instrutores com unidades atendidas e módulos",
+                        "third": "Vincular instrutores existentes a novas unidades",
+                        "fourty": "Vincular usuários a unidades adicionais",
+                        "fifth": "Editar nome e cargos de qualquer usuário",
+                        "sixth": "Filtrar usuários por nome, e-mail, empresa ou cargo"
+                    }
+                }
+            },
+
+            "rolesContainer": {
+                "title": "Cargos da plataforma",
+                "subtitle": "Cada usuário possui um cargo que define seu nível de acesso dentro do sistema.",
+
+                "roles": {
+                    "default": {
+                        "name": "Padrão",
+                        "about": "Acesso básico à plataforma"
+                    },
+                    
+                    "admin": {
+                        "name": "Admin",
+                        "about": "Permissões administrativas"
+                    },
+
+                    "instructor": {
+                        "name": "Instrutor",
+                        "about": "Acesso às unidades atendidas"
+                    },
+
+                    "master": {
+                        "name": "Master",
+                        "about": "Acesso total ao painel de controle"
+                    }
+                }
+            },
+
+            "modulesContainer": {
+                "title": "Módulos disponíveis",
+                "subtitle": "Os módulos definem quais funcionalidades estão ativas em cada unidade cadastrada.",
+
+                "tr": {
+                    "name": "Training Safe",
+                    "prefix": "TR",
+                    "about": "Módulo voltado para gestão e controle de treinamentos de segurança realizados nas unidades."
+                },
+                
+                "gl": {
+                    "name": "GL Safe",
+                    "prefix": "GL",
+                    "about": "Módulo voltado para a gestão e controle de sessões de ginástica laboral realizadas nas unidades."
+                }
+            }
         }
     },
 
@@ -129,7 +227,19 @@
             "errorLoadingData": "Erro ao carregar dados necessários."
         },
         "api_codes": {
-
+            "COMPANY_NOT_FOUND": "Empresa não encontrada",
+            "ACCESS_DENIED": "Acesso negado",
+            "COMPANY_ID_INVALID": "ID da empresa inválido",
+            "REQUIRED_UNIT_AND_CNPJ": "Unidade e CNPJ são obrigatórios",
+            "FILL_ALL_INFORMATION": "Preencha todas as informações",
+            "UNIT_NOT_FOUND": "Unidade não encontrada",
+            "USERS_NOT_FOUND": "Usuários não encontrados",
+            "UNITS_NOT_FOUND": "Unidades não encontradas",
+            "INVALID_MODULES_ID": "IDs de módulo inválidos",
+            "INVALID_CNPJ": "CNPJ inválido",
+            "INVALID_CNPJ_ROOT_FOR_COMPANY": "A raiz do CNPJ não corresponde à empresa informada",
+            "UNIT_CNPJ_ALREADY_REGISTERED": "Unidade com esse CNPJ já cadastrada",
+            "INVALID_LINKED_COMPANY_CNPJ_BASE": "CNPJ base não corresponde à empresa vinculada"
         }
     },
 
@@ -233,10 +343,31 @@
             "errorLoadingCompanies": "Erro ao carregar empresas.",
             "errorUnitAlreadyAdded": "Essa unidade já foi adicionada.",
             "errorUserNotFound": "Usuário não encontrado.",
-            "errorNotInstructor": "O usuário existe, mas não é um instrutor."
+            "errorNotInstructor": "O usuário existe, mas não é um instrutor.",
+            "errorUnits": "Unidades: {{error}}"
         },
         "api_codes": {
 
+        }
+    },
+
+    "app": {
+        "menuItems": {
+            "masterPanel": "Painel Master",
+            "companiesPanel": "Painel Empresas",
+            "usersPanel": "Painel Usuários",
+            "audit": "Auditoria"
+        },
+        "environment": "Ambiente",
+        "logout": "Sair",
+        "userFallback": "Usuário",
+        "unauthorized": {
+            "title": "Acesso não autorizado",
+            "description": "Sua conta não tem permissão para acessar este painel."
+        },
+        "loading": {
+            "auth": "Verificando autenticação...",
+            "app": "Carregando aplicação..."
         }
     },
 
@@ -250,5 +381,104 @@
         "loading": "Carregando...",
         "saving": "Salvando...",
         "linking": "Vinculando..."
+    },
+
+    "evidences": {
+        "components": {
+            "title": "Auditoria de Evidências",
+            "subtitle": "Consulte o snapshot oficial da sessão, confira o hash SHA256 e valide o carimbo ICP emitido pela Bry.",
+            "warningBox": "Informe uma sessão finalizada para consultar o snapshot, o hash e o carimbo de tempo",
+            "sessionField": "ID da sessão",
+            "searchButton": "Buscar",
+            "loadingText": "Buscando evidência da sessão...",
+
+            "cards": {
+                "session": {
+                    "title": "Sessão",
+                    "sessionField": "Sessão",
+                    "trainingField": "Treinamento",
+                    "openingField": "Abertura",
+                    "closingField": "Encerramento"
+                },
+
+                "context": {
+                    "title": "Contexto",
+                    "companyField": "Empresa",
+                    "unitField": "Unidade",
+                    "instructorField": "Instrutor",
+                    "participantsField": "Participantes"
+                },
+
+                "integrity": {
+                    "title": "Integridade",
+                    "snapshotField": "Snapshot",
+                    "schemaField": "Schema",
+                    "algorithmField": "Algoritmo",
+                    "createdAtField": "Criado em"
+                },
+
+                "processing": {
+                    "title": "Processamento",
+                    "jobField": "Job",
+                    "attemptsField": "Tentativas",
+                    "lastErrorField": "Último erro",
+                    "updatedAtField": "Atualizado em"
+                },
+
+                "trainingParticipants": {
+                    "title": "Participantes do Treinamento",
+                    "nameColumn": "Nome",
+                    "sectorColumn": "Setor",
+                    "levelColumn": "Nível",
+                    "methodColumn": "Método",
+                    "registryColumn": "Registro"
+                },
+
+                "hashAndStamp": {
+                    "title": "Hash e Carimbo ICP-Brasil",
+                    "provider": "Provider",
+                    "environment": "Ambiente",
+                    "nonce": "Nonce",
+                    "payloadHashTextField": "Payload Hash",
+                    "timestampTextField": "Timestamp Token",
+                    "validationButton": "Validar",
+                    "downloadTstButton": "Baixar .tst"
+                },
+
+                "validate": {  
+                    "concludedMessage": "Validação concluída. A Bry conferiu o carimbo de tempo desta sessão.",
+                    "bryNotReturnMessage": "A Bry concluiu a validação, mas não retornou detalhes adicionais.",
+                    "sendedCard": {
+                        "title": "Enviado à BRY",
+                        "hashSubtitle": "Hash enviado",
+                        "tokenSubtitle": "Token enviado"
+                    },
+
+                    "resultCard": {
+                        "title": "Resultado da Bry",
+                        "resultSubtitle": "Resultado",
+                        "stampHourSubtitle": "Horário do carimbo",
+                        "validationHashSubtitle": "Hash validado",
+                        "algorithmSubtitle": "Algoritmo",
+                        "stampNumberSubtitle": "Número do Carimbo",
+                        "issuerSubtitle": "Emissor"
+                    },
+
+                "evidencePayload": {
+                    "title": "Payload de Evidência",
+                    "sectionField": "Seção do payload",
+                    "visualizationField": "Visualização"
+                }
+                }
+            }
+        },
+        "messages": {
+            
+        },
+        "api_codes": {
+            "REQUIRED_SESSION_ID": "ID da sessão é obrigatório",
+            "EVIDENCE_NOT_FOUND": "Evidência não encontrada",
+            "INVALID_STAMP": "ID do carimbo inválido"
+        }
     }
 }

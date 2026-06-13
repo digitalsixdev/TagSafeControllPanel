@@ -78,7 +78,7 @@ const Login = ({ onLoginSuccess }) => {
         onLoginSuccess(normalizedUser, authToken, { refreshToken, refreshExpiresAt });
       }, 500);
     } catch (err) {
-      setError(formatApiError(err) || err.message || 'Erro ao conectar com o servidor!');
+      setError(formatApiError(err) || err.message || t('login.messages.errorConnection'));
     } finally {
       setLoading(false);
     }

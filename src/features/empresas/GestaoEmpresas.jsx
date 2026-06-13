@@ -4,6 +4,7 @@ import {
   getModules,
   getStats,
   formatApiError,
+  getApiCode,
   addUnit,
   getAllCompanies,
   getUnitByCompanieId,
@@ -111,25 +112,25 @@ function StatCard({ title, value, icon: Icon, gradient, delay = 0, isLoading = f
   );
 }
 
-const exportCSV = (rows, filename) => {
-  const columns = [
-    { label: 'Nome',      get: r => r.nome || '' },
-    { label: 'CNPJ Base', get: r => r.cnpj_base || '' },
-  ];
-  const escape = v => v.includes(',') || v.includes('"') || v.includes('\n') ? `"${v.replace(/"/g, '""')}"` : v;
-  const header = columns.map(c => c.label).join(',');
-  const body = rows.map(r => columns.map(c => escape(c.get(r))).join(',')).join('\n');
-  const blob = new Blob(['﻿' + header + '\n' + body], { type: 'text/csv;charset=utf-8;' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = filename;
-  a.click();
-  URL.revokeObjectURL(url);
-};
-
 function GestaoEmpresas() {
   const { t, i18n } = useTranslation();
+
+  const exportCSV = (rows, filename) => {
+    const columns = [
+      { label: t('gestaoEmpresas.components.table.companiesColumn'), get: r => r.nome || '' },
+      { label: t('gestaoEmpresas.components.table.cnpjBaseColumn'),  get: r => r.cnpj_base || '' },
+    ];
+    const escape = v => v.includes(',') || v.includes('"') || v.includes('\n') ? `"${v.replace(/"/g, '""')}"` : v;
+    const header = columns.map(c => c.label).join(',');
+    const body = rows.map(r => columns.map(c => escape(c.get(r))).join(',')).join('\n');
+    const blob = new Blob(['﻿' + header + '\n' + body], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
   const dataGridLocale = i18n.language === 'pt'
     ? ptBR.components.MuiDataGrid.defaultProps.localeText
     : enUS.components.MuiDataGrid.defaultProps.localeText;
@@ -240,7 +241,7 @@ function GestaoEmpresas() {
         </IconButton>
       ),
     },
-  ], []);
+  ], [t]);
 
   const unitsColumns = useMemo(() => [
     {
@@ -310,7 +311,7 @@ function GestaoEmpresas() {
         </IconButton>
       ),
     },
-  ], []);
+  ], [t]);
 
   const unitUsersColumns = useMemo(() => [
     { field: 'nome', headerName: t("gestaoEmpresas.components.dialogViewUnitUsers.table.nameColumn"), flex: 1 },
@@ -352,7 +353,7 @@ function GestaoEmpresas() {
         </Box>
       ),
     },
-  ], []);
+  ], [t]);
 
   const handleOpen = async () => {
     setError('');
@@ -382,7 +383,8 @@ function GestaoEmpresas() {
       await loadData();
       setTimeout(handleClose, 2000);
     } catch (err) {
-      setError(formatApiError(err));
+      const code = getApiCode(err);
+      setError(code ? t(`gestaoEmpresas.api_codes.${code}`, { defaultValue: formatApiError(err) }) : formatApiError(err));
     } finally {
       setLoading(false);
     }
@@ -406,7 +408,8 @@ function GestaoEmpresas() {
       const response = await getUnitByCompanieId(selectedCompany.empresa_id);
       setUnits(response.data || []);
     } catch (err) {
-      setError(formatApiError(err));
+      const code = getApiCode(err);
+      setError(code ? t(`gestaoEmpresas.api_codes.${code}`, { defaultValue: formatApiError(err) }) : formatApiError(err));
     } finally {
       setUnitsLoading(false);
     }
@@ -443,7 +446,8 @@ function GestaoEmpresas() {
       await loadData();
       setTimeout(handleEditClose, 2000);
     } catch (err) {
-      setError(formatApiError(err));
+      const code = getApiCode(err);
+      setError(code ? t(`gestaoEmpresas.api_codes.${code}`, { defaultValue: formatApiError(err) }) : formatApiError(err));
     } finally {
       setLoading(false);
     }
@@ -466,7 +470,8 @@ function GestaoEmpresas() {
       const response = await getAllUsersByIdUnit(selectedUnit.public_id);
       setUnitUsers(response.data || []);
     } catch (err) {
-      setError(formatApiError(err));
+      const code = getApiCode(err);
+      setError(code ? t(`gestaoEmpresas.api_codes.${code}`, { defaultValue: formatApiError(err) }) : formatApiError(err));
     } finally {
       setUnitUsersLoading(false);
     }
@@ -521,7 +526,8 @@ function GestaoEmpresas() {
       setUnits(response.data || []);
       setTimeout(handleEditUnitClose, 2000);
     } catch (err) {
-      setError(formatApiError(err));
+      const code = getApiCode(err);
+      setError(code ? t(`gestaoEmpresas.api_codes.${code}`, { defaultValue: formatApiError(err) }) : formatApiError(err));
     } finally {
       setLoading(false);
     }
@@ -553,7 +559,8 @@ function GestaoEmpresas() {
       setSuccess(t('gestaoEmpresas.messages.unitCreated'));
       setTimeout(handleUnitClose, 2000);
     } catch (err) {
-      setError(formatApiError(err));
+      const code = getApiCode(err);
+      setError(code ? t(`gestaoEmpresas.api_codes.${code}`, { defaultValue: formatApiError(err) }) : formatApiError(err));
     } finally {
       setLoading(false);
     }
@@ -858,7 +865,7 @@ function GestaoEmpresas() {
           </FormControl>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleUnitClose} disabled={loading}>{t("common.close")}</Button>
+          <Button onClick={handleUnitClose} disabled={loading}>{t("common.cancel")}</Button>
           <Button variant="contained" onClick={handleUnitSubmit} disabled={loading}>
             {loading ? t('common.saving') : t("common.save")}
           </Button>

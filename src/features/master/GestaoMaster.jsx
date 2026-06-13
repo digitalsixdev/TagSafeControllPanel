@@ -30,6 +30,8 @@ import {
   ArrowForward,
 } from '@mui/icons-material';
 import { getStats } from '../../services/api/ApiService';
+import { useTranslation, Trans } from 'react-i18next';
+import '../../app/i18n';
 
 function StatCard({ title, value, icon: Icon, gradient, delay = 0, isLoading = false }) {
   if (isLoading) {
@@ -65,68 +67,65 @@ function StatCard({ title, value, icon: Icon, gradient, delay = 0, isLoading = f
   );
 }
 
-const panelFeatures = [
-  {
-    title: 'Painel de Empresas',
-    icon: Business,
-    color: '#2563EB',
-    gradient: 'linear-gradient(135deg, rgba(37,99,235,0.15) 0%, rgba(37,99,235,0.05) 100%)',
-    border: 'rgba(37,99,235,0.3)',
-    description: 'Gerencie todas as empresas e suas unidades cadastradas na plataforma.',
-    features: [
-      { icon: Add, text: 'Cadastrar novas empresas com CNPJ e módulos' },
-      { icon: Store, text: 'Adicionar e editar unidades por empresa' },
-      { icon: ViewModule, text: 'Vincular módulos (TR, GL) a cada unidade' },
-      { icon: Search, text: 'Buscar empresas por nome ou CNPJ' },
-      { icon: People, text: 'Visualizar usuários vinculados a cada unidade' },
-      { icon: Edit, text: 'Editar dados de empresas e unidades' },
-    ],
-  },
-  {
-    title: 'Painel de Usuários',
-    icon: Groups3,
-    color: '#8B5CF6',
-    gradient: 'linear-gradient(135deg, rgba(139,92,246,0.15) 0%, rgba(139,92,246,0.05) 100%)',
-    border: 'rgba(139,92,246,0.3)',
-    description: 'Controle completo sobre usuários, cargos, vínculos e instrutores.',
-    features: [
-      { icon: Add, text: 'Cadastrar usuários com cargo e unidade vinculada' },
-      { icon: School, text: 'Registrar instrutores com unidades atendidas e módulos' },
-      { icon: LinkRounded, text: 'Vincular instrutores existentes a novas unidades' },
-      { icon: LinkRounded, text: 'Vincular usuários a unidades adicionais' },
-      { icon: Edit, text: 'Editar nome e cargos de qualquer usuário' },
-      { icon: Search, text: 'Filtrar usuários por nome, e-mail, empresa ou cargo' },
-    ],
-  },
-];
-
-const roles = [
-  { label: 'Padrão', description: 'Acesso básico à plataforma', color: '#94a3b8', bg: 'rgba(255,255,255,0.05)', border: 'rgba(255,255,255,0.1)' },
-  { label: 'Admin', description: 'Permissões administrativas', color: '#a78bfa', bg: 'rgba(139,92,246,0.1)', border: 'rgba(139,92,246,0.3)' },
-  { label: 'Instrutor', description: 'Acesso às unidades atendidas', color: '#60a5fa', bg: 'rgba(37,99,235,0.1)', border: 'rgba(59,130,246,0.3)' },
-  { label: 'Master', description: 'Acesso total ao painel de controle', color: '#fbbf24', bg: 'rgba(245,158,11,0.1)', border: 'rgba(245,158,11,0.3)' },
-];
-
-const modules = [
-  {
-    label: 'TR',
-    name: 'Training Safe',
-    description: 'Módulo voltado para gestão e controle de treinamentos de segurança realizados nas unidades.',
-    color: '#60a5fa',
-    bg: 'rgba(37,99,235,0.1)',
-    border: 'rgba(59,130,246,0.3)',
-  },
-  {
-    label: 'GL',
-    name: 'GL Safe',
-    description: 'Módulo voltado para a gestão e controle de sessões de ginástica laboral realizadas nas unidades.',
-    color: '#fbbf24',
-    bg: 'rgba(245,158,11,0.1)',
-    border: 'rgba(245,158,11,0.3)',
-  },
-];
-
 function GestaoMaster() {
+  const { t } = useTranslation();
+
+  const panelFeatures = [
+    {
+      title: t("gestaoMaster.components.panelsContainer.companiesCard.title"),
+      icon: Business,
+      color: '#2563EB',
+      gradient: 'linear-gradient(135deg, rgba(37,99,235,0.15) 0%, rgba(37,99,235,0.05) 100%)',
+      border: 'rgba(37,99,235,0.3)',
+      description: t("gestaoMaster.components.panelsContainer.companiesCard.subtitle"),
+      features: [
+        { icon: Add,        text: t("gestaoMaster.components.panelsContainer.companiesCard.features.first") },
+        { icon: Store,      text: t("gestaoMaster.components.panelsContainer.companiesCard.features.second") },
+        { icon: ViewModule, text: t("gestaoMaster.components.panelsContainer.companiesCard.features.third") },
+        { icon: Search,     text: t("gestaoMaster.components.panelsContainer.companiesCard.features.fourty") },
+        { icon: People,     text: t("gestaoMaster.components.panelsContainer.companiesCard.features.fifth") },
+        { icon: Edit,       text: t("gestaoMaster.components.panelsContainer.companiesCard.features.sixth") },
+      ],
+    },
+    {
+      title: t("gestaoMaster.components.panelsContainer.usersCard.title"),
+      icon: Groups3,
+      color: '#8B5CF6',
+      gradient: 'linear-gradient(135deg, rgba(139,92,246,0.15) 0%, rgba(139,92,246,0.05) 100%)',
+      border: 'rgba(139,92,246,0.3)',
+      description: t("gestaoMaster.components.panelsContainer.usersCard.subtitle"),
+      features: [
+        { icon: Add,         text: t("gestaoMaster.components.panelsContainer.usersCard.features.first") },
+        { icon: School,      text: t("gestaoMaster.components.panelsContainer.usersCard.features.second") },
+        { icon: LinkRounded, text: t("gestaoMaster.components.panelsContainer.usersCard.features.third") },
+        { icon: LinkRounded, text: t("gestaoMaster.components.panelsContainer.usersCard.features.fourty") },
+        { icon: Edit,        text: t("gestaoMaster.components.panelsContainer.usersCard.features.fifth") },
+        { icon: Search,      text: t("gestaoMaster.components.panelsContainer.usersCard.features.sixth") },
+      ],
+    },
+  ];
+
+  const rolesList = [
+    { label: t("gestaoMaster.components.rolesContainer.roles.default.name"),    description: t("gestaoMaster.components.rolesContainer.roles.default.about"),    color: '#94a3b8', bg: 'rgba(255,255,255,0.05)',   border: 'rgba(255,255,255,0.1)' },
+    { label: t("gestaoMaster.components.rolesContainer.roles.admin.name"),       description: t("gestaoMaster.components.rolesContainer.roles.admin.about"),       color: '#a78bfa', bg: 'rgba(139,92,246,0.1)',    border: 'rgba(139,92,246,0.3)' },
+    { label: t("gestaoMaster.components.rolesContainer.roles.instructor.name"),  description: t("gestaoMaster.components.rolesContainer.roles.instructor.about"),  color: '#60a5fa', bg: 'rgba(37,99,235,0.1)',     border: 'rgba(59,130,246,0.3)' },
+    { label: t("gestaoMaster.components.rolesContainer.roles.master.name"),      description: t("gestaoMaster.components.rolesContainer.roles.master.about"),      color: '#fbbf24', bg: 'rgba(245,158,11,0.1)',   border: 'rgba(245,158,11,0.3)' },
+  ];
+
+  const modulesList = [
+    {
+      label: t("gestaoMaster.components.modulesContainer.tr.prefix"),
+      name:  t("gestaoMaster.components.modulesContainer.tr.name"),
+      description: t("gestaoMaster.components.modulesContainer.tr.about"),
+      color: '#60a5fa', bg: 'rgba(37,99,235,0.1)', border: 'rgba(59,130,246,0.3)',
+    },
+    {
+      label: t("gestaoMaster.components.modulesContainer.gl.prefix"),
+      name:  t("gestaoMaster.components.modulesContainer.gl.name"),
+      description: t("gestaoMaster.components.modulesContainer.gl.about"),
+      color: '#fbbf24', bg: 'rgba(245,158,11,0.1)', border: 'rgba(245,158,11,0.3)',
+    },
+  ];
   const [statsLoading, setStatsLoading] = useState(true);
   const [stats, setStats] = useState({
     total_empresas: '',
@@ -155,29 +154,29 @@ function GestaoMaster() {
           <Box sx={{ mb: 4, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', flexWrap: 'wrap', gap: 2 }}>
             <Box>
               <Typography variant="h3" gutterBottom sx={{ fontWeight: 700 }}>
-                Painel Master
+                {t("gestaoMaster.components.title")}
               </Typography>
               <Typography variant="body1" color="text.secondary">
-                Central de controle do ecossistema TagSafe.
+                {t("gestaoMaster.components.subtitle")}
               </Typography>
             </Box>
           </Box>
 
           {/* Stats */}
-          <Grid container spacing={3} sx={{ mb: 5 }}>
-            <Grid item xs={12} sm={6} md={3}>
-              <StatCard title="Empresas cadastradas" value={stats.total_empresas} icon={Business} gradient="linear-gradient(135deg, #0f172a 0%, #1d4ed8 100%)" isLoading={statsLoading} />
-            </Grid>
-            <Grid item xs={12} sm={6} md={3}>
-              <StatCard title="Módulos disponíveis" value={stats.total_modulos} icon={ViewModule} gradient="linear-gradient(135deg, #0f172a 0%, #6d28d9 100%)" isLoading={statsLoading} delay={100} />
-            </Grid>
-            <Grid item xs={12} sm={6} md={3}>
-              <StatCard title="Usuários cadastrados" value={stats.total_usuarios} icon={Groups3} gradient="linear-gradient(135deg, #0f172a 0%, #0e7490 100%)" isLoading={statsLoading} delay={200} />
-            </Grid>
-            <Grid item xs={12} sm={6} md={3}>
-              <StatCard title="Unidades cadastradas" value={stats.total_unidades} icon={Store} gradient="linear-gradient(135deg, #0f172a 0%, #4c1d95 100%)" isLoading={statsLoading} delay={300} />
-            </Grid>
-          </Grid>
+          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 3, mb: 5 }}>
+            <Box sx={{ flex: '1 1 200px', minWidth: 0 }}>
+              <StatCard title={t("gestaoMaster.components.cards.registeredCompanies")} value={stats.total_empresas} icon={Business} gradient="linear-gradient(135deg, #0f172a 0%, #1d4ed8 100%)" isLoading={statsLoading} />
+            </Box>
+            <Box sx={{ flex: '1 1 200px', minWidth: 0 }}>
+              <StatCard title={t("gestaoMaster.components.cards.availableModules")} value={stats.total_modulos} icon={ViewModule} gradient="linear-gradient(135deg, #0f172a 0%, #6d28d9 100%)" isLoading={statsLoading} delay={100} />
+            </Box>
+            <Box sx={{ flex: '1 1 200px', minWidth: 0 }}>
+              <StatCard title={t("gestaoMaster.components.cards.registeredUsers")} value={stats.total_usuarios} icon={Groups3} gradient="linear-gradient(135deg, #0f172a 0%, #0e7490 100%)" isLoading={statsLoading} delay={200} />
+            </Box>
+            <Box sx={{ flex: '1 1 200px', minWidth: 0 }}>
+              <StatCard title={t("gestaoMaster.components.cards.registeredUnits")} value={stats.total_unidades} icon={Store} gradient="linear-gradient(135deg, #0f172a 0%, #4c1d95 100%)" isLoading={statsLoading} delay={300} />
+            </Box>
+          </Box>
 
           {/* O que é o painel */}
           <Grow in timeout={900}>
@@ -200,31 +199,36 @@ function GestaoMaster() {
                     <Shield fontSize="large" />
                   </Avatar>
                   <Typography variant="h5" sx={{ fontWeight: 700, lineHeight: 1.3 }}>
-                    TagSafe Control Panel
+                    {t("gestaoMaster.components.aboutContainer.title")}
                   </Typography>
                   <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.7 }}>
-                    Plataforma centralizada de gestão para administradores master do ecossistema TagSafe.
+                    {t("gestaoMaster.components.aboutContainer.subtitle")}
                   </Typography>
                 </Box>
 
                 <Box sx={{ p: 4, flex: 1 }}>
                   <Typography variant="overline" sx={{ color: 'text.disabled', letterSpacing: 2 }}>
-                    Para que serve
+                    {t("gestaoMaster.components.aboutContainer.explication.about.title")}
                   </Typography>
                   <Typography variant="body1" sx={{ mt: 1, mb: 3, color: 'text.secondary', lineHeight: 1.8 }}>
-                    Este painel permite que usuários <Chip label="Master" size="small" sx={{ bgcolor: 'rgba(245,158,11,0.1)', color: '#fbbf24', border: '1px solid rgba(245,158,11,0.3)', mx: 0.5, fontWeight: 700 }} /> gerenciem toda a estrutura da plataforma: desde o cadastro de empresas e suas unidades até o controle de usuários, cargos e vínculos com módulos disponíveis.
+                    <Trans
+                      i18nKey="gestaoMaster.components.aboutContainer.explication.about.text"
+                      components={{
+                        role: <Chip label="Master" size="small" sx={{ bgcolor: 'rgba(245,158,11,0.1)', color: '#fbbf24', border: '1px solid rgba(245,158,11,0.3)', mx: 0.5, fontWeight: 700 }} />
+                      }}
+                    />
                   </Typography>
 
                   <Divider sx={{ borderColor: 'rgba(255,255,255,0.06)', mb: 3 }} />
 
                   <Typography variant="overline" sx={{ color: 'text.disabled', letterSpacing: 2 }}>
-                    Como acessar
+                    {t("gestaoMaster.components.aboutContainer.explication.howToAccess.title")}
                   </Typography>
                   <Box sx={{ mt: 1.5, display: 'flex', flexDirection: 'column', gap: 1.5 }}>
                     {[
-                      { step: '1', text: 'Faça login com uma conta com o cargo Master.' },
-                      { step: '2', text: 'Use o menu lateral para navegar entre os painéis.' },
-                      { step: '3', text: 'Gerencie empresas, unidades e usuários de forma independente.' },
+                      { step: '1', text: t("gestaoMaster.components.aboutContainer.explication.howToAccess.firstStep") },
+                      { step: '2', text: t("gestaoMaster.components.aboutContainer.explication.howToAccess.secondStep") },
+                      { step: '3', text: t("gestaoMaster.components.aboutContainer.explication.howToAccess.thirdStep") },
                     ].map(({ step, text }) => (
                       <Box key={step} sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                         <Avatar sx={{ width: 28, height: 28, bgcolor: 'rgba(255,255,255,0.06)', color: 'text.secondary', fontSize: '0.8rem', fontWeight: 700, flexShrink: 0 }}>
@@ -242,9 +246,9 @@ function GestaoMaster() {
           {/* Painéis disponíveis */}
           <Grow in timeout={1100}>
             <Box sx={{ mb: 4 }}>
-              <Typography variant="h6" sx={{ fontWeight: 600, mb: 0.5 }}>Painéis disponíveis</Typography>
+              <Typography variant="h6" sx={{ fontWeight: 600, mb: 0.5 }}>{t("gestaoMaster.components.panelsContainer.title")}</Typography>
               <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-                O painel de controle é dividido em duas seções principais, acessíveis pelo menu lateral.
+                {t("gestaoMaster.components.panelsContainer.subtitle")}
               </Typography>
 
               <Grid container spacing={3}>
@@ -296,13 +300,13 @@ function GestaoMaster() {
           <Grow in timeout={1400}>
             <Card sx={{ borderRadius: 2, border: '1px solid rgba(255,255,255,0.08)', bgcolor: 'background.paper', mb: 3 }}>
               <CardContent sx={{ p: 3 }}>
-                <Typography variant="h6" sx={{ fontWeight: 600, mb: 0.5 }}>Cargos da plataforma</Typography>
+                <Typography variant="h6" sx={{ fontWeight: 600, mb: 0.5 }}>{t("gestaoMaster.components.rolesContainer.title")}</Typography>
                 <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-                  Cada usuário possui um cargo que define seu nível de acesso dentro do sistema.
+                  {t("gestaoMaster.components.rolesContainer.subtitle")}
                 </Typography>
 
                 <Grid container spacing={2}>
-                  {roles.map((role) => (
+                  {rolesList.map((role) => (
                     <Grid item xs={12} sm={6} md={3} key={role.label}>
                       <Box
                         sx={{
@@ -333,13 +337,13 @@ function GestaoMaster() {
           <Grow in timeout={1600}>
             <Card sx={{ borderRadius: 2, border: '1px solid rgba(255,255,255,0.08)', bgcolor: 'background.paper' }}>
               <CardContent sx={{ p: 3 }}>
-                <Typography variant="h6" sx={{ fontWeight: 600, mb: 0.5 }}>Módulos disponíveis</Typography>
+                <Typography variant="h6" sx={{ fontWeight: 600, mb: 0.5 }}>{t("gestaoMaster.components.modulesContainer.title")}</Typography>
                 <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-                  Os módulos definem quais funcionalidades estão ativas em cada unidade cadastrada.
+                  {t("gestaoMaster.components.modulesContainer.subtitle")}
                 </Typography>
 
                 <Grid container spacing={2}>
-                  {modules.map((mod) => (
+                  {modulesList.map((mod) => (
                     <Grid item xs={12} sm={6} key={mod.label}>
                       <Box
                         sx={{

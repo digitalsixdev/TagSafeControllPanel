@@ -100,33 +100,39 @@ function StatCard({ title, value, icon: Icon, gradient, delay = 0, isLoading = f
   );
 }
 
-const exportCSV = (rows, filename) => {
-  const columns = [
-    { label: 'Nome',            get: r => r.nome || '' },
-    { label: 'E-mail',          get: r => r.email || '' },
-    { label: 'Empresa',         get: r => r.empresa || '' },
-    { label: 'Cargo',           get: r => {
-      const nome = r.roles?.[0]?.nome;
-      if (!nome) return '';
-      if (nome === 'user_master') return 'Master';
-      return nome.charAt(0).toUpperCase() + nome.slice(1);
-    }},
-    { label: 'Primeiro Acesso', get: r => r.primeiro_acesso ? 'Pendente' : 'Concluído' },
-  ];
-  const escape = v => v.includes(',') || v.includes('"') || v.includes('\n') ? `"${v.replace(/"/g, '""')}"` : v;
-  const header = columns.map(c => c.label).join(',');
-  const body = rows.map(r => columns.map(c => escape(c.get(r))).join(',')).join('\n');
-  const blob = new Blob(['﻿' + header + '\n' + body], { type: 'text/csv;charset=utf-8;' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = filename;
-  a.click();
-  URL.revokeObjectURL(url);
-};
-
 function GestaoUsuarios() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+
+  const exportCSV = (rows, filename) => {
+    const columns = [
+      { label: t('gestaoUsuarios.components.table.nameColumn'),        get: r => r.nome || '' },
+      { label: t('gestaoUsuarios.components.table.emailColumn'),       get: r => r.email || '' },
+      { label: t('gestaoUsuarios.components.table.companyColumn'),     get: r => r.empresa || '' },
+      { label: t('gestaoUsuarios.components.table.roleColumn'),        get: r => {
+        const nome = r.roles?.[0]?.nome;
+        if (!nome) return '';
+        if (nome === 'user_master') return 'Master';
+        return nome.charAt(0).toUpperCase() + nome.slice(1);
+      }},
+      { label: t('gestaoUsuarios.components.table.firstAccessColumn'), get: r => r.primeiro_acesso
+        ? t('gestaoUsuarios.components.table.firstAccessPendingText')
+        : t('gestaoUsuarios.components.table.firstAccessCompletedText')
+      },
+    ];
+    const escape = v => v.includes(',') || v.includes('"') || v.includes('\n') ? `"${v.replace(/"/g, '""')}"` : v;
+    const header = columns.map(c => c.label).join(',');
+    const body = rows.map(r => columns.map(c => escape(c.get(r))).join(',')).join('\n');
+    const blob = new Blob(['﻿' + header + '\n' + body], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+  const dataGridLocale = i18n.language === 'pt'
+    ? ptBR.components.MuiDataGrid.defaultProps.localeText
+    : enUS.components.MuiDataGrid.defaultProps.localeText;
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -427,7 +433,7 @@ function GestaoUsuarios() {
         </IconButton>
       ),
     },
-  ], []);
+  ], [t]);
 
   const filteredUsers = useMemo(() => {
     const term = usersSearchTerm.toLowerCase();
@@ -660,7 +666,7 @@ function GestaoUsuarios() {
         const raw = unitsRes.data;
         setUnidadeUnits(Array.isArray(raw) ? raw : raw ? [raw] : []);
       } catch (err) {
-        setUnidadeError(`Unidades: ${formatApiError(err)}`);
+        setUnidadeError(t('gestaoUsuarios.messages.errorUnits', { error: formatApiError(err) }));
       } finally {
         setUnidadeUnitsLoading(false);
       }
@@ -815,7 +821,7 @@ function GestaoUsuarios() {
                   columns={usersColumns}
                   loading={statsLoading}
                   getRowId={(row) => row.public_id}
-                  localeText={ptBR.components.MuiDataGrid.defaultProps.localeText}
+                  localeText={dataGridLocale}
                   initialState={{ pagination: { paginationModel: { pageSize: 10 } } }}
                   pageSizeOptions={[5, 10, 25, 50]}
                   rowHeight={64}
@@ -1102,7 +1108,7 @@ function GestaoUsuarios() {
                 labelId="vincular-empresa-label"
                 value={vincularEmpresaId}
                 onChange={(e) => handleEmpresaChange(e.target.value)}
-                label="Empresa"
+                label={t("gestaoUsuarios.components.dialogLinkInstructors.companyField")}
               >
                 {allCompaniesList.map((emp) => (
                   <MenuItem key={emp.empresa_id} value={emp.empresa_id}>
@@ -1323,7 +1329,7 @@ function GestaoUsuarios() {
             onClick={handleUnidadeSubmit}
             disabled={unidadeLoading || !unidadeUser || !unidadeSelectedUnit}
           >
-            {unidadeLoading ? t('common.saving') : t("common.link")}
+            {unidadeLoading ? t('common.linking') : t("common.link")}
           </Button>
         </DialogActions>
       </Dialog>
