@@ -305,6 +305,7 @@
                 "title": "Link Instructor",
                 "emailField": "Instructor e-mail",
                 "emailMessage": "Press Enter to search",
+                "cpfField": "CPF",
                 "cardTitle": "Instructor found",
                 "companyField": "Company",
                 "unitField": "Unit",
@@ -334,6 +335,7 @@
                 "modulesField": "Modules",
                 "unitsLinkFields": {
                     "firstSubtitle": "Units attended by the instructor",
+                    "cpfField": "CPF",
                     "secondSubtitle": "Units to link ({{quantity}})",
                     "addUnitButton": "+ Add unit"
                 }

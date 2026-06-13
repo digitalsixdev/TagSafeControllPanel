@@ -156,6 +156,7 @@ function GestaoUsuarios() {
   });
 
   // seção de unidades atendidas no dialog de criar usuário (instrutor)
+  const [instrCpf, setInstrCpf] = useState('');
   const [instrEmpresaListLoading, setInstrEmpresaListLoading] = useState(false);
   const [instrEmpresaId, setInstrEmpresaId] = useState('');
   const [instrUnits, setInstrUnits] = useState([]);
@@ -172,6 +173,7 @@ function GestaoUsuarios() {
   const [vincularError, setVincularError] = useState('');
   const [vincularSuccess, setVincularSuccess] = useState('');
   const [vincularEmail, setVincularEmail] = useState('');
+  const [vincularCpf, setVincularCpf] = useState('');
   const [vincularEmailLoading, setVincularEmailLoading] = useState(false);
   const [vincularUser, setVincularUser] = useState(null);
   const [allCompaniesList, setAllCompaniesList] = useState([]);
@@ -337,6 +339,7 @@ function GestaoUsuarios() {
     setError('');
     setSuccess('');
     setOpen(false);
+    setInstrCpf('');
     setInstrEmpresaId('');
     setInstrUnits([]);
     setInstrUnit(null);
@@ -360,7 +363,7 @@ function GestaoUsuarios() {
           id: unit.public_id,
           modulos,
         }));
-        await setUnitsAttended(newUserPublicId, unidades_atendidas);
+        await setUnitsAttended(newUserPublicId, unidades_atendidas, instrCpf);
       }
       setSuccess(t('gestaoUsuarios.messages.userCreated'));
       loadStats();
@@ -507,6 +510,7 @@ function GestaoUsuarios() {
   // handlers de vincular instrutores
   const resetVincular = () => {
     setVincularEmail('');
+    setVincularCpf('');
     setVincularUser(null);
     setVincularEmpresaId('');
     setVincularUnits([]);
@@ -540,6 +544,7 @@ function GestaoUsuarios() {
     setVincularEmailLoading(true);
     setVincularError('');
     setVincularUser(null);
+    setVincularCpf('');
     setVincularEmpresaId('');
     setVincularUnits([]);
     setVincularUnit(null);
@@ -621,7 +626,7 @@ function GestaoUsuarios() {
         id: unit.public_id,
         modulos,
       }));
-      await setUnitsAttended(vincularUser.public_id, unidades_atendidas);
+      await setUnitsAttended(vincularUser.public_id, unidades_atendidas, vincularCpf);
       setVincularSuccess(t('gestaoUsuarios.messages.instructorLinked'));
       setTimeout(handleVincularClose, 2000);
     } catch (err) {
@@ -872,7 +877,7 @@ function GestaoUsuarios() {
               value={formData.roles || ''}
               onChange={(e) => {
                 setFormData({ ...formData, roles: e.target.value, senha: '' });
-                setInstrEmpresaId(''); setInstrUnits([]); setInstrUnit(null);
+                setInstrCpf(''); setInstrEmpresaId(''); setInstrUnits([]); setInstrUnit(null);
                 setInstrUnitModules([]); setInstrModulos([]); setInstrUnidades([]); setInstrError('');
               }}
               label={t("gestaoUsuarios.components.dialogNewUser.roleField")}
@@ -930,6 +935,14 @@ function GestaoUsuarios() {
               <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 0.5 }}>
                 {t("gestaoUsuarios.components.dialogNewUser.unitsLinkFields.firstSubtitle")}
               </Typography>
+
+              <TextField
+                label={t("gestaoUsuarios.components.dialogNewUser.unitsLinkFields.cpfField")}
+                fullWidth
+                margin="normal"
+                value={instrCpf}
+                onChange={(e) => setInstrCpf(e.target.value)}
+              />
 
               {instrError && <Alert severity="error" sx={{ mt: 1, mb: 1 }}>{instrError}</Alert>}
 
@@ -1066,6 +1079,7 @@ function GestaoUsuarios() {
             onChange={(e) => {
               setVincularEmail(e.target.value);
               setVincularUser(null);
+              setVincularCpf('');
               setVincularEmpresaId('');
               setVincularUnits([]);
               setVincularUnit(null);
@@ -1079,7 +1093,6 @@ function GestaoUsuarios() {
             }}
             helperText={t("gestaoUsuarios.components.dialogLinkInstructors.emailMessage")}
           />
-
           {/* 2. Confirmação do instrutor */}
           {vincularUser && (
             <Box sx={{ p: 1.5, borderRadius: 1.5, bgcolor: 'rgba(49,173,255,0.06)', border: '1px solid rgba(49,173,255,0.2)', mb: 1, display: 'flex', alignItems: 'center', gap: 1.5 }}>
@@ -1100,7 +1113,18 @@ function GestaoUsuarios() {
             </Box>
           )}
 
-          {/* 3. Empresa */}
+          {/* 3. CPF */}
+          {vincularUser && (
+            <TextField
+              label={t("gestaoUsuarios.components.dialogLinkInstructors.cpfField")}
+              fullWidth
+              margin="normal"
+              value={vincularCpf}
+              onChange={(e) => setVincularCpf(e.target.value)}
+            />
+          )}
+
+          {/* 4. Empresa */}
           {vincularUser && (
             <FormControl fullWidth margin="normal">
               <InputLabel id="vincular-empresa-label">{t("gestaoUsuarios.components.dialogLinkInstructors.companyField")}</InputLabel>

@@ -299,6 +299,7 @@
                 "title": "Vincular Instrutor",
                 "emailField": "E-mail do instrutor",
                 "emailMessage": "Pressione Enter para buscar",
+                "cpfField": "CPF",
                 "cardTitle": "Instrutor encontrado",
                 "companyField": "Empresa",
                 "unitField": "Unidade",
@@ -328,6 +329,7 @@
                 "modulesField": "Módulos",
                 "unitsLinkFields": {
                     "firstSubtitle": "Unidades atendidas pelo instrutor",
+                    "cpfField": "CPF",
                     "secondSubtitle": "Unidades a vincular ({{quantity}})",
                     "addUnitButton": "+ Adicionar unidade"
                 }

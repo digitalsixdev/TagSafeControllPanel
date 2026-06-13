@@ -141,10 +141,11 @@ export const getUnitsAttended = (instrutor_id) => {
   return apiClient.get(`/instrutores/unidades_atendidas/${instrutor_id}`);
 };
 
-export const setUnitsAttended = (usuario_id, unidades_atendidas) => {
+export const setUnitsAttended = (usuario_id, unidades_atendidas, cpf) => {
   const payload = {
     usuario_id,
     unidades_atendidas,
+    cpf,
   };
   return apiClient.post(`/instrutores/unidades_atendidas`, payload);
 };
