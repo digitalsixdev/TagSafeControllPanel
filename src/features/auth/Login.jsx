@@ -24,7 +24,7 @@ import {
   Login as LoginIcon,
 } from '@mui/icons-material';
 import { motion as Motion } from 'framer-motion';
-import { formatApiError, login as loginApi } from '../../services/api/ApiService';
+import { formatApiError, getApiCode, login as loginApi } from '../../services/api/ApiService';
 import { normalizeAuthSession } from './authUtils';
 import { useTranslation } from 'react-i18next';
 import '../../app/i18n';
@@ -78,7 +78,8 @@ const Login = ({ onLoginSuccess }) => {
         onLoginSuccess(normalizedUser, authToken, { refreshToken, refreshExpiresAt });
       }, 500);
     } catch (err) {
-      setError(formatApiError(err) || err.message || t('login.messages.errorConnection'));
+      const code = getApiCode(err);
+      setError(code ? t(`api_codes.${code}`, { defaultValue: formatApiError(err) }) : formatApiError(err));
     } finally {
       setLoading(false);
     }

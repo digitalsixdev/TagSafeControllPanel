@@ -472,7 +472,7 @@ function AuditoriaEvidencias() {
     } catch (err) {
       setEvidence(null);
       const code = getApiCode(err);
-      setError(code ? t(`evidences.api_codes.${code}`, { defaultValue: formatApiError(err) }) : formatApiError(err));
+      setError(code ? t(`api_codes.${code}`, { defaultValue: formatApiError(err) }) : formatApiError(err));
     } finally {
       setLoading(false);
     }
@@ -508,7 +508,7 @@ function AuditoriaEvidencias() {
       }));
     } catch (err) {
       const code = getApiCode(err);
-      showFeedback(code ? t(`evidences.api_codes.${code}`, { defaultValue: formatApiError(err) }) : formatApiError(err), 'error');
+      showFeedback(code ? t(`api_codes.${code}`, { defaultValue: formatApiError(err) }) : formatApiError(err), 'error');
     } finally {
       setActionLoading('');
     }
@@ -523,7 +523,7 @@ function AuditoriaEvidencias() {
       showFeedback(t("evidences.messages.tstFileGenerated"));
     } catch (err) {
       const code = getApiCode(err);
-      showFeedback(code ? t(`evidences.api_codes.${code}`, { defaultValue: formatApiError(err) }) : formatApiError(err), 'error');
+      showFeedback(code ? t(`api_codes.${code}`, { defaultValue: formatApiError(err) }) : formatApiError(err), 'error');
     } finally {
       setActionLoading('');
     }

@@ -13,9 +13,6 @@
             "errorInvalidUser": "Invalid user data.",
             "errorNoToken": "Authentication token not found.",
             "errorConnection": "Error connecting to the server!"
-        },
-        "api_codes": {
-
         }
     },
 
@@ -226,21 +223,6 @@
             "unitCreated": "Unit registered successfully!",
             "unitUpdated": "Unit updated successfully!",
             "errorLoadingData": "Error loading required data."
-        },
-        "api_codes": {
-            "COMPANY_NOT_FOUND": "Company not found",
-            "ACCESS_DENIED": "Access denied",
-            "COMPANY_ID_INVALID": "Invalid company ID",
-            "REQUIRED_UNIT_AND_CNPJ": "Unit and CNPJ are required",
-            "FILL_ALL_INFORMATION": "Fill in all information",
-            "UNIT_NOT_FOUND": "Unit not found",
-            "USERS_NOT_FOUND": "Users not found",
-            "UNITS_NOT_FOUND": "Units not found",
-            "INVALID_MODULES_ID": "Invalid module IDs",
-            "INVALID_CNPJ": "Invalid CNPJ",
-            "INVALID_CNPJ_ROOT_FOR_COMPANY": "CNPJ root does not match the provided company",
-            "UNIT_CNPJ_ALREADY_REGISTERED": "Unit with this CNPJ already registered",
-            "INVALID_LINKED_COMPANY_CNPJ_BASE": "CNPJ base does not match the linked company"
         }
     },
 
@@ -348,9 +330,6 @@
             "errorUserNotFound": "User not found.",
             "errorNotInstructor": "The user exists but is not an instructor.",
             "errorUnits": "Units: {{error}}"
-        },
-        "api_codes": {
-
         }
     },
 
@@ -372,18 +351,6 @@
             "auth": "Verifying authentication...",
             "app": "Loading application..."
         }
-    },
-
-    "common": {
-        "save": "Save",
-        "cancel": "Cancel",
-        "edit": "Edit",
-        "delete": "Delete",
-        "close": "Close",
-        "link": "Link",
-        "loading": "Loading...",
-        "saving": "Saving...",
-        "linking": "Linking..."
     },
 
     "evidences": {
@@ -484,12 +451,109 @@
             "valid": "Valid",
             "notValidated": "Not validated",
             "concluded": "Completed"
-        },
-        "api_codes": {
-            "REQUIRED_SESSION_ID": "Session ID is required",
-            "EVIDENCE_NOT_FOUND": "Evidence not found",
-            "INVALID_STAMP": "Invalid stamp ID",
-            "STAMP_NOT_FOUND": "Evidence stamp not found"
         }
+    },
+
+    "common": {
+        "save": "Save",
+        "cancel": "Cancel",
+        "edit": "Edit",
+        "delete": "Delete",
+        "close": "Close",
+        "link": "Link",
+        "loading": "Loading...",
+        "saving": "Saving...",
+        "linking": "Linking...",
+        "errors": {
+            "sessionExpired": "Session expired. Please log in again.",
+            "accessDenied": "Access denied.",
+            "notFound": "Resource not found.",
+            "serverError": "Internal server error.",
+            "connectionError": "Connection error. Check your internet.",
+            "unknown": "Unknown error. Please try again."
+        }
+    },
+
+    "api_codes": {
+        "INTERNAL_SERVER_ERROR": "Internal server error",
+
+        "ACCESS_DENIED": "Access denied",
+        "ACCESS_DENIED_INSTRUCTOR": "Access denied to view this instructor",
+        "RESTRICT_ACCESS": "Access restricted to master users",
+
+        "REQUIRED_CREDENTIALS": "E-mail and password are required",
+        "INVALID_CREDENTIALS": "Invalid e-mail or password",
+        "INVALID_EMAIL": "Check if the e-mail is correct",
+        "INVALID_PASSWORD": "Invalid password",
+        "REGISTERED_EMAIL": "E-mail already registered",
+        "MASTER_PASSWORD_REQUIRED": "Password is required for master users",
+        "FILL_ALL_FIELDS": "Fill in all required fields",
+        "FILL_ALL_INFORMATION": "Fill in all information",
+
+        "USER_NOT_FOUND": "User not found",
+        "USERS_NOT_FOUND": "Users not found",
+        "USER_NOT_INSTRUCTOR": "The specified user does not have the instructor role",
+        "USER_ALREADY_LINKED_TO_UNIT": "User already linked to this unit",
+        "USER_ALREADY_HAS_ROLES": "User already has these roles",
+        "REQUIRED_USER_ID": "usuario_id is required",
+        "REQUIRED_USER_PUBLIC_ID": "User publicId is required",
+        "REQUIRED_EMAIL": "E-mail is required",
+        "REMOVED_USER_SUCCESSFUL": "User removed successfully",
+        "UPDATED_NAME_USER_SUCCESSFUL": "User name updated successfully",
+        "REQUIRED_NAME": "A new name is required",
+        "UNIT_LINKED_TO_USER": "Unit linked to user",
+
+        "ROLE_NOT_FOUND": "Role not found",
+        "ONE_ROLE_NOT_FOUND": "One of the roles was not found",
+        "REQUIRED_ROLE": "Provide at least one role",
+        "REQUIRED_ROLES": "Roles are required",
+        "INVALID_ROLES": "Invalid role(s)",
+        "ADDED_ROLES_SUCCESSFUL": "Roles added successfully",
+        "DELETED_ROLES_SUCCESSFUL": "Roles deleted successfully",
+        "UPDATED_ROLES_SUCCESSFUL": "Roles updated successfully",
+        "REMOVED_ROLE_SUCCESSFUL": "Role removed successfully",
+        "NO_ROLES_TO_DELETE": "No roles found to delete",
+        "NO_LINKED_ROLES_TO_DELETE": "No roles linked to the user to delete",
+        "NO_CHANGES_MADE": "No changes were made",
+
+        "COMPANY_NOT_FOUND": "Company not found",
+        "COMPANY_ID_INVALID": "Invalid company ID",
+
+        "UNIT_NOT_FOUND": "Unit not found",
+        "UNITS_NOT_FOUND": "Units not found",
+        "REQUIRED_UNIT_ID": "unidade_id is required",
+        "INVALID_UNIT_ID": "Invalid unidade_id",
+        "REQUIRED_UNIT_AND_CNPJ": "Unit and CNPJ are required",
+        "UNIT_CNPJ_ALREADY_REGISTERED": "Unit with this CNPJ already registered",
+        "REMOVED_UNIT_SUCCESSFUL": "Unit removed from attended units",
+        "UNITS_ADDED_SUCCESSFUL": "Unit added to attended units",
+
+        "INVALID_CNPJ": "Invalid CNPJ",
+        "INVALID_CNPJ_ROOT_FOR_COMPANY": "CNPJ root does not match the provided company",
+        "INVALID_LINKED_COMPANY_CNPJ_BASE": "CNPJ base does not match the linked company",
+
+        "INVALID_MODULES_ID": "Invalid module IDs",
+
+        "INVALID_PARAMETER_ID": "Invalid ID parameter",
+        "INVALID_COMPANY_ID": "Invalid empresaId parameter",
+
+        "REQUIRED_SESSION_ID": "sessao_id is required",
+        "EVIDENCE_NOT_FOUND": "Evidence not found",
+        "INVALID_STAMP": "Invalid stamp ID",
+        "STAMP_NOT_FOUND": "Stamp not found",
+
+        "INSTRUCTOR_NOT_FOUND": "Instructor not found",
+        "INSTRUCTOR_ALREADY_SERVES_THIS_UNIT": "Instructor already serves this unit",
+        "INSTRUCTOR_UNITS_CONFIGURED": "Instructor units configured successfully",
+        "REQUIRED_INSTRUCTOR_ID": "instrutor_id is required",
+        "REQUIRED_UNIT_AND_MODULES": "Provide at least one unit and its modules for the instructor",
+        "REQUIRED_ATTENDED_UNIT": "Provide at least one attended unit",
+        "NO_INSTRUCTOR_FOUND_IN_COMPANY": "No instructor found in this company",
+
+        "REQUIRED_CPF": "CPF is required",
+        "INVALID_CPF": "Invalid CPF",
+        "CPF_ALREADY_REGISTERED": "CPF already registered",
+
+        "RELATIONSHIP_NOT_FOUND": "Relationship not found"
     }
 }

@@ -13,9 +13,6 @@
             "errorInvalidUser": "Dados do usuário inválidos.",
             "errorNoToken": "Token de autenticação não encontrado.",
             "errorConnection": "Erro ao conectar com o servidor!"
-        },
-        "api_codes": {
-            
         }
     },
 
@@ -226,21 +223,6 @@
             "unitCreated": "Unidade cadastrada com sucesso!",
             "unitUpdated": "Unidade atualizada com sucesso!",
             "errorLoadingData": "Erro ao carregar dados necessários."
-        },
-        "api_codes": {
-            "COMPANY_NOT_FOUND": "Empresa não encontrada",
-            "ACCESS_DENIED": "Acesso negado",
-            "COMPANY_ID_INVALID": "ID da empresa inválido",
-            "REQUIRED_UNIT_AND_CNPJ": "Unidade e CNPJ são obrigatórios",
-            "FILL_ALL_INFORMATION": "Preencha todas as informações",
-            "UNIT_NOT_FOUND": "Unidade não encontrada",
-            "USERS_NOT_FOUND": "Usuários não encontrados",
-            "UNITS_NOT_FOUND": "Unidades não encontradas",
-            "INVALID_MODULES_ID": "IDs de módulo inválidos",
-            "INVALID_CNPJ": "CNPJ inválido",
-            "INVALID_CNPJ_ROOT_FOR_COMPANY": "A raiz do CNPJ não corresponde à empresa informada",
-            "UNIT_CNPJ_ALREADY_REGISTERED": "Unidade com esse CNPJ já cadastrada",
-            "INVALID_LINKED_COMPANY_CNPJ_BASE": "CNPJ base não corresponde à empresa vinculada"
         }
     },
 
@@ -348,9 +330,6 @@
             "errorUserNotFound": "Usuário não encontrado.",
             "errorNotInstructor": "O usuário existe, mas não é um instrutor.",
             "errorUnits": "Unidades: {{error}}"
-        },
-        "api_codes": {
-
         }
     },
 
@@ -372,18 +351,6 @@
             "auth": "Verificando autenticação...",
             "app": "Carregando aplicação..."
         }
-    },
-
-    "common": {
-        "save": "Salvar",
-        "cancel": "Cancelar",
-        "edit": "Editar",
-        "delete": "Deletar",
-        "close": "Fechar",
-        "link": "Vincular",
-        "loading": "Carregando...",
-        "saving": "Salvando...",
-        "linking": "Vinculando..."
     },
 
     "evidences": {
@@ -492,12 +459,109 @@
             "valid": "Válido",
             "notValidated": "Não validado",
             "concluded": "Concluído"
-        },
-        "api_codes": {
-            "REQUIRED_SESSION_ID": "ID da sessão é obrigatório",
-            "EVIDENCE_NOT_FOUND": "Evidência não encontrada",
-            "INVALID_STAMP": "ID do carimbo inválido",
-            "STAMP_NOT_FOUND": "Carimbo de evidência não encontrado"
         }
+    },
+
+    "common": {
+        "save": "Salvar",
+        "cancel": "Cancelar",
+        "edit": "Editar",
+        "delete": "Deletar",
+        "close": "Fechar",
+        "link": "Vincular",
+        "loading": "Carregando...",
+        "saving": "Salvando...",
+        "linking": "Vinculando...",
+        "errors": {
+            "sessionExpired": "Sessão expirada. Faça login novamente.",
+            "accessDenied": "Acesso negado.",
+            "notFound": "Recurso não encontrado.",
+            "serverError": "Erro interno do servidor.",
+            "connectionError": "Erro de conexão. Verifique sua internet.",
+            "unknown": "Erro desconhecido. Tente novamente."
+        }
+    },
+
+    "api_codes": {
+        "INTERNAL_SERVER_ERROR": "Erro interno do servidor",
+
+        "ACCESS_DENIED": "Acesso negado",
+        "ACCESS_DENIED_INSTRUCTOR": "Acesso negado para consultar este instrutor",
+        "RESTRICT_ACCESS": "Acesso restrito a usuários master",
+
+        "REQUIRED_CREDENTIALS": "Email e senha são obrigatórios",
+        "INVALID_CREDENTIALS": "Email ou senha inválidos",
+        "INVALID_EMAIL": "Verifique se o e-mail está correto",
+        "INVALID_PASSWORD": "Senha inválida",
+        "REGISTERED_EMAIL": "Email já cadastrado",
+        "MASTER_PASSWORD_REQUIRED": "A senha é obrigatória para usuários master",
+        "FILL_ALL_FIELDS": "Preencha todos os campos obrigatórios",
+        "FILL_ALL_INFORMATION": "Preencha todas as informações",
+
+        "USER_NOT_FOUND": "Usuário não encontrado",
+        "USERS_NOT_FOUND": "Usuários não encontrados",
+        "USER_NOT_INSTRUCTOR": "Usuário informado não possui role de instrutor",
+        "USER_ALREADY_LINKED_TO_UNIT": "Usuário já vinculado a essa unidade",
+        "USER_ALREADY_HAS_ROLES": "Usuário já possui essas roles",
+        "REQUIRED_USER_ID": "usuario_id é obrigatório",
+        "REQUIRED_USER_PUBLIC_ID": "publicId do usuário é obrigatório",
+        "REQUIRED_NAME": "É necessário preencher um novo nome",
+        "REQUIRED_EMAIL": "Email é obrigatório",
+        "REMOVED_USER_SUCCESSFUL": "Usuário removido com sucesso",
+        "UPDATED_NAME_USER_SUCCESSFUL": "Nome do usuário atualizado com sucesso",
+        "UNIT_LINKED_TO_USER": "Unidade vinculada ao usuário",
+
+        "ROLE_NOT_FOUND": "Role não encontrada",
+        "ONE_ROLE_NOT_FOUND": "Uma das roles não foi encontrada",
+        "REQUIRED_ROLE": "Informe ao menos uma role",
+        "REQUIRED_ROLES": "Roles são obrigatórios",
+        "INVALID_ROLES": "Role(s) inválida(s)",
+        "ADDED_ROLES_SUCCESSFUL": "Roles adicionadas com sucesso",
+        "DELETED_ROLES_SUCCESSFUL": "Roles deletadas com sucesso",
+        "UPDATED_ROLES_SUCCESSFUL": "Roles atualizadas com sucesso",
+        "REMOVED_ROLE_SUCCESSFUL": "Role removida com sucesso",
+        "NO_ROLES_TO_DELETE": "Nenhuma role encontrada para ser deletada",
+        "NO_LINKED_ROLES_TO_DELETE": "Nenhuma role vinculada ao usuário para ser deletada",
+        "NO_CHANGES_MADE": "Nenhuma mudança foi realizada",
+
+        "COMPANY_NOT_FOUND": "Empresa não encontrada",
+        "COMPANY_ID_INVALID": "ID da empresa inválido",
+
+        "UNIT_NOT_FOUND": "Unidade não encontrada",
+        "UNITS_NOT_FOUND": "Unidades não encontradas",
+        "REQUIRED_UNIT_ID": "unidade_id é obrigatório",
+        "REQUIRED_UNIT_AND_CNPJ": "Unidade e CNPJ são obrigatórios",
+        "UNIT_CNPJ_ALREADY_REGISTERED": "Unidade com esse CNPJ já cadastrada",
+        "REMOVED_UNIT_SUCCESSFUL": "Unidade removida das atendidas",
+        "UNITS_ADDED_SUCCESSFUL": "Unidade adicionada às atendidas",
+        "INVALID_UNIT_ID": "unidade_id inválido",
+
+        "INVALID_CNPJ": "CNPJ inválido",
+        "INVALID_CNPJ_ROOT_FOR_COMPANY": "A raiz do CNPJ não corresponde à empresa informada",
+        "INVALID_LINKED_COMPANY_CNPJ_BASE": "CNPJ base não corresponde à empresa vinculada",
+
+        "INVALID_MODULES_ID": "IDs de módulo inválidos",
+
+        "INVALID_PARAMETER_ID": "Parâmetro ID inválido",
+        "INVALID_COMPANY_ID": "Parâmetro empresaId inválido",
+
+        "REQUIRED_SESSION_ID": "sessao_id é obrigatório",
+        "EVIDENCE_NOT_FOUND": "Evidência não encontrada",
+        "INVALID_STAMP": "ID do carimbo inválido",
+        "STAMP_NOT_FOUND": "Carimbo não encontrado",
+
+        "INSTRUCTOR_NOT_FOUND": "Instrutor não encontrado",
+        "INSTRUCTOR_ALREADY_SERVES_THIS_UNIT": "Instrutor já atende essa unidade",
+        "INSTRUCTOR_UNITS_CONFIGURED": "Unidades do instrutor configuradas com sucesso",
+        "REQUIRED_INSTRUCTOR_ID": "instrutor_id é obrigatório",
+        "REQUIRED_UNIT_AND_MODULES": "Informe ao menos uma unidade e seus módulos para o instrutor",
+        "REQUIRED_ATTENDED_UNIT": "Informe ao menos uma unidade atendida",
+        "NO_INSTRUCTOR_FOUND_IN_COMPANY": "Nenhum instrutor encontrado nessa empresa",
+
+        "REQUIRED_CPF": "CPF é obrigatório",
+        "INVALID_CPF": "CPF inválido",
+        "CPF_ALREADY_REGISTERED": "CPF já cadastrado",
+
+        "RELATIONSHIP_NOT_FOUND": "Relacionamento não encontrado"
     }
 }

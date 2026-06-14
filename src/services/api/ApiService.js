@@ -1,4 +1,5 @@
 import axios from 'axios';
+import i18n from '../../app/i18n';
 
 const ENV_URLS = {
   dev:   import.meta.env.VITE_API_URL_DEV   || 'https://dev.api.tagsafeapplication.com',
@@ -31,13 +32,14 @@ export const logout = () =>
 export const getApiCode = (error) => error?.response?.data?.code ?? null;
 
 export const formatApiError = (error) => {
+  const t = i18n.t.bind(i18n);
   if (error?.response?.data?.error) return error.response.data.error;
-  if (error?.response?.status === 401) return 'Sessão expirada. Faça login novamente.';
-  if (error?.response?.status === 403) return 'Acesso negado.';
-  if (error?.response?.status === 404) return 'Recurso não encontrado.';
-  if (error?.response?.status === 500) return 'Erro interno do servidor.';
-  if (error?.request) return 'Erro de conexão. Verifique sua internet.';
-  return 'Erro desconhecido. Tente novamente.';
+  if (error?.response?.status === 401) return t('common.errors.sessionExpired');
+  if (error?.response?.status === 403) return t('common.errors.accessDenied');
+  if (error?.response?.status === 404) return t('common.errors.notFound');
+  if (error?.response?.status === 500) return t('common.errors.serverError');
+  if (error?.request) return t('common.errors.connectionError');
+  return t('common.errors.unknown');
 };
 
 // controle e gestao master

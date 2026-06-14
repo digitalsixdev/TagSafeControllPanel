@@ -327,7 +327,7 @@ function GestaoEmpresas() {
           ? params.value.charAt(0).toUpperCase() + params.value.slice(1).toLowerCase() 
           : t("gestaoEmpresas.components.dialogViewUnitUsers.table.noRole");
           
-        const cargo = params.value == 'user_master' ? 'Master' : cargoFormatado;
+        const cargo = params.value == 'user_master' ? t('gestaoMaster.components.rolesContainer.roles.master.name') : cargoFormatado;
           
         return (
           <Box sx={{ display: 'flex', alignItems: 'center', height: '100%' }}>
@@ -384,7 +384,7 @@ function GestaoEmpresas() {
       setTimeout(handleClose, 2000);
     } catch (err) {
       const code = getApiCode(err);
-      setError(code ? t(`gestaoEmpresas.api_codes.${code}`, { defaultValue: formatApiError(err) }) : formatApiError(err));
+      setError(code ? t(`api_codes.${code}`, { defaultValue: formatApiError(err) }) : formatApiError(err));
     } finally {
       setLoading(false);
     }
@@ -409,7 +409,7 @@ function GestaoEmpresas() {
       setUnits(response.data || []);
     } catch (err) {
       const code = getApiCode(err);
-      setError(code ? t(`gestaoEmpresas.api_codes.${code}`, { defaultValue: formatApiError(err) }) : formatApiError(err));
+      setError(code ? t(`api_codes.${code}`, { defaultValue: formatApiError(err) }) : formatApiError(err));
     } finally {
       setUnitsLoading(false);
     }
@@ -447,7 +447,7 @@ function GestaoEmpresas() {
       setTimeout(handleEditClose, 2000);
     } catch (err) {
       const code = getApiCode(err);
-      setError(code ? t(`gestaoEmpresas.api_codes.${code}`, { defaultValue: formatApiError(err) }) : formatApiError(err));
+      setError(code ? t(`api_codes.${code}`, { defaultValue: formatApiError(err) }) : formatApiError(err));
     } finally {
       setLoading(false);
     }
@@ -471,7 +471,7 @@ function GestaoEmpresas() {
       setUnitUsers(response.data || []);
     } catch (err) {
       const code = getApiCode(err);
-      setError(code ? t(`gestaoEmpresas.api_codes.${code}`, { defaultValue: formatApiError(err) }) : formatApiError(err));
+      setError(code ? t(`api_codes.${code}`, { defaultValue: formatApiError(err) }) : formatApiError(err));
     } finally {
       setUnitUsersLoading(false);
     }
@@ -527,7 +527,7 @@ function GestaoEmpresas() {
       setTimeout(handleEditUnitClose, 2000);
     } catch (err) {
       const code = getApiCode(err);
-      setError(code ? t(`gestaoEmpresas.api_codes.${code}`, { defaultValue: formatApiError(err) }) : formatApiError(err));
+      setError(code ? t(`api_codes.${code}`, { defaultValue: formatApiError(err) }) : formatApiError(err));
     } finally {
       setLoading(false);
     }
@@ -560,7 +560,7 @@ function GestaoEmpresas() {
       setTimeout(handleUnitClose, 2000);
     } catch (err) {
       const code = getApiCode(err);
-      setError(code ? t(`gestaoEmpresas.api_codes.${code}`, { defaultValue: formatApiError(err) }) : formatApiError(err));
+      setError(code ? t(`api_codes.${code}`, { defaultValue: formatApiError(err) }) : formatApiError(err));
     } finally {
       setLoading(false);
     }

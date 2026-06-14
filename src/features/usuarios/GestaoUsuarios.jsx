@@ -4,6 +4,7 @@ import {
   getRoles,
   getCompanies,
   formatApiError,
+  getApiCode,
   getAllCompanies,
   setUnitsAttended,
   getUserByEmail,
@@ -279,7 +280,8 @@ function GestaoUsuarios() {
       loadStats();
       setTimeout(handleEditClose, 2000);
     } catch (err) {
-      setEditError(formatApiError(err));
+      const code = getApiCode(err);
+      setEditError(code ? t(`api_codes.${code}`, { defaultValue: formatApiError(err) }) : formatApiError(err));
     } finally {
       setEditLoading(false);
     }
@@ -369,7 +371,8 @@ function GestaoUsuarios() {
       loadStats();
       setTimeout(handleClose, 3000);
     } catch (err) {
-      setError(formatApiError(err));
+      const code = getApiCode(err);
+      setError(code ? t(`api_codes.${code}`, { defaultValue: formatApiError(err) }) : formatApiError(err));
     } finally {
       setLoading(false);
     }
@@ -563,8 +566,8 @@ function GestaoUsuarios() {
       }
       setVincularUser(user);
     } catch (err) {
-      const status = err?.response?.status;
-      setVincularError(status === 404 ? t('gestaoUsuarios.messages.errorUserNotFound') : formatApiError(err));
+      const code = getApiCode(err);
+      setVincularError(code ? t(`api_codes.${code}`, { defaultValue: formatApiError(err) }) : formatApiError(err));
     } finally {
       setVincularEmailLoading(false);
     }
@@ -630,7 +633,8 @@ function GestaoUsuarios() {
       setVincularSuccess(t('gestaoUsuarios.messages.instructorLinked'));
       setTimeout(handleVincularClose, 2000);
     } catch (err) {
-      setVincularError(formatApiError(err));
+      const code = getApiCode(err);
+      setVincularError(code ? t(`api_codes.${code}`, { defaultValue: formatApiError(err) }) : formatApiError(err));
     } finally {
       setVincularLoading(false);
     }
@@ -676,8 +680,8 @@ function GestaoUsuarios() {
         setUnidadeUnitsLoading(false);
       }
     } catch (err) {
-      const status = err?.response?.status;
-      setUnidadeError(status === 404 ? t('gestaoUsuarios.messages.errorUserNotFound') : formatApiError(err));
+      const code = getApiCode(err);
+      setUnidadeError(code ? t(`api_codes.${code}`, { defaultValue: formatApiError(err) }) : formatApiError(err));
     } finally {
       setUnidadeEmailLoading(false);
     }
@@ -693,7 +697,8 @@ function GestaoUsuarios() {
       setUnidadeSuccess(t('gestaoUsuarios.messages.unitLinked'));
       setTimeout(handleUnidadeClose, 2000);
     } catch (err) {
-      setUnidadeError(formatApiError(err));
+      const code = getApiCode(err);
+      setUnidadeError(code ? t(`api_codes.${code}`, { defaultValue: formatApiError(err) }) : formatApiError(err));
     } finally {
       setUnidadeLoading(false);
     }
