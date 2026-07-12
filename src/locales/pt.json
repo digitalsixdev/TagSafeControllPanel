@@ -339,6 +339,7 @@
     },
 
     "app": {
+        "tabTitle": "TagSafe - Painel de Controle",
         "menuItems": {
             "masterPanel": "Painel Master",
             "companiesPanel": "Painel Empresas",

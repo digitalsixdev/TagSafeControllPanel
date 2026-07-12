@@ -339,6 +339,7 @@
     },
 
     "app": {
+        "tabTitle": "TagSafe - Control Panel",
         "menuItems": {
             "masterPanel": "Master Panel",
             "companiesPanel": "Companies Panel",

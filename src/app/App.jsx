@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -180,7 +180,11 @@ const AuthenticatedApp = () => {
 
 const AppContent = () => {
   const { loading, isAuthenticated, isMaster, login } = useAuth();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+
+  useEffect(() => {
+    document.title = t('app.tabTitle');
+  }, [t, i18n.language]);
 
   if (loading) return <LoadingSpinner fullScreen message={t('app.loading.app')} />;
 
