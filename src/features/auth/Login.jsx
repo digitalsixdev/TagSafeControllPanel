@@ -24,18 +24,22 @@ import {
   Login as LoginIcon,
 } from '@mui/icons-material';
 import { motion as Motion } from 'framer-motion';
-import { formatApiError, login as loginApi } from '../../services/api/ApiService';
+import { formatApiError, getApiCode, login as loginApi } from '../../services/api/ApiService';
 import { normalizeAuthSession } from './authUtils';
+import { useTranslation } from 'react-i18next';
+import '../../app/i18n';
 
 const Login = ({ onLoginSuccess }) => {
+  const { t } = useTranslation();
   const [formData, setFormData] = useState({ email: '', senha: '' });
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
-  const [selectedEnv, setSelectedEnv] = useState(
-    () => localStorage.getItem('selected_env') || 'dev'
-  );
+  const [selectedEnv, setSelectedEnv] = useState(() => {
+    const saved = localStorage.getItem('selected_env');
+    return saved === 'local' ? 'dev' : saved || 'dev';
+  });
 
   const handleEnvChange = (_, newEnv) => {
     if (!newEnv) return;
@@ -53,7 +57,7 @@ const Login = ({ onLoginSuccess }) => {
     event.preventDefault();
 
     if (!formData.email || !formData.senha) {
-      setError('Por favor, preencha todos os campos');
+      setError(t('login.messages.errorEmptyFields'));
       return;
     }
 
@@ -66,15 +70,16 @@ const Login = ({ onLoginSuccess }) => {
       const { user: normalizedUser, token: authToken, refreshToken, refreshExpiresAt } =
         normalizeAuthSession(response?.data);
 
-      if (!normalizedUser) throw new Error('Dados do usuário inválidos.');
-      if (!authToken) throw new Error('Token de autenticação não encontrado.');
+      if (!normalizedUser) throw new Error(t('login.messages.errorInvalidUser'));
+      if (!authToken) throw new Error(t('login.messages.errorNoToken'));
 
-      setSuccess('Login realizado com sucesso!');
+      setSuccess(t('login.messages.success'));
       setTimeout(() => {
         onLoginSuccess(normalizedUser, authToken, { refreshToken, refreshExpiresAt });
       }, 500);
     } catch (err) {
-      setError(formatApiError(err) || err.message || 'Erro ao conectar com o servidor!');
+      const code = getApiCode(err);
+      setError(code ? t(`api_codes.${code}`, { defaultValue: formatApiError(err) }) : formatApiError(err));
     } finally {
       setLoading(false);
     }
@@ -153,10 +158,7 @@ const Login = ({ onLoginSuccess }) => {
                     <LoginIcon sx={{ fontSize: 40 }} />
                   </Avatar>
                   <Typography variant="h4" gutterBottom sx={{ fontWeight: 700 }}>
-                    Bem-vindo
-                  </Typography>
-                  <Typography variant="body1" sx={{ color: 'text.secondary' }}>
-                    Painel de controle master
+                    {t('login.components.welcome')}
                   </Typography>
                 </Box>
 
@@ -166,7 +168,7 @@ const Login = ({ onLoginSuccess }) => {
                 <Box component="form" onSubmit={handleSubmit}>
                   <TextField
                     fullWidth
-                    label="Email"
+                    label={t('login.components.email')}
                     type="email"
                     value={formData.email}
                     onChange={handleChange('email')}
@@ -182,7 +184,7 @@ const Login = ({ onLoginSuccess }) => {
                   />
                   <TextField
                     fullWidth
-                    label="Senha"
+                    label={t('login.components.password')}
                     type={showPassword ? 'text' : 'password'}
                     value={formData.senha}
                     onChange={handleChange('senha')}
@@ -218,13 +220,13 @@ const Login = ({ onLoginSuccess }) => {
                       '&:disabled': { background: 'rgba(255, 255, 255, 0.1)' },
                     }}
                   >
-                    {loading ? <CircularProgress size={24} sx={{ color: 'white' }} /> : 'Entrar'}
+                    {loading ? <CircularProgress size={24} sx={{ color: 'white' }} /> : t('login.components.signIn')}
                   </Button>
                 </Box>
 
                 <Box sx={{ textAlign: 'center', mt: 4 }}>
                   <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', mb: 1.5 }}>
-                    Selecione o ambiente
+                    {t('login.components.selectEnvironment')}
                   </Typography>
                   <ToggleButtonGroup
                     value={selectedEnv}
@@ -234,9 +236,8 @@ const Login = ({ onLoginSuccess }) => {
                     sx={{ mb: 2 }}
                   >
                     {[
-                      { value: 'dev',   label: 'Dev' },
-                      { value: 'prod',  label: 'Prod' },
-                      { value: 'local', label: 'Local' },
+                      { value: 'dev',  label: 'Dev' },
+                      { value: 'prod', label: 'Prod' },
                     ].map(({ value, label }) => (
                       <ToggleButton
                         key={value}
@@ -261,9 +262,6 @@ const Login = ({ onLoginSuccess }) => {
                     ))}
                   </ToggleButtonGroup>
                   <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                    Painel de Controle TagSafe
-                  </Typography>
-                  <Typography variant="caption" sx={{ color: 'text.secondary' }}>
                     TagSafe © 2025
                   </Typography>
                 </Box>

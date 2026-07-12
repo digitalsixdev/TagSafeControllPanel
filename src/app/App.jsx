@@ -4,9 +4,10 @@ import { ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import { GlobalStyles } from '@mui/material';
 import { 
-  Business, 
+  Business,
   People,
-  AdminPanelSettings
+  AdminPanelSettings,
+  FactCheck,
 } from '@mui/icons-material';
 import { Box, Typography, Button } from '@mui/material';
 import { AuthProvider, useAuth } from '../features/auth/AuthContext';
@@ -15,8 +16,11 @@ import Login from '../features/auth/Login';
 import GestaoMaster from '../features/master/GestaoMaster';
 import GestaoEmpresas from '../features/empresas/GestaoEmpresas';
 import GestaoUsuarios from '../features/usuarios/GestaoUsuarios';
+import AuditoriaEvidencias from '../features/auditoria/AuditoriaEvidencias'
 import LoadingSpinner from '../components/feedback/LoadingSpinner';
 import theme from './theme';
+import { useTranslation } from 'react-i18next';
+import './i18n';
 
 const globalStyles = (
   <GlobalStyles
@@ -117,33 +121,35 @@ const globalStyles = (
 
 const UnauthorizedScreen = () => {
   const { logout } = useAuth();
+  const { t } = useTranslation();
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100vh', gap: 2 }}>
-      <Typography variant="h5" color="error">Acesso não autorizado</Typography>
-      <Typography variant="body2" color="text.secondary">Sua conta não tem permissão para acessar este painel.</Typography>
-      <Button variant="outlined" color="error" onClick={logout}>Sair</Button>
+      <Typography variant="h5" color="error">{t('app.unauthorized.title')}</Typography>
+      <Typography variant="body2" color="text.secondary">{t('app.unauthorized.description')}</Typography>
+      <Button variant="outlined" color="error" onClick={logout}>{t('app.logout')}</Button>
     </Box>
   );
 };
 
 const ProtectedRoute = ({ children }) => {
   const { loading, isAuthenticated, isMaster } = useAuth();
-  if (loading) return <LoadingSpinner fullScreen message="Verificando autenticação..." />;
+  const { t } = useTranslation();
+  if (loading) return <LoadingSpinner fullScreen message={t('app.loading.auth')} />;
   if (!isAuthenticated()) return <Navigate to="/login" replace />;
   if (!isMaster()) return <UnauthorizedScreen />;
   return children;
 };
 
-
-
-const masterMenuItems = [
-  { text: 'Painel Master', path: '/master', icon: AdminPanelSettings },
-  { text: 'Painel Empresas', path: '/empresas', icon: Business },
-  { text: 'Painel Usuários', path: '/usuarios', icon: People }
-];
-
 const AuthenticatedApp = () => {
   const { user, logout } = useAuth();
+  const { t } = useTranslation();
+
+  const masterMenuItems = [
+    { text: t('app.menuItems.masterPanel'),    path: '/master',   icon: AdminPanelSettings },
+    { text: t('app.menuItems.companiesPanel'), path: '/empresas', icon: Business },
+    { text: t('app.menuItems.usersPanel'),     path: '/usuarios', icon: People },
+    { text: t('app.menuItems.audit'), path: '/auditoria', icon: FactCheck },
+  ];
 
   return (
     <AppLayout user={user} onLogout={logout} menuItems={masterMenuItems}>
@@ -163,6 +169,10 @@ const AuthenticatedApp = () => {
           path="/usuarios"
           element={<GestaoUsuarios />}
         />
+        <Route
+          path="/auditoria"
+          element={<AuditoriaEvidencias />}
+        />
       </Routes>
     </AppLayout>
   );
@@ -170,8 +180,9 @@ const AuthenticatedApp = () => {
 
 const AppContent = () => {
   const { loading, isAuthenticated, isMaster, login } = useAuth();
+  const { t } = useTranslation();
 
-  if (loading) return <LoadingSpinner fullScreen message="Carregando aplicação..." />;
+  if (loading) return <LoadingSpinner fullScreen message={t('app.loading.app')} />;
 
   const resolveLoginRedirect = () => {
     if (!isAuthenticated()) return <Login onLoginSuccess={login} />;

@@ -1,4 +1,5 @@
 import axios from 'axios';
+import i18n from '../../app/i18n';
 
 const ENV_URLS = {
   dev:   import.meta.env.VITE_API_URL_DEV   || 'https://dev.api.tagsafeapplication.com',
@@ -20,7 +21,7 @@ apiClient.interceptors.request.use((config) => {
 });
 
 export const login = (email, senha) =>
-  apiClient.post('/auth/login-master', { email, senha }); // nova rota de login adicionada
+  apiClient.post('/auth/login-master', { email, senha });
 
 export const verifyToken = () =>
   apiClient.get('/auth/me');
@@ -28,14 +29,17 @@ export const verifyToken = () =>
 export const logout = () =>
   apiClient.post('/auth/logout');
 
+export const getApiCode = (error) => error?.response?.data?.code ?? null;
+
 export const formatApiError = (error) => {
+  const t = i18n.t.bind(i18n);
   if (error?.response?.data?.error) return error.response.data.error;
-  if (error?.response?.status === 401) return 'Sessão expirada. Faça login novamente.';
-  if (error?.response?.status === 403) return 'Acesso negado.';
-  if (error?.response?.status === 404) return 'Recurso não encontrado.';
-  if (error?.response?.status === 500) return 'Erro interno do servidor.';
-  if (error?.request) return 'Erro de conexão. Verifique sua internet.';
-  return 'Erro desconhecido. Tente novamente.';
+  if (error?.response?.status === 401) return t('common.errors.sessionExpired');
+  if (error?.response?.status === 403) return t('common.errors.accessDenied');
+  if (error?.response?.status === 404) return t('common.errors.notFound');
+  if (error?.response?.status === 500) return t('common.errors.serverError');
+  if (error?.request) return t('common.errors.connectionError');
+  return t('common.errors.unknown');
 };
 
 // controle e gestao master
@@ -112,7 +116,10 @@ export const getModules = () => {
 };
 
 // criar usuario
-export const createUser = (data) => {
+export const createUser = (data, lang = 'pt') => {
+  const query = new URLSearchParams();
+  query.set("lang", lang);
+
   const payload = {
     nome: data?.nome,
     email: data?.email,
@@ -121,7 +128,7 @@ export const createUser = (data) => {
     unidades_id: data?.unidades_id
   }
 
-  return apiClient.post('/auth/registrar', payload);
+  return apiClient.post(`/auth/registrar?${query.toString()}`, payload);
 };
 
 // lista todos os cargos disponiveis
@@ -136,20 +143,21 @@ export const getStats = () => {
 
 // unidades-atendidas
 export const getUnitsAttended = (instrutor_id) => { 
-  return apiClient.get(`/instrutores/unidades-atendidas/${instrutor_id}`);
+  return apiClient.get(`/instrutores/unidades_atendidas/${instrutor_id}`);
 };
 
-export const setUnitsAttended = (usuario_id, unidades_atendidas) => {
+export const setUnitsAttended = (usuario_id, unidades_atendidas, cpf) => {
   const payload = {
     usuario_id,
     unidades_atendidas,
+    cpf,
   };
-  return apiClient.post(`/instrutores/unidades-atendidas`, payload);
+  return apiClient.post(`/instrutores/unidades_atendidas`, payload);
 };
 
 // selecionar o instrutor da empresa
 export const getInstructorsByCompany = (empresa_id) => {
-  return apiClient.get(`/instrutores/instrutores-by-company/${empresa_id}`);
+  return apiClient.get(`/instrutores/instrutores_by_company/${empresa_id}`);
 };
 
 // ter as unidades vinculadas do usuário
@@ -168,7 +176,7 @@ export const addUnitToUser = (usuario_id, unidade_id) => {
 
 // extrair o usuário pelo e-mail
 export const getUserByEmail = (email) => {
-  return apiClient.get(`/usuarios/get_by_email/${email}`);
+  return apiClient.get(`/usuarios/get_by_email/${encodeURIComponent(email)}`);
 };
 
 // extrair todos os usuários com usuário master
@@ -178,7 +186,7 @@ export const getAllUsers = () => {
 
 // extrair quantidade de usuários por role
 export const getAllUsersQuantity = () => {
-  return apiClient.get('/admin/users-quantity');
+  return apiClient.get('/admin/users_quantity');
 }; 
 
 // extrair empresa pelo empresa_id
@@ -192,7 +200,7 @@ export const updateNameByPublicId = (public_id, name) => {
     'name': name
   };
 
-  return apiClient.put(`/usuarios/update-name/${public_id}`, payload);
+  return apiClient.put(`/usuarios/update_name/${public_id}`, payload);
 };
 
 export const updateRolesByPublicId = (public_id, roles) => {
@@ -200,9 +208,27 @@ export const updateRolesByPublicId = (public_id, roles) => {
     'roles': roles
   };
 
-  return apiClient.put(`/usuarios/update-roles/${public_id}`, payload)
+  return apiClient.put(`/usuarios/update_roles/${public_id}`, payload)
 };
 
 export const getRolesByUserId = (public_id) => {
-  return apiClient.get(`/usuarios/get-roles/${public_id}`);
+  return apiClient.get(`/usuarios/get_roles/${public_id}`);
+};
+
+// rotas evidência carimbo
+export const baixarEvidenciaCarimboTst = (carimboId) => {
+  return apiClient.get(`/evidencias/carimbos/${encodeURIComponent(carimboId)}/tst`, {
+    responseType: 'blob',
+    timeout: 30000,
+  });
+};
+
+export const getEvidenciaBySessao = (sessaoId, unidadeId) => {
+  return apiClient.get(
+    `/evidencias/sessoes/master/${encodeURIComponent(sessaoId)}`
+  );
+};
+
+export const validarEvidenciaCarimboBry = (carimboId) => {
+  return apiClient.post(`/evidencias/carimbos/${encodeURIComponent(carimboId)}/validar`);
 };

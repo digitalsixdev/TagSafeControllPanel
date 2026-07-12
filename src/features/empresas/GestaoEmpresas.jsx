@@ -4,6 +4,7 @@ import {
   getModules,
   getStats,
   formatApiError,
+  getApiCode,
   addUnit,
   getAllCompanies,
   getUnitByCompanieId,
@@ -19,7 +20,8 @@ import {
   MoreVert,
   Edit,
   Delete,
-  Group
+  Group,
+  FileDownload
 } from '@mui/icons-material';
 import {
   Alert,
@@ -52,7 +54,9 @@ import {
   Divider
 } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
-import { ptBR } from '@mui/x-data-grid/locales';
+import { ptBR, enUS } from '@mui/x-data-grid/locales';
+import { useTranslation } from 'react-i18next';
+import '../../app/i18n';
 
 const getModulesColor = (moduleName) => {
   const colors = {
@@ -109,6 +113,27 @@ function StatCard({ title, value, icon: Icon, gradient, delay = 0, isLoading = f
 }
 
 function GestaoEmpresas() {
+  const { t, i18n } = useTranslation();
+
+  const exportCSV = (rows, filename) => {
+    const columns = [
+      { label: t('gestaoEmpresas.components.table.companiesColumn'), get: r => r.nome || '' },
+      { label: t('gestaoEmpresas.components.table.cnpjBaseColumn'),  get: r => r.cnpj_base || '' },
+    ];
+    const escape = v => v.includes(',') || v.includes('"') || v.includes('\n') ? `"${v.replace(/"/g, '""')}"` : v;
+    const header = columns.map(c => c.label).join(',');
+    const body = rows.map(r => columns.map(c => escape(c.get(r))).join(',')).join('\n');
+    const blob = new Blob(['﻿' + header + '\n' + body], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+  const dataGridLocale = i18n.language === 'pt'
+    ? ptBR.components.MuiDataGrid.defaultProps.localeText
+    : enUS.components.MuiDataGrid.defaultProps.localeText;
   // "Nova Empresa" dialog
   const [open, setOpen] = useState(false);
   const [formData, setFormData] = useState({ nome: '', cnpj: '', unidade: '', modulos: [] });
@@ -183,19 +208,19 @@ function GestaoEmpresas() {
   const columns = useMemo(() => [
     {
       field: 'nome',
-      headerName: 'Empresa',
+      headerName: t("gestaoEmpresas.components.table.companiesColumn"),
       flex: 1,
       minWidth: 200,
     },
     {
       field: 'cnpj_base',
-      headerName: 'CNPJ Base',
+      headerName: t("gestaoEmpresas.components.table.cnpjBaseColumn"),
       width: 200,
       renderCell: (params) => params.value || '—',
     },
     {
       field: 'actions',
-      headerName: 'Ações',
+      headerName: t("gestaoEmpresas.components.table.actionsColumn"),
       width: 80,
       sortable: false,
       align: 'center',
@@ -216,17 +241,17 @@ function GestaoEmpresas() {
         </IconButton>
       ),
     },
-  ], []);
+  ], [t]);
 
   const unitsColumns = useMemo(() => [
     {
       field: 'unidade',
-      headerName: 'Unidade',
+      headerName: t("gestaoEmpresas.components.dialogViewUnits.table.unitColumn"),
       flex: 1,
     },
     {
       field: 'cnpj',
-      headerName: 'CNPJ',
+      headerName: t("gestaoEmpresas.components.dialogViewUnits.table.cnpjColumn"),
       width: 220,
       renderCell: (params) => {
         if (!params.value) return '—';
@@ -235,7 +260,7 @@ function GestaoEmpresas() {
     },
     {
       field: 'modulos',
-      headerName: 'Módulos',
+      headerName: t("gestaoEmpresas.components.dialogViewUnits.table.modulesColumn"),
       flex: 1,
       sortable: false,
       renderCell: (params) => (
@@ -265,7 +290,7 @@ function GestaoEmpresas() {
     },
     {
       field: 'actions',
-      headerName: 'Ações',
+      headerName: t("gestaoEmpresas.components.dialogViewUnits.table.actionsColumn"),
       width: 80,
       sortable: false,
       align: 'center',
@@ -286,23 +311,23 @@ function GestaoEmpresas() {
         </IconButton>
       ),
     },
-  ], []);
+  ], [t]);
 
   const unitUsersColumns = useMemo(() => [
-    { field: 'nome', headerName: 'Nome', flex: 1 },
-    { field: 'email', headerName: 'E-mail', flex: 1 },
+    { field: 'nome', headerName: t("gestaoEmpresas.components.dialogViewUnitUsers.table.nameColumn"), flex: 1 },
+    { field: 'email', headerName: t("gestaoEmpresas.components.dialogViewUnitUsers.table.emailColumn"), flex: 1 },
     {
       field: 'cargo',
-      headerName: 'Cargo',
+      headerName: t("gestaoEmpresas.components.dialogViewUnitUsers.table.roleColumn"),
       width: 160,
       renderCell: (params) => {
         const style = getRolesColor(params.value);
 
         const cargoFormatado = params.value 
           ? params.value.charAt(0).toUpperCase() + params.value.slice(1).toLowerCase() 
-          : 'Sem Cargo';
+          : t("gestaoEmpresas.components.dialogViewUnitUsers.table.noRole");
           
-        const cargo = params.value == 'user_master' ? 'Master' : cargoFormatado;
+        const cargo = params.value == 'user_master' ? t('gestaoMaster.components.rolesContainer.roles.master.name') : cargoFormatado;
           
         return (
           <Box sx={{ display: 'flex', alignItems: 'center', height: '100%' }}>
@@ -318,17 +343,17 @@ function GestaoEmpresas() {
     },
     {
       field: 'primeiro_acesso',
-      headerName: 'Primeiro Acesso',
+      headerName: t("gestaoEmpresas.components.dialogViewUnitUsers.table.firstAccessColumn"),
       width: 150,
       renderCell: (params) => (
         <Box sx={{ display: 'flex', alignItems: 'center', height: '100%' }}>
           <Typography variant="body2" color={params.value ? 'warning.main' : 'success.main'}>
-            {params.value ? 'Pendente' : 'Concluído'}
+            {params.value ? t("gestaoEmpresas.components.dialogViewUnitUsers.table.firstAccessStatus.pending") : t("gestaoEmpresas.components.dialogViewUnitUsers.table.firstAccessStatus.completed")}
           </Typography>
         </Box>
       ),
     },
-  ], []);
+  ], [t]);
 
   const handleOpen = async () => {
     setError('');
@@ -354,11 +379,12 @@ function GestaoEmpresas() {
       const payload = { ...rest };
       if (modulos.length) payload.modulo = modulos;
       await createCompanie(payload);
-      setSuccess('Empresa cadastrada com sucesso!');
+      setSuccess(t('gestaoEmpresas.messages.companyCreated'));
       await loadData();
       setTimeout(handleClose, 2000);
     } catch (err) {
-      setError(formatApiError(err));
+      const code = getApiCode(err);
+      setError(code ? t(`api_codes.${code}`, { defaultValue: formatApiError(err) }) : formatApiError(err));
     } finally {
       setLoading(false);
     }
@@ -382,7 +408,8 @@ function GestaoEmpresas() {
       const response = await getUnitByCompanieId(selectedCompany.empresa_id);
       setUnits(response.data || []);
     } catch (err) {
-      setError(formatApiError(err));
+      const code = getApiCode(err);
+      setError(code ? t(`api_codes.${code}`, { defaultValue: formatApiError(err) }) : formatApiError(err));
     } finally {
       setUnitsLoading(false);
     }
@@ -415,11 +442,12 @@ function GestaoEmpresas() {
     setSuccess('');
     try {
       await updateCompanieById(selectedCompany.empresa_id, editFormData);
-      setSuccess('Empresa atualizada com sucesso!');
+      setSuccess(t('gestaoEmpresas.messages.companyUpdated'));
       await loadData();
       setTimeout(handleEditClose, 2000);
     } catch (err) {
-      setError(formatApiError(err));
+      const code = getApiCode(err);
+      setError(code ? t(`api_codes.${code}`, { defaultValue: formatApiError(err) }) : formatApiError(err));
     } finally {
       setLoading(false);
     }
@@ -442,7 +470,8 @@ function GestaoEmpresas() {
       const response = await getAllUsersByIdUnit(selectedUnit.public_id);
       setUnitUsers(response.data || []);
     } catch (err) {
-      setError(formatApiError(err));
+      const code = getApiCode(err);
+      setError(code ? t(`api_codes.${code}`, { defaultValue: formatApiError(err) }) : formatApiError(err));
     } finally {
       setUnitUsersLoading(false);
     }
@@ -492,12 +521,13 @@ function GestaoEmpresas() {
     setSuccess('');
     try {
       await updateUnitById(selectedUnit.public_id, editUnitFormData);
-      setSuccess('Unidade atualizada com sucesso!');
+      setSuccess(t('gestaoEmpresas.messages.unitUpdated'));
       const response = await getUnitByCompanieId(selectedCompany.empresa_id);
       setUnits(response.data || []);
       setTimeout(handleEditUnitClose, 2000);
     } catch (err) {
-      setError(formatApiError(err));
+      const code = getApiCode(err);
+      setError(code ? t(`api_codes.${code}`, { defaultValue: formatApiError(err) }) : formatApiError(err));
     } finally {
       setLoading(false);
     }
@@ -513,7 +543,7 @@ function GestaoEmpresas() {
       setUnitFormData({ empresa_id: '', unidade: '', cnpj: '', modulo: [] });
       setUnitOpen(true);
     } catch (err) {
-      setError('Erro ao carregar dados necessários.');
+      setError(t('gestaoEmpresas.messages.errorLoadingData'));
     }
   };
 
@@ -526,10 +556,11 @@ function GestaoEmpresas() {
     try {
       const { empresa_id, ...data } = unitFormData;
       await addUnit(empresa_id, data);
-      setSuccess('Unidade cadastrada com sucesso!');
+      setSuccess(t('gestaoEmpresas.messages.unitCreated'));
       setTimeout(handleUnitClose, 2000);
     } catch (err) {
-      setError(formatApiError(err));
+      const code = getApiCode(err);
+      setError(code ? t(`api_codes.${code}`, { defaultValue: formatApiError(err) }) : formatApiError(err));
     } finally {
       setLoading(false);
     }
@@ -543,16 +574,16 @@ function GestaoEmpresas() {
           <Box sx={{ mb: 4, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', flexWrap: 'wrap', gap: 2 }}>
             <Box>
               <Typography variant="h3" gutterBottom sx={{ fontWeight: 700 }}>
-                Painel de Empresas
+                {t("gestaoEmpresas.components.title")}
               </Typography>
               <Typography variant="body1" sx={{ color: 'text.secondary', fontSize: '1.1rem' }}>
-                Gerencie as empresas cadastradas na plataforma.
+                {t("gestaoEmpresas.components.subtitle")}
               </Typography>
             </Box>
             <Box sx={{ display: 'flex', gap: 1.5 }}>
               {[
-                { label: 'Nova Unidade', icon: <Business />, onClick: handleUnitOpen },
-                { label: 'Nova Empresa', icon: <Store />,    onClick: handleOpen },
+                { label: t("gestaoEmpresas.components.buttons.newUnitButton"), icon: <Business />, onClick: handleUnitOpen },
+                { label: t("gestaoEmpresas.components.buttons.newCompanyButton"), icon: <Store />,    onClick: handleOpen },
               ].map(({ label, icon, onClick }) => (
                 <Button
                   key={label}
@@ -579,38 +610,63 @@ function GestaoEmpresas() {
             </Box>
           </Box>
 
-          <Grid container spacing={3} sx={{ mb: 4 }}>
-            <Grid item xs={12} sm={6} md={4}>
-              <StatCard title="Empresas cadastradas" value={stats.total_empresas} icon={Business} gradient="linear-gradient(135deg, #0f172a 0%, #1d4ed8 100%)" isLoading={statsLoading} />
-            </Grid>
-            <Grid item xs={12} sm={6} md={4}>
-              <StatCard title="Unidades cadastradas" value={stats.total_unidades} icon={Store} gradient="linear-gradient(135deg, #0f172a 0%, #6d28d9 100%)" isLoading={statsLoading} />
-            </Grid>
-            <Grid item xs={12} sm={6} md={4}>
-              <StatCard title="Módulos disponíveis" value={stats.total_modulos} icon={ViewModule} gradient="linear-gradient(135deg, #0f172a 0%, #047857 100%)" isLoading={statsLoading} delay={200} />
-            </Grid>
-          </Grid>
+          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 3, mb: 4 }}>
+            <Box sx={{ flex: '1 1 200px', minWidth: 0 }}>
+              <StatCard title={t("gestaoEmpresas.components.cards.companies")} value={stats.total_empresas} icon={Business} gradient="linear-gradient(135deg, #0f172a 0%, #1d4ed8 100%)" isLoading={statsLoading} />
+            </Box>
+            <Box sx={{ flex: '1 1 200px', minWidth: 0 }}>
+              <StatCard title={t("gestaoEmpresas.components.cards.units")} value={stats.total_unidades} icon={Store} gradient="linear-gradient(135deg, #0f172a 0%, #6d28d9 100%)" isLoading={statsLoading} />
+            </Box>
+            <Box sx={{ flex: '1 1 200px', minWidth: 0 }}>
+              <StatCard title={t("gestaoEmpresas.components.cards.modules")} value={stats.total_modulos} icon={ViewModule} gradient="linear-gradient(135deg, #0f172a 0%, #047857 100%)" isLoading={statsLoading} delay={200} />
+            </Box>
+          </Box>
 
           <Grow in timeout={1200}>
             <Card sx={{ borderRadius: 2, border: '1px solid rgba(255,255,255,0.08)', bgcolor: 'background.paper' }}>
-              <Box sx={{ p: 1, borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
-                <Typography sx={{ p: 2, fontWeight: 'bold' }}>
-                  Encontre todas as {stats.total_empresas} empresas cadastradas no sistema
+              <Box sx={{ p: 2, borderBottom: '1px solid rgba(255,255,255,0.08)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 2 }}>
+                <Typography sx={{ fontWeight: 'bold' }}>
+                  {t("gestaoEmpresas.components.table.title", { quantity: stats.total_empresas})}
                 </Typography>
-                <TextField
-                  size="small"
-                  placeholder="Buscar empresa por nome ou CNPJ..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  InputProps={{
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        <Search fontSize="small" />
-                      </InputAdornment>
-                    ),
-                  }}
-                  sx={{ p: 1, width: { xs: '100%', sm: 480 }, '& input': {height: '35px'} }}
-                />
+                <Box sx={{ display: 'flex', gap: 1.5, alignItems: 'center', flexWrap: 'wrap' }}>
+                  <TextField
+                    size="small"
+                    placeholder={t("gestaoEmpresas.components.table.field")}
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    InputProps={{
+                      startAdornment: (
+                        <InputAdornment position="start">
+                          <Search fontSize="small" />
+                        </InputAdornment>
+                      ),
+                    }}
+                    sx={{ width: { xs: '100%', sm: 400 } }}
+                  />
+                  <Button
+                    variant="text"
+                    size="small"
+                    startIcon={<FileDownload />}
+                    onClick={() => exportCSV(filteredCompanies, `empresas_${new Date().toISOString().slice(0,10)}.csv`)}
+                    disabled={filteredCompanies.length === 0}
+                    sx={{
+                      borderRadius: 2,
+                      color: 'rgba(255,255,255,0.65)',
+                      background: 'rgba(255,255,255,0.04)',
+                      border: '1px solid rgba(255,255,255,0.08)',
+                      backdropFilter: 'blur(8px)',
+                      whiteSpace: 'nowrap',
+                      transition: 'all 0.2s ease',
+                      '&:hover': {
+                        background: 'rgba(255,255,255,0.08)',
+                        border: '1px solid rgba(255,255,255,0.16)',
+                        color: 'rgba(255,255,255,0.95)',
+                      },
+                    }}
+                  >
+                    {t("gestaoEmpresas.components.buttons.csvButton")}
+                  </Button>
+                </Box>
               </Box>
 
               <Box sx={{ p: 1, height: 500, width: '100%' }}>
@@ -619,7 +675,7 @@ function GestaoEmpresas() {
                   columns={columns}
                   loading={statsLoading}
                   getRowId={(row) => row.empresa_id}
-                  localeText={ptBR.components.MuiDataGrid.defaultProps.localeText}
+                  localeText={dataGridLocale}
                   initialState={{ pagination: { paginationModel: { pageSize: 10 } } }}
                   pageSizeOptions={[5, 10, 25, 50]}
                   rowHeight={64}
@@ -649,12 +705,12 @@ function GestaoEmpresas() {
       >
         <MenuItem onClick={handleEditCompanies}>
           <Edit fontSize="small" sx={{ mr: 1.5, color: 'primary.main' }} />
-          <Typography variant="body2">Editar Empresa</Typography>
+          <Typography variant="body2">{t("gestaoEmpresas.components.table.actions.editCompany")}</Typography>
         </MenuItem>
 
         <MenuItem onClick={handleViewUnits}>
           <Business fontSize="small" sx={{ mr: 1.5, color: 'info.main' }} />
-          <Typography variant="body2">Visualizar Unidades</Typography>
+          <Typography variant="body2">{t("gestaoEmpresas.components.table.actions.viewUnits")}</Typography>
         </MenuItem>
       </Menu>
 
@@ -669,11 +725,11 @@ function GestaoEmpresas() {
       >
         <MenuItem onClick={handleEditUnit}>
           <Edit fontSize="small" sx={{ mr: 1.5, color: 'primary.main' }} />
-          <Typography variant="body2">Editar Unidade</Typography>
+          <Typography variant="body2">{t("gestaoEmpresas.components.dialogViewUnits.table.actions.editUnit")}</Typography>
         </MenuItem>
         <MenuItem onClick={handleViewUnitUsers}>
           <Group fontSize="small" sx={{ mr: 1.5, color: 'info.main' }} />
-          <Typography variant="body2">Visualizar Usuários</Typography>
+          <Typography variant="body2">{t("gestaoEmpresas.components.dialogViewUnits.table.actions.viewUsers")}</Typography>
         </MenuItem>
       </Menu>
 
@@ -684,7 +740,7 @@ function GestaoEmpresas() {
             <Box sx={{ pt: 2, textAlign: 'center' }}>
               <Typography variant="h4" component="span" sx={{ fontWeight: 'bold', letterSpacing: 1 }}>
                 <Box><Store /></Box>
-                Vincule uma nova empresa
+                {t("gestaoEmpresas.components.dialogAddNewCompany.title")}
               </Typography>
             </Box>
           </Fade>
@@ -693,18 +749,18 @@ function GestaoEmpresas() {
           {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
           {success && <Alert severity="success" sx={{ mb: 2 }}>{success}</Alert>}
 
-          <TextField label="Nome" fullWidth margin="normal" value={formData.nome} onChange={(e) => setFormData({ ...formData, nome: e.target.value })} />
-          <TextField label="CNPJ" fullWidth margin="normal" value={formData.cnpj} onChange={(e) => setFormData({ ...formData, cnpj: e.target.value })} />
-          <TextField label="Unidade" fullWidth margin="normal" value={formData.unidade} onChange={(e) => setFormData({ ...formData, unidade: e.target.value })} />
+          <TextField label={t("gestaoEmpresas.components.dialogAddNewCompany.fields.nameField")} fullWidth margin="normal" value={formData.nome} onChange={(e) => setFormData({ ...formData, nome: e.target.value })} />
+          <TextField label={t("gestaoEmpresas.components.dialogAddNewCompany.fields.cnpjField")} fullWidth margin="normal" value={formData.cnpj} onChange={(e) => setFormData({ ...formData, cnpj: e.target.value })} />
+          <TextField label={t("gestaoEmpresas.components.dialogAddNewCompany.fields.unitField")} fullWidth margin="normal" value={formData.unidade} onChange={(e) => setFormData({ ...formData, unidade: e.target.value })} />
 
           <FormControl fullWidth margin="normal">
-            <InputLabel id="select-modulos-label">Módulos</InputLabel>
+            <InputLabel id="select-modulos-label">{t("gestaoEmpresas.components.dialogAddNewCompany.fields.modulesField")}</InputLabel>
             <Select
               labelId="select-modulos-label"
               multiple
               value={formData.modulos}
               onChange={(e) => setFormData({ ...formData, modulos: e.target.value })}
-              label="Módulos"
+              label={t("gestaoEmpresas.components.dialogAddNewCompany.fields.modulesField")}
               renderValue={(selected) =>
                 modules.filter(mod => selected.includes(mod.public_id)).map(mod => mod.nome).join(', ')
               }
@@ -719,9 +775,9 @@ function GestaoEmpresas() {
           </FormControl>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleClose} disabled={loading}>Cancelar</Button>
+          <Button onClick={handleClose} disabled={loading}>{t("common.cancel")}</Button>
           <Button variant="contained" onClick={handleSubmit} disabled={loading}>
-            {loading ? 'Salvando...' : 'Salvar'}
+            {loading ? t('common.saving') : t("common.save")}
           </Button>
         </DialogActions>
       </Dialog>
@@ -733,7 +789,7 @@ function GestaoEmpresas() {
             <Box sx={{ pt: 2, textAlign: 'center' }}>
               <Typography variant="h4" component="span" sx={{ fontWeight: 'bold', letterSpacing: 1 }}>
                 <Box><Edit /></Box>
-                Editar Empresa
+                {t("gestaoEmpresas.components.dialogEditCompany.title")}
               </Typography>
             </Box>
           </Fade>
@@ -742,12 +798,12 @@ function GestaoEmpresas() {
           {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
           {success && <Alert severity="success" sx={{ mb: 2 }}>{success}</Alert>}
 
-          <TextField label="Nome" fullWidth margin="normal" value={editFormData.nome} onChange={(e) => setEditFormData({ ...editFormData, nome: e.target.value })} />
+          <TextField label={t("gestaoEmpresas.components.dialogEditCompany.fieldEditName")} fullWidth margin="normal" value={editFormData.nome} onChange={(e) => setEditFormData({ ...editFormData, nome: e.target.value })} />
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleEditClose} disabled={loading}>Cancelar</Button>
+          <Button onClick={handleEditClose} disabled={loading}>{t("common.cancel")}</Button>
           <Button variant="contained" onClick={handleEditSubmit} disabled={loading}>
-            {loading ? 'Salvando...' : 'Salvar'}
+            {loading ? t('common.saving') : t("common.save")}
           </Button>
         </DialogActions>
       </Dialog>
@@ -759,7 +815,7 @@ function GestaoEmpresas() {
             <Box sx={{ pt: 2, textAlign: 'center' }}>
               <Typography variant="h4" component="span" sx={{ fontWeight: 'bold', letterSpacing: 1 }}>
                 <Box><Business /></Box>
-                Adicionar Nova Unidade
+                {t("gestaoEmpresas.components.dialogAddNewUnit.title")}
               </Typography>
             </Box>
           </Fade>
@@ -769,12 +825,12 @@ function GestaoEmpresas() {
           {success && <Alert severity="success" sx={{ mb: 2 }}>{success}</Alert>}
 
           <FormControl fullWidth margin="normal">
-            <InputLabel id="select-company-label">Empresa</InputLabel>
+            <InputLabel id="select-company-label">{t("gestaoEmpresas.components.dialogAddNewUnit.fields.companyField")}</InputLabel>
             <Select
               labelId="select-company-label"
               value={unitFormData.empresa_id}
               onChange={(e) => setUnitFormData({ ...unitFormData, empresa_id: e.target.value })}
-              label="Empresa"
+              label={t("gestaoEmpresas.components.dialogAddNewUnit.fields.companyField")}
             >
               {allCompaniesList.map((emp) => (
                 <MenuItem key={emp.empresa_id} value={emp.empresa_id}>
@@ -784,17 +840,17 @@ function GestaoEmpresas() {
             </Select>
           </FormControl>
 
-          <TextField label="Nome da Unidade" fullWidth margin="normal" value={unitFormData.unidade} onChange={(e) => setUnitFormData({ ...unitFormData, unidade: e.target.value })} />
-          <TextField label="CNPJ" fullWidth margin="normal" value={unitFormData.cnpj} onChange={(e) => setUnitFormData({ ...unitFormData, cnpj: e.target.value })} />
+          <TextField label={t("gestaoEmpresas.components.dialogAddNewUnit.fields.nameUnitField")} fullWidth margin="normal" value={unitFormData.unidade} onChange={(e) => setUnitFormData({ ...unitFormData, unidade: e.target.value })} />
+          <TextField label={t("gestaoEmpresas.components.dialogAddNewUnit.fields.cnpjField")} fullWidth margin="normal" value={unitFormData.cnpj} onChange={(e) => setUnitFormData({ ...unitFormData, cnpj: e.target.value })} />
 
           <FormControl fullWidth margin="normal">
-            <InputLabel id="select-unit-modulos-label">Módulos</InputLabel>
+            <InputLabel id="select-unit-modulos-label">{t("gestaoEmpresas.components.dialogAddNewUnit.fields.modulesField")}</InputLabel>
             <Select
               labelId="select-unit-modulos-label"
               multiple
               value={unitFormData.modulo}
               onChange={(e) => setUnitFormData({ ...unitFormData, modulo: e.target.value })}
-              label="Módulos"
+              label={t("gestaoEmpresas.components.dialogAddNewUnit.fields.modulesField")}
               renderValue={(selected) =>
                 modules.filter(mod => selected.includes(mod.public_id)).map(mod => mod.nome).join(', ')
               }
@@ -809,9 +865,9 @@ function GestaoEmpresas() {
           </FormControl>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleUnitClose} disabled={loading}>Cancelar</Button>
+          <Button onClick={handleUnitClose} disabled={loading}>{t("common.cancel")}</Button>
           <Button variant="contained" onClick={handleUnitSubmit} disabled={loading}>
-            {loading ? 'Salvando...' : 'Salvar'}
+            {loading ? t('common.saving') : t("common.save")}
           </Button>
         </DialogActions>
       </Dialog>
@@ -819,7 +875,7 @@ function GestaoEmpresas() {
       {/* Visualizar Unidades dialog */}
       <Dialog open={unitsOpen} onClose={handleUnitsClose} fullWidth maxWidth="md">
         <DialogTitle variant="h4" component="span" sx={{ fontWeight: 'bold', letterSpacing: 1 }}>
-          Unidades — {selectedCompany?.nome}
+          {t("gestaoEmpresas.components.dialogViewUnits.title",  { company: selectedCompany?.nome })}
         </DialogTitle>
         <DialogContent dividers>
           {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
@@ -829,7 +885,7 @@ function GestaoEmpresas() {
               columns={unitsColumns}
               loading={unitsLoading}
               getRowId={(row) => row.public_id}
-              localeText={ptBR.components.MuiDataGrid.defaultProps.localeText}
+              localeText={dataGridLocale}
               pageSizeOptions={[5, 10]}
               initialState={{ pagination: { paginationModel: { pageSize: 5 } } }}
               disableRowSelectionOnClick
@@ -838,14 +894,14 @@ function GestaoEmpresas() {
           </Box>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleUnitsClose} variant="outlined">Fechar</Button>
+          <Button onClick={handleUnitsClose} variant="outlined">{t("common.close")}</Button>
         </DialogActions>
       </Dialog>
 
       {/* Visualizar Usuários da Unidade dialog */}
       <Dialog open={unitUsersOpen} onClose={handleUnitUsersClose} fullWidth maxWidth="md">
         <DialogTitle variant="h4" component="span" sx={{ fontWeight: 'bold', letterSpacing: 1 }}>
-          Usuários — {selectedUnit?.unidade}
+          {t("gestaoEmpresas.components.dialogViewUnitUsers.title", { unit: selectedUnit?.unidade })}
         </DialogTitle>
         <DialogContent dividers>
           <Box sx={{ height: 400, width: '100%' }}>
@@ -854,7 +910,7 @@ function GestaoEmpresas() {
               columns={unitUsersColumns}
               loading={unitUsersLoading}
               getRowId={(row) => row.public_id}
-              localeText={ptBR.components.MuiDataGrid.defaultProps.localeText}
+              localeText={dataGridLocale}
               pageSizeOptions={[5, 10]}
               initialState={{ pagination: { paginationModel: { pageSize: 5 } } }}
               disableRowSelectionOnClick
@@ -863,7 +919,7 @@ function GestaoEmpresas() {
           </Box>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleUnitUsersClose} variant="outlined">Fechar</Button>
+          <Button onClick={handleUnitUsersClose} variant="outlined">{t("common.close")}</Button>
         </DialogActions>
       </Dialog>
 
@@ -874,7 +930,7 @@ function GestaoEmpresas() {
             <Box sx={{ pt: 2, textAlign: 'center' }}>
               <Typography variant="h4" component="span" sx={{ fontWeight: 'bold', letterSpacing: 1 }}>
                 <Box><Edit /></Box>
-                Editar Unidade
+                {t("gestaoEmpresas.components.dialogEditUnit.title")}
               </Typography>
             </Box>
           </Fade>
@@ -884,27 +940,27 @@ function GestaoEmpresas() {
           {success && <Alert severity="success" sx={{ mb: 2 }}>{success}</Alert>}
 
           <TextField
-            label="Nome da Unidade"
+            label={t("gestaoEmpresas.components.dialogEditUnit.fields.nameUnitField")}
             fullWidth
             margin="normal"
             value={editUnitFormData.unidade}
             onChange={(e) => setEditUnitFormData({ ...editUnitFormData, unidade: e.target.value })}
           />
           <TextField
-            label="CNPJ"
+            label={t("gestaoEmpresas.components.dialogEditUnit.fields.cnpjField")}
             fullWidth
             margin="normal"
             value={editUnitFormData.cnpj}
             onChange={(e) => setEditUnitFormData({ ...editUnitFormData, cnpj: e.target.value })}
           />
           <FormControl fullWidth margin="normal">
-            <InputLabel id="edit-unit-modulos-label">Módulos</InputLabel>
+            <InputLabel id="edit-unit-modulos-label">{t("gestaoEmpresas.components.dialogEditUnit.fields.modulesField")}</InputLabel>
             <Select
               labelId="edit-unit-modulos-label"
               multiple
               value={editUnitFormData.modulos}
               onChange={(e) => setEditUnitFormData({ ...editUnitFormData, modulos: e.target.value })}
-              label="Módulos"
+              label={t("gestaoEmpresas.components.dialogEditUnit.fields.modulesField")}
               renderValue={(selected) =>
                 modules.filter((mod) => selected.includes(mod.public_id)).map((mod) => mod.nome).join(', ')
               }
@@ -919,9 +975,9 @@ function GestaoEmpresas() {
           </FormControl>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleEditUnitClose} disabled={loading}>Cancelar</Button>
+          <Button onClick={handleEditUnitClose} disabled={loading}>{t("common.cancel")}</Button>
           <Button variant="contained" onClick={handleEditUnitSubmit} disabled={loading}>
-            {loading ? 'Salvando...' : 'Salvar'}
+            {loading ? t('common.saving') : t("common.save")}
           </Button>
         </DialogActions>
       </Dialog>

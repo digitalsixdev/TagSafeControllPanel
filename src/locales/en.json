@@ -1,0 +1,567 @@
+{
+    "login": {
+        "components": {
+            "welcome": "Welcome to the TagSafe Panel",
+            "email": "E-mail",
+            "password": "Password",
+            "signIn": "Sign in",
+            "selectEnvironment": "Select an environment"
+        },
+        "messages": {
+            "success": "Login successful!",
+            "errorEmptyFields": "Please fill in all fields",
+            "errorInvalidUser": "Invalid user data.",
+            "errorNoToken": "Authentication token not found.",
+            "errorConnection": "Error connecting to the server!"
+        }
+    },
+
+    "gestaoMaster": {
+        "components": {
+            "title": "Master Panel",
+            "subtitle": "Control center of the TagSafe ecosystem.",
+
+            "cards": {
+                "registeredCompanies": "Registered companies",
+                "availableModules": "Available modules",
+                "registeredUsers": "Registered users",
+                "registeredUnits": "Registered units"
+            },
+
+            "aboutContainer": {
+                "title": "TagSafe Control Panel",
+                "subtitle": "Centralized management platform for master administrators of the TagSafe ecosystem.",
+
+                "explication": {
+                    "about": {
+                        "title": "WHAT IT'S FOR",
+                        "text": "This panel allows <role/> users to manage the entire platform structure: from registering companies and their units to controlling users, roles, and links to available modules."
+                    },
+                    "howToAccess": {
+                        "title": "HOW TO ACCESS",
+                        "firstStep": "Log in with an account with the Master role.",
+                        "secondStep": "Use the side menu to navigate between panels",
+                        "thirdStep": "Manage companies, units, and users independently."
+                    }
+                }
+            },
+
+            "panelsContainer": {
+                "title": "Available panels",
+                "subtitle": "The control panel is divided into two main sections, accessible from the side menu.",
+
+                "companiesCard": {
+                    "title": "Companies Panel",
+                    "subtitle": "Manage all companies and their units registered on the platform.",
+
+                    "features": {
+                        "first": "Register new companies with CNPJ and modules",
+                        "second": "Add and edit units per company",
+                        "third": "Link modules (TR, GL) to each unit",
+                        "fourty": "Search companies by name or CNPJ",
+                        "fifth": "View users linked to each unit",
+                        "sixth": "Edit company and unit data"
+                    }
+                },
+
+                "usersCard": {
+                    "title": "Users Panel",
+                    "subtitle": "Full control over users, roles, links, and instructors.",
+
+                    "features": {
+                        "first": "Register users with role and linked unit",
+                        "second": "Register instructors with attended units and modules",
+                        "third": "Link existing instructors to new units",
+                        "fourty": "Link users to additional units",
+                        "fifth": "Edit name and roles of any user",
+                        "sixth": "Filter users by name, e-mail, company, or role"
+                    }
+                }
+            },
+
+            "rolesContainer": {
+                "title": "Platform roles",
+                "subtitle": "Each user has a role that defines their access level within the system.",
+
+                "roles": {
+                    "default": {
+                        "name": "Default",
+                        "about": "Basic platform access"
+                    },
+
+                    "admin": {
+                        "name": "Admin",
+                        "about": "Administrative permissions"
+                    },
+
+                    "instructor": {
+                        "name": "Instructor",
+                        "about": "Access to attended units"
+                    },
+
+                    "master": {
+                        "name": "Master",
+                        "about": "Full access to the control panel"
+                    }
+                }
+            },
+
+            "modulesContainer": {
+                "title": "Available modules",
+                "subtitle": "Modules define which features are active in each registered unit.",
+
+                "tr": {
+                    "name": "Training Safe",
+                    "prefix": "TR",
+                    "about": "Module focused on the management and control of safety training sessions carried out in units."
+                },
+
+                "gl": {
+                    "name": "GL Safe",
+                    "prefix": "GL",
+                    "about": "Module focused on the management and control of workplace gymnastics sessions carried out in units."
+                }
+            }
+        }
+    },
+
+    "gestaoEmpresas": {
+        "components": {
+            "title": "Companies Panel",
+            "subtitle": "Manage the companies registered on the platform",
+
+            "cards": {
+                "companies": "Registered companies",
+                "units": "Registered units",
+                "modules": "Available modules"
+            },
+
+            "table": {
+                "title": "Find all {{quantity}} companies registered in the system",
+                "field": "Search for a company by name or CNPJ",
+                "companiesColumn": "Company",
+                "cnpjBaseColumn": "CNPJ Base",
+                "actionsColumn": "Actions",
+                "actions": {
+                    "editCompany": "Edit Company",
+                    "viewUnits": "View Units"
+                }
+            },
+
+            "buttons": {
+                "csvButton": "Export CSV",
+                "newUnitButton": "New unit",
+                "newCompanyButton": "New company"
+            },
+
+            "dialogEditCompany": {
+                "title": "Edit Company",
+                "fieldEditName": "Name"
+            },
+
+            "dialogViewUnits": {
+                "title": "Units — {{company}}",
+                "table": {
+                    "unitColumn": "Unit",
+                    "cnpjColumn": "CNPJ",
+                    "modulesColumn": "Modules",
+                    "actionsColumn": "Actions",
+                    "actions": {
+                        "editUnit": "Edit Unit",
+                        "viewUsers": "View Users"
+                    }
+                }
+            },
+
+            "dialogViewUnitUsers": {
+                "title": "Users — {{unit}}",
+                "table": {
+                    "nameColumn": "Name",
+                    "emailColumn": "E-mail",
+                    "roleColumn": "Role",
+                    "noRole": "No Role",
+                    "firstAccessColumn": "First Access",
+                    "firstAccessStatus": {
+                        "completed": "Completed",
+                        "pending": "Pending"
+                    }
+                }
+            },
+
+            "dialogEditUnit": {
+                "title": "Edit Unit",
+                "fields": {
+                    "nameUnitField": "Unit Name",
+                    "cnpjField": "CNPJ",
+                    "modulesField": "Modules"
+                }
+            },
+
+            "dialogAddNewUnit": {
+                "title": "Add New Unit",
+                "fields": {
+                    "companyField": "Company",
+                    "nameUnitField": "Unit Name",
+                    "cnpjField": "CNPJ",
+                    "modulesField": "Modules"
+                }
+            },
+
+            "dialogAddNewCompany": {
+                "title": "Create a new company",
+                "fields": {
+                    "nameField": "Name",
+                    "cnpjField": "CNPJ",
+                    "unitField": "Unit",
+                    "modulesField": "Modules"
+                }
+            }
+        },
+        "messages": {
+            "companyCreated": "Company registered successfully!",
+            "companyUpdated": "Company updated successfully!",
+            "unitCreated": "Unit registered successfully!",
+            "unitUpdated": "Unit updated successfully!",
+            "errorLoadingData": "Error loading required data."
+        }
+    },
+
+    "gestaoUsuarios": {
+        "components": {
+            "title": "Users Panel",
+            "subtitle": "Manage the users registered on the platform.",
+
+            "cards": {
+                "allUsers": "Total Users",
+                "default": "Default",
+                "instructor": "Instructor",
+                "admin": "Administrator",
+                "master": "Master"
+            },
+
+            "table": {
+                "title": "Find all {{quantity}} users registered in the system",
+                "field": "Search by name, e-mail or company...",
+                "allRolesField": "All roles",
+                "allRolesFieldSelected": "All",
+                "nameColumn": "Name",
+                "emailColumn": "E-mail",
+                "companyColumn": "Company",
+                "firstAccessColumn": "First Access",
+                "firstAccessPendingText": "Awaiting first access",
+                "firstAccessCompletedText": "First access completed",
+                "roleColumn": "Role",
+                "actionsColumn": "Actions",
+                "actions": {
+                    "editUser": "Edit User",
+                    "viewUnits": "View Units"
+                }
+            },
+
+            "buttons": {
+                "csvButton": "Export CSV",
+                "newUserButton": "New User",
+                "linkUnitsButton": "Link Units",
+                "linkInstructorsButton": "Link Instructors"
+            },
+
+            "dialogEditUser": {
+                "title": "Edit User",
+                "fields": {
+                    "nameUserField": "Name",
+                    "roleUserField": "Roles"
+                }
+            },
+
+            "dialogViewUnits": {
+                "title": "Linked Units",
+                "nothingUnitsMessage": "No units linked to this user."
+            },
+
+            "dialogLinkInstructors": {
+                "title": "Link Instructor",
+                "emailField": "Instructor e-mail",
+                "emailMessage": "Press Enter to search",
+                "cpfField": "CPF",
+                "cardTitle": "Instructor found",
+                "companyField": "Company",
+                "unitField": "Unit",
+                "modulesField": "Modules",
+                "addUnitButton": "+ Add unit",
+                "linkInstructorButton": "Link {{quantity}}",
+                "unitsTitle": "Units to link ({{quantity}})"
+            },
+
+            "dialogLinkUnits": {
+                "title": "Link Unit",
+                "emailField": "User e-mail",
+                "emailMessage": "Press Enter to search",
+                "firstCardTitle": "User Found",
+                "unitField": "Unit",
+                "secondCardTitle": "Link summary"
+            },
+
+            "dialogNewUser": {
+                "title": "Register a new user",
+                "nameField": "Name",
+                "emailField": "E-mail",
+                "roleField": "Role",
+                "companyField": "Company",
+                "unitField": "Unit",
+                "passwordField": "Password",
+                "modulesField": "Modules",
+                "emailLangField": "E-mail language",
+                "emailLangOptions": {
+                    "pt": "Portuguese",
+                    "en": "English"
+                },
+                "unitsLinkFields": {
+                    "firstSubtitle": "Units attended by the instructor",
+                    "cpfField": "CPF",
+                    "secondSubtitle": "Units to link ({{quantity}})",
+                    "addUnitButton": "+ Add unit"
+                }
+            }
+        },
+        "messages": {
+            "userCreated": "User registered successfully!",
+            "userUpdated": "User updated successfully!",
+            "noChanges": "No changes detected.",
+            "instructorLinked": "Instructor linked successfully!",
+            "unitLinked": "Unit linked successfully!",
+            "errorLoadingUnits": "Error loading units.",
+            "errorLoadingCompanies": "Error loading companies.",
+            "errorUnitAlreadyAdded": "This unit has already been added.",
+            "errorUserNotFound": "User not found.",
+            "errorNotInstructor": "The user exists but is not an instructor.",
+            "errorUnits": "Units: {{error}}"
+        }
+    },
+
+    "app": {
+        "menuItems": {
+            "masterPanel": "Master Panel",
+            "companiesPanel": "Companies Panel",
+            "usersPanel": "Users Panel",
+            "audit": "Audit"
+        },
+        "environment": "Environment",
+        "logout": "Sign out",
+        "userFallback": "User",
+        "unauthorized": {
+            "title": "Unauthorized access",
+            "description": "Your account does not have permission to access this panel."
+        },
+        "loading": {
+            "auth": "Verifying authentication...",
+            "app": "Loading application..."
+        }
+    },
+
+    "evidences": {
+        "components": {
+            "title": "Evidence Audit",
+            "subtitle": "Consult the official session snapshot, check the SHA256 hash and validate the ICP timestamp issued by Bry.",
+            "warningBox": "Enter a completed session to consult the snapshot, hash and timestamp",
+            "sessionField": "Session ID",
+            "searchButton": "Search",
+            "loadingText": "Fetching session evidence...",
+
+            "jsonViewer": {
+                "simple": "Simple"
+            },
+
+            "cards": {
+                "session": {
+                    "title": "Session",
+                    "sessionField": "Session",
+                    "trainingField": "Training",
+                    "openingField": "Opening",
+                    "closingField": "Closing"
+                },
+                "context": {
+                    "title": "Context",
+                    "companyField": "Company",
+                    "unitField": "Unit",
+                    "instructorField": "Instructor",
+                    "participantsField": "Participants"
+                },
+                "integrity": {
+                    "title": "Integrity",
+                    "snapshotField": "Snapshot",
+                    "schemaField": "Schema",
+                    "algorithmField": "Algorithm",
+                    "createdAtField": "Created at"
+                },
+                "processing": {
+                    "title": "Processing",
+                    "jobField": "Job",
+                    "attemptsField": "Attempts",
+                    "lastErrorField": "Last error",
+                    "updatedAtField": "Updated at"
+                },
+                "trainingParticipants": {
+                    "title": "Training Participants",
+                    "nameColumn": "Name",
+                    "sectorColumn": "Sector",
+                    "levelColumn": "Level",
+                    "methodColumn": "Method",
+                    "registryColumn": "Record"
+                },
+                "hashAndStamp": {
+                    "title": "Hash & ICP-Brasil Timestamp",
+                    "provider": "Provider",
+                    "environment": "Environment",
+                    "nonce": "Nonce",
+                    "payloadHashTextField": "Payload Hash",
+                    "timestampTextField": "Timestamp Token",
+                    "validationButton": "Validate",
+                    "downloadTstButton": "Download .tst"
+                },
+                "validate": {
+                    "concludedMessage": "Validation completed. Bry verified the timestamp of this session.",
+                    "bryNotReturnMessage": "Bry completed the validation but did not return additional details.",
+                    "sendedCard": {
+                        "title": "Sent to BRY",
+                        "hashSubtitle": "Sent hash",
+                        "tokenSubtitle": "Sent token"
+                    },
+                    "resultCard": {
+                        "title": "Bry Result",
+                        "resultSubtitle": "Result",
+                        "stampHourSubtitle": "Timestamp time",
+                        "validationHashSubtitle": "Validated hash",
+                        "algorithmSubtitle": "Algorithm",
+                        "stampNumberSubtitle": "Stamp number",
+                        "issuerSubtitle": "Issuer"
+                    },
+                    "evidencePayload": {
+                        "title": "Evidence Payload",
+                        "sectionField": "Payload section",
+                        "visualizationField": "View"
+                    }
+                }
+            }
+        },
+        "messages": {
+            "not_id_session": "Enter the session ID to fetch the evidence.",
+            "bryValidatedConcluded": "Bry validation completed.",
+            "tstFileGenerated": ".tst file generated.",
+            "couldNotCopyContent": "Could not copy content.",
+            "labelComplete": "Complete",
+            "labelCopied": "copied",
+            "labelProcessed": "processed",
+            "yes": "Yes",
+            "no": "No",
+            "valid": "Valid",
+            "notValidated": "Not validated",
+            "concluded": "Completed"
+        }
+    },
+
+    "common": {
+        "save": "Save",
+        "cancel": "Cancel",
+        "edit": "Edit",
+        "delete": "Delete",
+        "close": "Close",
+        "link": "Link",
+        "loading": "Loading...",
+        "saving": "Saving...",
+        "linking": "Linking...",
+        "errors": {
+            "sessionExpired": "Session expired. Please log in again.",
+            "accessDenied": "Access denied.",
+            "notFound": "Resource not found.",
+            "serverError": "Internal server error.",
+            "connectionError": "Connection error. Check your internet.",
+            "unknown": "Unknown error. Please try again."
+        }
+    },
+
+    "api_codes": {
+        "INTERNAL_SERVER_ERROR": "Internal server error",
+
+        "ACCESS_DENIED": "Access denied",
+        "ACCESS_DENIED_INSTRUCTOR": "Access denied to view this instructor",
+        "RESTRICT_ACCESS": "Access restricted to master users",
+
+        "REQUIRED_CREDENTIALS": "E-mail and password are required",
+        "INVALID_CREDENTIALS": "Invalid e-mail or password",
+        "INVALID_EMAIL": "Check if the e-mail is correct",
+        "INVALID_PASSWORD": "Invalid password",
+        "REGISTERED_EMAIL": "E-mail already registered",
+        "MASTER_PASSWORD_REQUIRED": "Password is required for master users",
+        "FILL_ALL_FIELDS": "Fill in all required fields",
+        "FILL_ALL_INFORMATION": "Fill in all information",
+
+        "USER_NOT_FOUND": "User not found",
+        "USERS_NOT_FOUND": "Users not found",
+        "USER_NOT_INSTRUCTOR": "The specified user does not have the instructor role",
+        "USER_ALREADY_LINKED_TO_UNIT": "User already linked to this unit",
+        "USER_ALREADY_HAS_ROLES": "User already has these roles",
+        "REQUIRED_USER_ID": "usuario_id is required",
+        "REQUIRED_USER_PUBLIC_ID": "User publicId is required",
+        "REQUIRED_EMAIL": "E-mail is required",
+        "REMOVED_USER_SUCCESSFUL": "User removed successfully",
+        "UPDATED_NAME_USER_SUCCESSFUL": "User name updated successfully",
+        "REQUIRED_NAME": "A new name is required",
+        "UNIT_LINKED_TO_USER": "Unit linked to user",
+
+        "ROLE_NOT_FOUND": "Role not found",
+        "ONE_ROLE_NOT_FOUND": "One of the roles was not found",
+        "REQUIRED_ROLE": "Provide at least one role",
+        "REQUIRED_ROLES": "Roles are required",
+        "INVALID_ROLES": "Invalid role(s)",
+        "ADDED_ROLES_SUCCESSFUL": "Roles added successfully",
+        "DELETED_ROLES_SUCCESSFUL": "Roles deleted successfully",
+        "UPDATED_ROLES_SUCCESSFUL": "Roles updated successfully",
+        "REMOVED_ROLE_SUCCESSFUL": "Role removed successfully",
+        "NO_ROLES_TO_DELETE": "No roles found to delete",
+        "NO_LINKED_ROLES_TO_DELETE": "No roles linked to the user to delete",
+        "NO_CHANGES_MADE": "No changes were made",
+
+        "COMPANY_NOT_FOUND": "Company not found",
+        "COMPANY_ID_INVALID": "Invalid company ID",
+
+        "UNIT_NOT_FOUND": "Unit not found",
+        "UNITS_NOT_FOUND": "Units not found",
+        "REQUIRED_UNIT_ID": "unidade_id is required",
+        "INVALID_UNIT_ID": "Invalid unidade_id",
+        "REQUIRED_UNIT_AND_CNPJ": "Unit and CNPJ are required",
+        "UNIT_CNPJ_ALREADY_REGISTERED": "Unit with this CNPJ already registered",
+        "REMOVED_UNIT_SUCCESSFUL": "Unit removed from attended units",
+        "UNITS_ADDED_SUCCESSFUL": "Unit added to attended units",
+
+        "INVALID_CNPJ": "Invalid CNPJ",
+        "INVALID_CNPJ_ROOT_FOR_COMPANY": "CNPJ root does not match the provided company",
+        "INVALID_LINKED_COMPANY_CNPJ_BASE": "CNPJ base does not match the linked company",
+
+        "INVALID_MODULES_ID": "Invalid module IDs",
+
+        "INVALID_PARAMETER_ID": "Invalid ID parameter",
+        "INVALID_COMPANY_ID": "Invalid empresaId parameter",
+
+        "REQUIRED_SESSION_ID": "sessao_id is required",
+        "EVIDENCE_NOT_FOUND": "Evidence not found",
+        "INVALID_STAMP": "Invalid stamp ID",
+        "STAMP_NOT_FOUND": "Stamp not found",
+
+        "INSTRUCTOR_NOT_FOUND": "Instructor not found",
+        "INSTRUCTOR_ALREADY_SERVES_THIS_UNIT": "Instructor already serves this unit",
+        "INSTRUCTOR_UNITS_CONFIGURED": "Instructor units configured successfully",
+        "REQUIRED_INSTRUCTOR_ID": "instrutor_id is required",
+        "REQUIRED_UNIT_AND_MODULES": "Provide at least one unit and its modules for the instructor",
+        "REQUIRED_ATTENDED_UNIT": "Provide at least one attended unit",
+        "NO_INSTRUCTOR_FOUND_IN_COMPANY": "No instructor found in this company",
+
+        "REQUIRED_CPF": "CPF is required",
+        "INVALID_CPF": "Invalid CPF",
+        "CPF_ALREADY_REGISTERED": "CPF already registered",
+
+        "RELATIONSHIP_NOT_FOUND": "Relationship not found",
+
+        "REQUIRED_LANGUAGE": "Specify a language",
+        "INVALID_LANGUAGE": "The provided language does not have a translation"
+    }
+}

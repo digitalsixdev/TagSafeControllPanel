@@ -1,0 +1,575 @@
+{
+    "login": {
+        "components": {
+            "welcome": "Bem-vindo ao Painel do TagSafe",
+            "email": "E-mail",
+            "password": "Senha",
+            "signIn": "Entrar",
+            "selectEnvironment": "Selecione um ambiente"
+        },
+        "messages": {
+            "success": "Login realizado com sucesso!",
+            "errorEmptyFields": "Por favor, preencha todos os campos",
+            "errorInvalidUser": "Dados do usuário inválidos.",
+            "errorNoToken": "Token de autenticação não encontrado.",
+            "errorConnection": "Erro ao conectar com o servidor!"
+        }
+    },
+
+    "gestaoMaster": {
+        "components": {
+            "title": "Painel Master",
+            "subtitle": "Central de controle do ecossistema TagSafe.",
+
+            "cards": {
+                "registeredCompanies": "Empresas cadastradas",
+                "availableModules": "Módulos disponíveis",
+                "registeredUsers": "Usuários cadastrados",
+                "registeredUnits": "Unidades cadastradas"
+            },
+
+            "aboutContainer": {
+                "title": "TagSafe Control Panel",
+                "subtitle": "Plataforma centralizada de gestão para administradores master do ecossistema TagSafe.",
+
+                "explication": {
+                    "about": {
+                        "title": "PARA QUE SERVE",
+                        "text": "Este painel permite que usuários <role/> gerenciem toda a estrutura da plataforma: desde o cadastro de empresas e suas unidades até o controle de usuários, cargos e vínculos com módulos disponíveis."
+                    },
+                    "howToAccess": {
+                        "title": "COMO ACESSAR",
+                        "firstStep": "Faça login com uma conta com o cargo Master.",
+                        "secondStep": "Use o menu lateral para navegar entre os painéis",
+                        "thirdStep": "Gerencie empresas, unidades e usuários de forma independente."
+                    }
+                }
+            },
+
+            "panelsContainer": {
+                "title": "Painéis disponíveis",
+                "subtitle": "O painel de controle é divido em duas seções principais, acessíveis pelo menu lateral.",
+
+                "companiesCard": {
+                    "title": "Painel de Empresas",
+                    "subtitle": "Gerencie todas as empresas e suas unidades cadastradas na plataforma.",
+                    
+                    "features": {
+                        "first": "Cadastrar novas empresas com CNPJ e módulos",
+                        "second": "Adicionar e editar unidades por empresa",
+                        "third": "Vincular módulos (TR, GL) a cada unidade",
+                        "fourty": "Buscar empresas por nome ou CNPJ",
+                        "fifth": "Visualizar usuários vinculados a cada unidade",
+                        "sixth": "Editar dados de empresas e unidades"
+                    }
+                },
+
+                "usersCard": {
+                    "title": "Painel de Usuários",
+                    "subtitle": "Controle completo sobre usuários, cargos, vínculos e instrutores.",
+                    
+                    "features": {
+                        "first": "Cadastrar usuários com cargo e unidade vinculada",
+                        "second": "Registrar instrutores com unidades atendidas e módulos",
+                        "third": "Vincular instrutores existentes a novas unidades",
+                        "fourty": "Vincular usuários a unidades adicionais",
+                        "fifth": "Editar nome e cargos de qualquer usuário",
+                        "sixth": "Filtrar usuários por nome, e-mail, empresa ou cargo"
+                    }
+                }
+            },
+
+            "rolesContainer": {
+                "title": "Cargos da plataforma",
+                "subtitle": "Cada usuário possui um cargo que define seu nível de acesso dentro do sistema.",
+
+                "roles": {
+                    "default": {
+                        "name": "Padrão",
+                        "about": "Acesso básico à plataforma"
+                    },
+                    
+                    "admin": {
+                        "name": "Admin",
+                        "about": "Permissões administrativas"
+                    },
+
+                    "instructor": {
+                        "name": "Instrutor",
+                        "about": "Acesso às unidades atendidas"
+                    },
+
+                    "master": {
+                        "name": "Master",
+                        "about": "Acesso total ao painel de controle"
+                    }
+                }
+            },
+
+            "modulesContainer": {
+                "title": "Módulos disponíveis",
+                "subtitle": "Os módulos definem quais funcionalidades estão ativas em cada unidade cadastrada.",
+
+                "tr": {
+                    "name": "Training Safe",
+                    "prefix": "TR",
+                    "about": "Módulo voltado para gestão e controle de treinamentos de segurança realizados nas unidades."
+                },
+                
+                "gl": {
+                    "name": "GL Safe",
+                    "prefix": "GL",
+                    "about": "Módulo voltado para a gestão e controle de sessões de ginástica laboral realizadas nas unidades."
+                }
+            }
+        }
+    },
+
+    "gestaoEmpresas": {
+        "components": {
+            "title": "Painel de Empresas",
+            "subtitle": "Gerencie as empresas cadastradas na plataforma",
+        
+            "cards": {
+                "companies": "Empresas cadastradas",
+                "units": "Unidades cadastradas",
+                "modules": "Módulos disponíveis"
+            },
+
+            "table": {
+                "title": "Encontre todas as {{quantity}} empresas cadastradas no sistema",
+                "field": "Buscar empresa por nome ou CNPJ...",
+                "companiesColumn": "Empresa",
+                "cnpjBaseColumn": "CNPJ Base",
+                "actionsColumn": "Ações",
+                "actions": {
+                    "editCompany": "Editar Empresa",
+                    "viewUnits": "Visualizar Unidades"
+                }
+            },
+
+            "buttons": {
+                "csvButton": "Exportar CSV",
+                "newUnitButton": "Nova unidade",
+                "newCompanyButton": "Nova empresa"
+            },
+
+            "dialogEditCompany": {
+                "title": "Editar Empresa",
+                "fieldEditName": "Nome"
+            },
+
+            "dialogViewUnits": {
+                "title": "Unidades — {{company}}",
+                "table": {
+                    "unitColumn": "Unidade",
+                    "cnpjColumn": "CNPJ",
+                    "modulesColumn": "Módulos",
+                    "actionsColumn": "Ações",
+                    "actions": {
+                        "editUnit": "Editar Unidade",
+                        "viewUsers": "Visualizar Usuários"
+                    }
+                }
+            },
+
+            "dialogViewUnitUsers": {
+                "title": "Usuários — {{unit}}",
+                "table": {
+                    "nameColumn": "Nome",
+                    "emailColumn": "E-mail",
+                    "roleColumn": "Cargo",
+                    "noRole": "Sem Cargo",
+                    "firstAccessColumn": "Primeiro Acesso",
+                    "firstAccessStatus": {
+                        "completed": "Concluído",
+                        "pending": "Pendente"
+                    }
+                }
+            },
+
+            "dialogEditUnit": {
+                "title": "Editar Unidade",
+                "fields": {
+                    "nameUnitField": "Nome da Unidade",
+                    "cnpjField": "CNPJ",
+                    "modulesField": "Módulos"
+                }
+            },
+
+            "dialogAddNewUnit": {
+                "title": "Adicionar Nova Unidade",
+                "fields": {
+                    "companyField": "Empresa",
+                    "nameUnitField": "Nome da Unidade",
+                    "cnpjField": "CNPJ",
+                    "modulesField": "Módulos"
+                }
+            },
+
+            "dialogAddNewCompany": {
+                "title": "Vincule uma nova empresa",
+                "fields": {
+                    "nameField": "Nome",
+                    "cnpjField": "CNPJ",
+                    "unitField": "Unidade",
+                    "modulesField": "Módulos"
+                }
+            }
+        },
+        "messages": {
+            "companyCreated": "Empresa cadastrada com sucesso!",
+            "companyUpdated": "Empresa atualizada com sucesso!",
+            "unitCreated": "Unidade cadastrada com sucesso!",
+            "unitUpdated": "Unidade atualizada com sucesso!",
+            "errorLoadingData": "Erro ao carregar dados necessários."
+        }
+    },
+
+    "gestaoUsuarios": {
+        "components": {
+            "title": "Painel de Usuários",
+            "subtitle": "Gerencie os usuários cadastrados na plataforma.",
+        
+            "cards": {
+                "allUsers": "Total de Usuários",
+                "default": "Padrão",
+                "instructor": "Instrutor",
+                "admin": "Administrador",
+                "master": "Master"
+            },
+
+            "table": {
+                "title": "Encontre todos os {{quantity}} usuários cadastrados no sistema",
+                "field": "Buscar por nome, e-mail ou empresa...",
+                "allRolesField": "Todos os cargos",
+                "allRolesFieldSelected": "Todos",
+                "nameColumn": "Nome",
+                "emailColumn": "E-mail",
+                "companyColumn": "Empresa",
+                "firstAccessColumn": "Primeiro Acesso",
+                "firstAccessPendingText": "Aguardando primeiro acesso",
+                "firstAccessCompletedText": "Primeiro acesso concluído",
+                "roleColumn": "Cargo",
+                "actionsColumn": "Ações",
+                "actions": {
+                    "editUser": "Editar Usuário",
+                    "viewUnits": "Visualizar Unidades"
+                }
+            },
+
+            "buttons": {
+                "csvButton": "Exportar CSV",
+                "newUserButton": "Novo Usuário",
+                "linkUnitsButton": "Vincular Unidades",
+                "linkInstructorsButton": "Vincular Instrutores"
+            },
+
+            "dialogEditUser": {
+                "title": "Editar Usuário",
+                "fields": {
+                    "nameUserField": "Nome",
+                    "roleUserField": "Cargos"
+                }
+            },
+
+            "dialogViewUnits": {
+                "title": "Unidades Vinculadas",
+                "nothingUnitsMessage": "Nenhuma unidade vinculada a este usuário."
+            },
+
+            "dialogLinkInstructors": {
+                "title": "Vincular Instrutor",
+                "emailField": "E-mail do instrutor",
+                "emailMessage": "Pressione Enter para buscar",
+                "cpfField": "CPF",
+                "cardTitle": "Instrutor encontrado",
+                "companyField": "Empresa",
+                "unitField": "Unidade",
+                "modulesField": "Módulos",
+                "addUnitButton": "+ Adicionar unidade",
+                "linkInstructorButton": "Vincular {{quantity}}",
+                "unitsTitle": "Unidades a vincular ({{quantity}})"
+            },
+
+            "dialogLinkUnits": {
+                "title": "Vincular Unidade",
+                "emailField": "E-mail do usuário",
+                "emailMessage": "Pressione Enter para buscar",
+                "firstCardTitle": "Usuário Encontrado",
+                "unitField": "Unidade",
+                "secondCardTitle": "Resumo do vínculo"
+            },
+
+            "dialogNewUser": {
+                "title": "Cadastre um novo usuário",
+                "nameField": "Nome",
+                "emailField": "E-mail",
+                "roleField": "Cargo",
+                "companyField": "Empresa",
+                "unitField": "Unidade",
+                "passwordField": "Senha",
+                "modulesField": "Módulos",
+                "emailLangField": "Idioma do e-mail",
+                "emailLangOptions": {
+                    "pt": "Português",
+                    "en": "Inglês"
+                },
+                "unitsLinkFields": {
+                    "firstSubtitle": "Unidades atendidas pelo instrutor",
+                    "cpfField": "CPF",
+                    "secondSubtitle": "Unidades a vincular ({{quantity}})",
+                    "addUnitButton": "+ Adicionar unidade"
+                }
+            }
+        },
+        "messages": {
+            "userCreated": "Usuário cadastrado com sucesso!",
+            "userUpdated": "Usuário atualizado com sucesso!",
+            "noChanges": "Nenhuma alteração detectada.",
+            "instructorLinked": "Instrutor vinculado com sucesso!",
+            "unitLinked": "Unidade vinculada com sucesso!",
+            "errorLoadingUnits": "Erro ao carregar unidades.",
+            "errorLoadingCompanies": "Erro ao carregar empresas.",
+            "errorUnitAlreadyAdded": "Essa unidade já foi adicionada.",
+            "errorUserNotFound": "Usuário não encontrado.",
+            "errorNotInstructor": "O usuário existe, mas não é um instrutor.",
+            "errorUnits": "Unidades: {{error}}"
+        }
+    },
+
+    "app": {
+        "menuItems": {
+            "masterPanel": "Painel Master",
+            "companiesPanel": "Painel Empresas",
+            "usersPanel": "Painel Usuários",
+            "audit": "Auditoria"
+        },
+        "environment": "Ambiente",
+        "logout": "Sair",
+        "userFallback": "Usuário",
+        "unauthorized": {
+            "title": "Acesso não autorizado",
+            "description": "Sua conta não tem permissão para acessar este painel."
+        },
+        "loading": {
+            "auth": "Verificando autenticação...",
+            "app": "Carregando aplicação..."
+        }
+    },
+
+    "evidences": {
+        "components": {
+            "title": "Auditoria de Evidências",
+            "subtitle": "Consulte o snapshot oficial da sessão, confira o hash SHA256 e valide o carimbo ICP emitido pela Bry.",
+            "warningBox": "Informe uma sessão finalizada para consultar o snapshot, o hash e o carimbo de tempo",
+            "sessionField": "ID da sessão",
+            "searchButton": "Buscar",
+            "loadingText": "Buscando evidência da sessão...",
+
+            "jsonViewer": {
+                "simple": "Simples"
+            },
+
+            "cards": {
+                "session": {
+                    "title": "Sessão",
+                    "sessionField": "Sessão",
+                    "trainingField": "Treinamento",
+                    "openingField": "Abertura",
+                    "closingField": "Encerramento"
+                },
+
+                "context": {
+                    "title": "Contexto",
+                    "companyField": "Empresa",
+                    "unitField": "Unidade",
+                    "instructorField": "Instrutor",
+                    "participantsField": "Participantes"
+                },
+
+                "integrity": {
+                    "title": "Integridade",
+                    "snapshotField": "Snapshot",
+                    "schemaField": "Schema",
+                    "algorithmField": "Algoritmo",
+                    "createdAtField": "Criado em"
+                },
+
+                "processing": {
+                    "title": "Processamento",
+                    "jobField": "Job",
+                    "attemptsField": "Tentativas",
+                    "lastErrorField": "Último erro",
+                    "updatedAtField": "Atualizado em"
+                },
+
+                "trainingParticipants": {
+                    "title": "Participantes do Treinamento",
+                    "nameColumn": "Nome",
+                    "sectorColumn": "Setor",
+                    "levelColumn": "Nível",
+                    "methodColumn": "Método",
+                    "registryColumn": "Registro"
+                },
+
+                "hashAndStamp": {
+                    "title": "Hash e Carimbo ICP-Brasil",
+                    "provider": "Provider",
+                    "environment": "Ambiente",
+                    "nonce": "Nonce",
+                    "payloadHashTextField": "Payload Hash",
+                    "timestampTextField": "Timestamp Token",
+                    "validationButton": "Validar",
+                    "downloadTstButton": "Baixar .tst"
+                },
+
+                "validate": {  
+                    "concludedMessage": "Validação concluída. A Bry conferiu o carimbo de tempo desta sessão.",
+                    "bryNotReturnMessage": "A Bry concluiu a validação, mas não retornou detalhes adicionais.",
+                    "sendedCard": {
+                        "title": "Enviado à BRY",
+                        "hashSubtitle": "Hash enviado",
+                        "tokenSubtitle": "Token enviado"
+                    },
+
+                    "resultCard": {
+                        "title": "Resultado da Bry",
+                        "resultSubtitle": "Resultado",
+                        "stampHourSubtitle": "Horário do carimbo",
+                        "validationHashSubtitle": "Hash validado",
+                        "algorithmSubtitle": "Algoritmo",
+                        "stampNumberSubtitle": "Número do Carimbo",
+                        "issuerSubtitle": "Emissor"
+                    },
+
+                "evidencePayload": {
+                    "title": "Payload de Evidência",
+                    "sectionField": "Seção do payload",
+                    "visualizationField": "Visualização"
+                }
+                }
+            }
+        },
+        "messages": {
+            "not_id_session": "Informe o ID da sessão para buscar a evidência.",
+            "bryValidatedConcluded": "Validação na Bry concluída.",
+            "tstFileGenerated": "Arquivo .tst gerado.",
+            "couldNotCopyContent": "Não foi possível copiar o conteúdo.",
+            "labelComplete": "Completo",
+            "labelCopied": "copiado",
+            "labelProcessed": "processado",
+            "yes": "Sim",
+            "no": "Não",
+            "valid": "Válido",
+            "notValidated": "Não validado",
+            "concluded": "Concluído"
+        }
+    },
+
+    "common": {
+        "save": "Salvar",
+        "cancel": "Cancelar",
+        "edit": "Editar",
+        "delete": "Deletar",
+        "close": "Fechar",
+        "link": "Vincular",
+        "loading": "Carregando...",
+        "saving": "Salvando...",
+        "linking": "Vinculando...",
+        "errors": {
+            "sessionExpired": "Sessão expirada. Faça login novamente.",
+            "accessDenied": "Acesso negado.",
+            "notFound": "Recurso não encontrado.",
+            "serverError": "Erro interno do servidor.",
+            "connectionError": "Erro de conexão. Verifique sua internet.",
+            "unknown": "Erro desconhecido. Tente novamente."
+        }
+    },
+
+    "api_codes": {
+        "INTERNAL_SERVER_ERROR": "Erro interno do servidor",
+
+        "ACCESS_DENIED": "Acesso negado",
+        "ACCESS_DENIED_INSTRUCTOR": "Acesso negado para consultar este instrutor",
+        "RESTRICT_ACCESS": "Acesso restrito a usuários master",
+
+        "REQUIRED_CREDENTIALS": "Email e senha são obrigatórios",
+        "INVALID_CREDENTIALS": "Email ou senha inválidos",
+        "INVALID_EMAIL": "Verifique se o e-mail está correto",
+        "INVALID_PASSWORD": "Senha inválida",
+        "REGISTERED_EMAIL": "Email já cadastrado",
+        "MASTER_PASSWORD_REQUIRED": "A senha é obrigatória para usuários master",
+        "FILL_ALL_FIELDS": "Preencha todos os campos obrigatórios",
+        "FILL_ALL_INFORMATION": "Preencha todas as informações",
+
+        "USER_NOT_FOUND": "Usuário não encontrado",
+        "USERS_NOT_FOUND": "Usuários não encontrados",
+        "USER_NOT_INSTRUCTOR": "Usuário informado não possui role de instrutor",
+        "USER_ALREADY_LINKED_TO_UNIT": "Usuário já vinculado a essa unidade",
+        "USER_ALREADY_HAS_ROLES": "Usuário já possui essas roles",
+        "REQUIRED_USER_ID": "usuario_id é obrigatório",
+        "REQUIRED_USER_PUBLIC_ID": "publicId do usuário é obrigatório",
+        "REQUIRED_NAME": "É necessário preencher um novo nome",
+        "REQUIRED_EMAIL": "Email é obrigatório",
+        "REMOVED_USER_SUCCESSFUL": "Usuário removido com sucesso",
+        "UPDATED_NAME_USER_SUCCESSFUL": "Nome do usuário atualizado com sucesso",
+        "UNIT_LINKED_TO_USER": "Unidade vinculada ao usuário",
+
+        "ROLE_NOT_FOUND": "Role não encontrada",
+        "ONE_ROLE_NOT_FOUND": "Uma das roles não foi encontrada",
+        "REQUIRED_ROLE": "Informe ao menos uma role",
+        "REQUIRED_ROLES": "Roles são obrigatórios",
+        "INVALID_ROLES": "Role(s) inválida(s)",
+        "ADDED_ROLES_SUCCESSFUL": "Roles adicionadas com sucesso",
+        "DELETED_ROLES_SUCCESSFUL": "Roles deletadas com sucesso",
+        "UPDATED_ROLES_SUCCESSFUL": "Roles atualizadas com sucesso",
+        "REMOVED_ROLE_SUCCESSFUL": "Role removida com sucesso",
+        "NO_ROLES_TO_DELETE": "Nenhuma role encontrada para ser deletada",
+        "NO_LINKED_ROLES_TO_DELETE": "Nenhuma role vinculada ao usuário para ser deletada",
+        "NO_CHANGES_MADE": "Nenhuma mudança foi realizada",
+
+        "COMPANY_NOT_FOUND": "Empresa não encontrada",
+        "COMPANY_ID_INVALID": "ID da empresa inválido",
+
+        "UNIT_NOT_FOUND": "Unidade não encontrada",
+        "UNITS_NOT_FOUND": "Unidades não encontradas",
+        "REQUIRED_UNIT_ID": "unidade_id é obrigatório",
+        "REQUIRED_UNIT_AND_CNPJ": "Unidade e CNPJ são obrigatórios",
+        "UNIT_CNPJ_ALREADY_REGISTERED": "Unidade com esse CNPJ já cadastrada",
+        "REMOVED_UNIT_SUCCESSFUL": "Unidade removida das atendidas",
+        "UNITS_ADDED_SUCCESSFUL": "Unidade adicionada às atendidas",
+        "INVALID_UNIT_ID": "unidade_id inválido",
+
+        "INVALID_CNPJ": "CNPJ inválido",
+        "INVALID_CNPJ_ROOT_FOR_COMPANY": "A raiz do CNPJ não corresponde à empresa informada",
+        "INVALID_LINKED_COMPANY_CNPJ_BASE": "CNPJ base não corresponde à empresa vinculada",
+
+        "INVALID_MODULES_ID": "IDs de módulo inválidos",
+
+        "INVALID_PARAMETER_ID": "Parâmetro ID inválido",
+        "INVALID_COMPANY_ID": "Parâmetro empresaId inválido",
+
+        "REQUIRED_SESSION_ID": "sessao_id é obrigatório",
+        "EVIDENCE_NOT_FOUND": "Evidência não encontrada",
+        "INVALID_STAMP": "ID do carimbo inválido",
+        "STAMP_NOT_FOUND": "Carimbo não encontrado",
+
+        "INSTRUCTOR_NOT_FOUND": "Instrutor não encontrado",
+        "INSTRUCTOR_ALREADY_SERVES_THIS_UNIT": "Instrutor já atende essa unidade",
+        "INSTRUCTOR_UNITS_CONFIGURED": "Unidades do instrutor configuradas com sucesso",
+        "REQUIRED_INSTRUCTOR_ID": "instrutor_id é obrigatório",
+        "REQUIRED_UNIT_AND_MODULES": "Informe ao menos uma unidade e seus módulos para o instrutor",
+        "REQUIRED_ATTENDED_UNIT": "Informe ao menos uma unidade atendida",
+        "NO_INSTRUCTOR_FOUND_IN_COMPANY": "Nenhum instrutor encontrado nessa empresa",
+
+        "REQUIRED_CPF": "CPF é obrigatório",
+        "INVALID_CPF": "CPF inválido",
+        "CPF_ALREADY_REGISTERED": "CPF já cadastrado",
+
+        "RELATIONSHIP_NOT_FOUND": "Relacionamento não encontrado",
+
+        "REQUIRED_LANGUAGE": "Especifique um idioma",
+        "INVALID_LANGUAGE": "Idioma inserido não contém tradução"
+    }
+}

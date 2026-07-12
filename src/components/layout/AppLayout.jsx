@@ -27,16 +27,43 @@ import {
 } from '@mui/icons-material';
 import { Link as RouterLink, useLocation } from 'react-router-dom';
 import { useAuth } from '../../features/auth/AuthContext';
+import { useTranslation } from 'react-i18next';
 
 const drawerWidth = 280;
+
+const envConfig = {
+  dev:   { label: 'DEV',   color: '#f97316', bg: 'rgba(249,115,22,0.12)',  border: 'rgba(249,115,22,0.35)',  appBarBorder: '#f97316' },
+  prod:  { label: 'PROD',  color: '#ef4444', bg: 'rgba(239,68,68,0.12)',   border: 'rgba(239,68,68,0.35)',   appBarBorder: '#ef4444' },
+  local: { label: 'LOCAL', color: '#22c55e', bg: 'rgba(34,197,94,0.12)',   border: 'rgba(34,197,94,0.35)',   appBarBorder: '#22c55e' },
+};
 
 function AppLayout({ children, menuItems: menuItemsProp = [] }) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [userMenuAnchor, setUserMenuAnchor] = useState(null);
+  const [langMenuAnchor, setLangMenuAnchor] = useState(null);
   const location = useLocation();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('lg'));
   const { user, logout, isMaster } = useAuth();
+  const { t, i18n } = useTranslation();
+
+  const languages = [
+    { code: 'pt', flag: '🇧🇷', label: 'Português' },
+    { code: 'en', flag: '🇺🇸', label: 'English' },
+  ];
+
+  const handleLangMenuOpen = (e) => setLangMenuAnchor(e.currentTarget);
+  const handleLangMenuClose = () => setLangMenuAnchor(null);
+  const handleLanguageSelect = (code) => {
+    i18n.changeLanguage(code);
+    localStorage.setItem('lang', code);
+    handleLangMenuClose();
+  };
+
+  const currentLang = languages.find(l => l.code === i18n.language) ?? languages[1];
+
+  const currentEnv = localStorage.getItem('selected_env') || 'dev';
+  const env = envConfig[currentEnv] ?? envConfig.dev;
 
   const menuItems = menuItemsProp;
 
@@ -61,6 +88,9 @@ function AppLayout({ children, menuItems: menuItemsProp = [] }) {
 
   const drawer = (
     <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+      {/* Env bar */}
+      <Box sx={{ height: 4, bgcolor: env.appBarBorder, flexShrink: 0 }} />
+
       {/* Logo Section */}
       <Box sx={{ p: 3, borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
         <Box sx={{ display: 'flex', justifyContent: 'center' }}>
@@ -69,6 +99,21 @@ function AppLayout({ children, menuItems: menuItemsProp = [] }) {
             src="/Principal.png"
             alt="TagSafe Admin"
             sx={{ width: '100%', maxWidth: 250, height: 'auto', objectFit: 'contain' }}
+          />
+        </Box>
+        <Box sx={{ display: 'flex', justifyContent: 'center', mt: 1.5 }}>
+          <Chip
+            label={`${t('app.environment')}: ${env.label}`}
+            size="small"
+            sx={{
+              fontWeight: 700,
+              fontSize: '0.65rem',
+              letterSpacing: 0.5,
+              color: env.color,
+              bgcolor: env.bg,
+              border: `1px solid ${env.border}`,
+              height: 22,
+            }}
           />
         </Box>
       </Box>
@@ -153,7 +198,7 @@ function AppLayout({ children, menuItems: menuItemsProp = [] }) {
             </Avatar>
             <Box sx={{ flexGrow: 1, minWidth: 0 }}>
               <Typography variant="body2" sx={{ fontWeight: 500, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                {user?.nome || 'Usuário'}
+                {user?.nome || t('app.userFallback')}
               </Typography>
               <Typography variant="caption" sx={{ color: 'text.secondary', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                 {user?.email}
@@ -180,6 +225,7 @@ function AppLayout({ children, menuItems: menuItemsProp = [] }) {
           zIndex: (theme) => theme.zIndex.drawer + 1,
           ml: { lg: `${drawerWidth}px` },
           width: { lg: `calc(100% - ${drawerWidth}px)` },
+          borderBottom: `2px solid ${env.appBarBorder}`,
         }}
       >
         <Toolbar sx={{ minHeight: 70, px: 3 }}>
@@ -189,6 +235,78 @@ function AppLayout({ children, menuItems: menuItemsProp = [] }) {
             </IconButton>
           )}
           <Box sx={{ flexGrow: 1 }} />
+
+          {/* Language selector */}
+          <IconButton
+            onClick={handleLangMenuOpen}
+            size="small"
+            sx={{
+              mr: 3,
+              fontSize: '1.25rem',
+              width: 36,
+              height: 36,
+              borderRadius: 2,
+              border: '1px solid rgba(255,255,255,0.08)',
+              bgcolor: 'rgba(255,255,255,0.04)',
+              transition: 'all 0.2s ease',
+              '&:hover': { bgcolor: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.16)' },
+            }}
+          >
+            {currentLang.flag}
+          </IconButton>
+          <Menu
+            anchorEl={langMenuAnchor}
+            open={Boolean(langMenuAnchor)}
+            onClose={handleLangMenuClose}
+            transformOrigin={{ horizontal: 'right', vertical: 'top' }}
+            anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
+            PaperProps={{
+              sx: {
+                mt: 1,
+                minWidth: 150,
+                bgcolor: 'background.paper',
+                border: '1px solid rgba(255,255,255,0.1)',
+                borderRadius: 2,
+                boxShadow: '0 8px 32px rgba(0,0,0,0.3)',
+              },
+            }}
+          >
+            {languages.map(({ code, flag, label }) => (
+              <MenuItem
+                key={code}
+                onClick={() => handleLanguageSelect(code)}
+                selected={i18n.language === code}
+                sx={{ gap: 1.5, '&.Mui-selected': { bgcolor: 'rgba(255,255,255,0.06)' } }}
+              >
+                <span style={{ fontSize: '1.2rem' }}>{flag}</span>
+                <Typography variant="body2">{label}</Typography>
+              </MenuItem>
+            ))}
+          </Menu>
+
+          {/* Env badge */}
+          <Chip
+            label={env.label}
+            size="small"
+            sx={{
+              mr: 2,
+              fontWeight: 800,
+              fontSize: '0.65rem',
+              letterSpacing: 1,
+              color: env.color,
+              bgcolor: env.bg,
+              border: `1px solid ${env.border}`,
+              height: 24,
+              ...(currentEnv === 'prod' && {
+                animation: 'pulse 2s ease-in-out infinite',
+                '@keyframes pulse': {
+                  '0%, 100%': { boxShadow: `0 0 0 0 ${env.border}` },
+                  '50%': { boxShadow: `0 0 0 4px transparent` },
+                },
+              }),
+            }}
+          />
+
           <Box
             sx={{
               display: 'flex',
@@ -216,7 +334,7 @@ function AppLayout({ children, menuItems: menuItemsProp = [] }) {
             {!isMobile && (
               <Box sx={{ mr: 1 }}>
                 <Typography variant="body2" sx={{ fontSize: '0.9rem' }}>
-                  {user?.nome?.split(' ')[0] || 'Usuário'}
+                  {user?.nome?.split(' ')[0] || t('app.userFallback')}
                 </Typography>
                 {getUserTypeChip() && <Box sx={{ mt: 0.5 }}>{getUserTypeChip()}</Box>}
               </Box>
@@ -280,7 +398,7 @@ function AppLayout({ children, menuItems: menuItemsProp = [] }) {
         </Box>
         <MenuItem onClick={handleLogout}>
           <ListItemIcon><Logout fontSize="small" /></ListItemIcon>
-          <ListItemText>Sair</ListItemText>
+          <ListItemText>{t('app.logout')}</ListItemText>
         </MenuItem>
       </Menu>
     </Box>
