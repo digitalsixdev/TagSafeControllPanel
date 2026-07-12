@@ -116,7 +116,10 @@ export const getModules = () => {
 };
 
 // criar usuario
-export const createUser = (data) => {
+export const createUser = (data, lang = 'pt') => {
+  const query = new URLSearchParams();
+  query.set("lang", lang);
+
   const payload = {
     nome: data?.nome,
     email: data?.email,
@@ -125,7 +128,7 @@ export const createUser = (data) => {
     unidades_id: data?.unidades_id
   }
 
-  return apiClient.post('/auth/registrar', payload);
+  return apiClient.post(`/auth/registrar?${query.toString()}`, payload);
 };
 
 // lista todos os cargos disponiveis

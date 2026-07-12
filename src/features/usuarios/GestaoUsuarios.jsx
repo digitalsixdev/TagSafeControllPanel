@@ -154,6 +154,7 @@ function GestaoUsuarios() {
     senha: '',
     roles: '',
     unidades_id: [],
+    emailLang: 'pt',
   });
 
   // seção de unidades atendidas no dialog de criar usuário (instrutor)
@@ -333,7 +334,7 @@ function GestaoUsuarios() {
     setRoles(rolesRes.data);
     setCompanies(companiesRes.data);
     setSelectedCompanyName('');
-    setFormData({ nome: '', email: '', senha: '', roles: '', unidades_id: [] });
+    setFormData({ nome: '', email: '', senha: '', roles: '', unidades_id: [], emailLang: 'pt' });
     setOpen(true);
   };
 
@@ -356,7 +357,7 @@ function GestaoUsuarios() {
     setError('');
     setSuccess('');
     try {
-      await createUser(formData);
+      await createUser(formData, formData.emailLang);
       if (instrUnidades.length > 0) {
         const allUsersRes = await getAllUsers();
         const newUser = (allUsersRes.data || []).find(u => u.email === formData.email);
@@ -881,7 +882,7 @@ function GestaoUsuarios() {
               labelId="select-roles-label"
               value={formData.roles || ''}
               onChange={(e) => {
-                setFormData({ ...formData, roles: e.target.value, senha: '' });
+                setFormData({ ...formData, roles: e.target.value, senha: '', emailLang: 'pt' });
                 setInstrCpf(''); setInstrEmpresaId(''); setInstrUnits([]); setInstrUnit(null);
                 setInstrUnitModules([]); setInstrModulos([]); setInstrUnidades([]); setInstrError('');
               }}
@@ -894,6 +895,20 @@ function GestaoUsuarios() {
           </FormControl>
           {roles.find(r => r.public_id === formData.roles)?.nome === 'user_master' && (
             <TextField label={t("gestaoUsuarios.components.dialogNewUser.passwordField")} fullWidth margin="normal" value={formData.senha} onChange={(e) => setFormData({ ...formData, senha: e.target.value })} />
+          )}
+          {formData.roles && roles.find(r => r.public_id === formData.roles)?.nome !== 'user_master' && (
+            <FormControl fullWidth margin="normal">
+              <InputLabel id="select-email-lang-label">{t("gestaoUsuarios.components.dialogNewUser.emailLangField")}</InputLabel>
+              <Select
+                labelId="select-email-lang-label"
+                value={formData.emailLang || 'pt'}
+                onChange={(e) => setFormData({ ...formData, emailLang: e.target.value })}
+                label={t("gestaoUsuarios.components.dialogNewUser.emailLangField")}
+              >
+                <MenuItem value="pt">{t("gestaoUsuarios.components.dialogNewUser.emailLangOptions.pt")}</MenuItem>
+                <MenuItem value="en">{t("gestaoUsuarios.components.dialogNewUser.emailLangOptions.en")}</MenuItem>
+              </Select>
+            </FormControl>
           )}
 
           <FormControl fullWidth margin="normal">

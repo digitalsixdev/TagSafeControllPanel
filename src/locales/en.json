@@ -310,6 +310,11 @@
                 "unitField": "Unit",
                 "passwordField": "Password",
                 "modulesField": "Modules",
+                "emailLangField": "E-mail language",
+                "emailLangOptions": {
+                    "pt": "Portuguese",
+                    "en": "English"
+                },
                 "unitsLinkFields": {
                     "firstSubtitle": "Units attended by the instructor",
                     "cpfField": "CPF",
@@ -554,6 +559,9 @@
         "INVALID_CPF": "Invalid CPF",
         "CPF_ALREADY_REGISTERED": "CPF already registered",
 
-        "RELATIONSHIP_NOT_FOUND": "Relationship not found"
+        "RELATIONSHIP_NOT_FOUND": "Relationship not found",
+
+        "REQUIRED_LANGUAGE": "Specify a language",
+        "INVALID_LANGUAGE": "The provided language does not have a translation"
     }
 }

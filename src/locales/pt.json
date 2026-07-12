@@ -310,6 +310,11 @@
                 "unitField": "Unidade",
                 "passwordField": "Senha",
                 "modulesField": "Módulos",
+                "emailLangField": "Idioma do e-mail",
+                "emailLangOptions": {
+                    "pt": "Português",
+                    "en": "Inglês"
+                },
                 "unitsLinkFields": {
                     "firstSubtitle": "Unidades atendidas pelo instrutor",
                     "cpfField": "CPF",
@@ -562,6 +567,9 @@
         "INVALID_CPF": "CPF inválido",
         "CPF_ALREADY_REGISTERED": "CPF já cadastrado",
 
-        "RELATIONSHIP_NOT_FOUND": "Relacionamento não encontrado"
+        "RELATIONSHIP_NOT_FOUND": "Relacionamento não encontrado",
+
+        "REQUIRED_LANGUAGE": "Especifique um idioma",
+        "INVALID_LANGUAGE": "Idioma inserido não contém tradução"
     }
 }
